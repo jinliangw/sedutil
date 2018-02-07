@@ -68,15 +68,22 @@ void DtaHashPwd(vector<uint8_t> &hash, char * password, DtaDev * d)
     LOG(D1) << " Entered DtaHashPwd";
     char *serNum;
 
-    if (d->no_hash_passwords) {
+    if (strlen(password) == 0) {
         hash.clear();
-	for (uint16_t i = 0; i < strnlen(password, 32); i++)
-		hash.push_back(password[i]);
-	// add the token overhead
-	hash.insert(hash.begin(), (uint8_t)hash.size());
-	hash.insert(hash.begin(), 0xd0);
-	LOG(D1) << " Exit DtaHashPwd";
-	return;
+        hash.push_back(0xa0);
+    	LOG(D1) << " Exit DtaHashPwd, zero length";
+    	return;
+    }
+    if (d->no_hash_passwords)
+    {
+        hash.clear();
+	    for (uint16_t i = 0; i < strnlen(password, 32); i++)
+            hash.push_back(password[i]);
+        // add the token overhead
+    	hash.insert(hash.begin(), (uint8_t)hash.size());
+    	hash.insert(hash.begin(), 0xd0);
+    	LOG(D1) << " Exit DtaHashPwd";
+    	return;
     }
     serNum = d->getSerialNum();
     vector<uint8_t> salt(serNum, serNum + 20);
