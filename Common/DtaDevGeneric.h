@@ -23,7 +23,7 @@ class DtaSession;
 #include "os.h"
 #include "DtaDev.h"
 #include "DtaDevOS.h"
-#include "DtaStructures.h"   
+#include "DtaStructures.h"
 
 #include <vector>
 
@@ -37,7 +37,7 @@ using namespace std;
 class DtaDevGeneric : public DtaDevOS {
 public:
     /** Constructor using an OS specific device descriptor.
-     * @param devref reference to device is OS specific lexicon 
+     * @param devref reference to device is OS specific lexicon
      *  */
     DtaDevGeneric(const char * devref);
     /** Default constructor */
@@ -52,9 +52,9 @@ public:
          */
 	 void init(const char * devref) ;
 	/* sedutil.cpp */
-         /** User command to prepare the device for management by sedutil. 
+         /** User command to prepare the device for management by sedutil.
          * Specific to the SSC that the device supports
-         * @param password the password that is to be assigned to the SSC master entities 
+         * @param password the password that is to be assigned to the SSC master entities
          */
 	 uint8_t initialSetup(char * password) ;
 	/** User command to prepare the drive for Single User Mode and rekey a SUM locking range.
@@ -71,12 +71,12 @@ public:
          * @param newpassword  value password is to be changed to
          * @param hasholdpwd  is the old password to be hashed before being added to the bytestream
          * @param hashnewpwd  is the new password to be hashed before being added to the bytestream
-         */ 
+         */
 	 uint8_t setSIDPassword(char * oldpassword, char * newpassword,
 		uint8_t hasholdpwd = 1, uint8_t hashnewpwd = 1) ;
          /** Set the password of a locking SP user.
           * @param password  current password
-         * @param userid the userid whose password is to be changed 
+         * @param userid the userid whose password is to be changed
          * @param newpassword  value password is to be changed to
          */
 	 uint8_t setPassword(char * password, char * userid, char * newpassword) ;
@@ -91,10 +91,10 @@ public:
          * @param filename the filename of the disk image
          */
 	 uint8_t loadPBA(char * password, char * filename) ;
-         /** Change the locking state of a locking range 
+         /** Change the locking state of a locking range
          * @param lockingrange The number of the locking range (0 = global)
          * @param lockingstate  the locking state to set
-         * @param Admin1Password password of administrative authority for locking range 
+         * @param Admin1Password password of administrative authority for locking range
          */
 	 uint8_t setLockingRange(uint8_t lockingrange, uint8_t lockingstate,
 		char * Admin1Password) ;
@@ -105,10 +105,10 @@ public:
          */
 	 uint8_t setLockingRange_SUM(uint8_t lockingrange, uint8_t lockingstate,
 		 char * password);
-         /** Change the active state of a locking range 
+         /** Change the active state of a locking range
          * @param lockingrange The number of the locking range (0 = global)
          * @param enabled  enable (true) or disable (false) the lockingrange
-         * @param password password of administrative authority for locking range 
+         * @param password password of administrative authority for locking range
          */
 	 uint8_t configureLockingRange(uint8_t lockingrange, uint8_t enabled,
 		char * password) ;
@@ -131,7 +131,7 @@ public:
 	 uint8_t setupLockingRange_SUM(uint8_t lockingrange, uint64_t start,
 		 uint64_t length, char * password);
          /** Primitive to set the MBRDone flag.
-         * @param state 0 or 1  
+         * @param state 0 or 1
          * @param Admin1Password Locking SP authority with access to flag
          */
 	 /** List status of locking ranges.
@@ -149,11 +149,11 @@ public:
 	 uint8_t setBandsEnabled(int16_t rangeid, char * password);
 	 uint8_t setMBRDone(uint8_t state, char * Admin1Password) ;
          /** Primitive to set the MBREnable flag.
-         * @param state 0 or 1  
+         * @param state 0 or 1
          * @param Admin1Password Locking SP authority with access to flag
          */
 	 uint8_t setMBREnable(uint8_t state, char * Admin1Password) ;
-         /** enable a locking sp user.  
+         /** enable a locking sp user.
          * @param password password of locking sp administrative authority
          * @param userid  the user to be enabled
          */
@@ -172,9 +172,9 @@ public:
          * @param password The administrator password for the drive
          */
         uint8_t eraseLockingRange_SUM(uint8_t lockingrange, char * password);
-        /** Change the SID password from it's MSID default 
+        /** Change the SID password from it's MSID default
          * @param newpassword  new password for SID and locking SP admins
-         */ 
+         */
 	 uint8_t takeOwnership(char * newpassword) ;
          /** Reset the Locking SP to its factory default condition
          * ERASES ALL DATA!
@@ -182,7 +182,7 @@ public:
          * @param keep true false for noerase function NOT WWORKING
          */
 	 uint8_t revertLockingSP(char * password, uint8_t keep ) ;
-         /** Reset the TPER to its factory condition   
+         /** Reset the TPER to its factory condition
          * ERASES ALL DATA!
          * @param password password of authority (SID or PSID)
          * @param PSID true or false is the authority the PSID
@@ -198,7 +198,7 @@ public:
          * @param auth the authority ti use for the dump
          * @param pass the password for the suthority
          * @param objID the UID of the object to dump
-         */ 
+         */
 	 uint8_t objDump(char *sp, char * auth, char *pass,
 		char * objID) ;
          /** Issue any command to the drive for diagnostic purposes
@@ -208,13 +208,16 @@ public:
          * @param invoker caller of the method
          * @param method the method to call
          * @param plist  the parameter list for the command
-         * 
+         *
          */
 	 uint8_t rawCmd(char *sp, char * auth, char *pass,
 		char *invoker, char *method, char *plist) ;
 	/** Read MSID
 	 */
 	uint8_t printDefaultPassword();
+    /** print table contents.
+     */
+    uint8_t printTables(char* sp, char* password, uint8_t level);
 	/* DtaSession.cpp 	*/
         /** Send a command to the device and wait for the response
          * @param cmd the MswdCommand object containg the command

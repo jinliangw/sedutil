@@ -54,16 +54,18 @@ DtaCommand::reset()
 	memset(respbuf, 0, MIN_BUFFER_LENGTH);
     bufferpos = sizeof (OPALHeader);
 }
-void 
-DtaCommand::reset(OPAL_UID InvokingUid, vector<uint8_t> method){
+void
+DtaCommand::reset(OPAL_UID InvokingUid, vector<uint8_t> method)
+{
 	LOG(D1) << "Entering DtaCommand::reset(OPAL_UID,uint8_t)";
 	reset();
 	cmdbuf[bufferpos++] = OPAL_TOKEN::CALL;
 	addToken(InvokingUid);
 	addToken(method);
 }
-void 
-DtaCommand::reset(vector<uint8_t> InvokingUid, vector<uint8_t> method){
+void
+DtaCommand::reset(vector<uint8_t> InvokingUid, vector<uint8_t> method)
+{
 	LOG(D1) << "Entering DtaCommand::reset(uint8_t,uint8_t)";
 	reset();
 	cmdbuf[bufferpos++] = OPAL_TOKEN::CALL;
@@ -72,10 +74,21 @@ DtaCommand::reset(vector<uint8_t> InvokingUid, vector<uint8_t> method){
 }
 
 void
+DtaCommand::reset(vector<uint8_t> InvokingUid, OPAL_METHOD method)
+{
+    LOG(D1) << "Entering DtaCommand::reset(vector<uint8_t>, OPAL_METHOD)";
+    reset();
+    cmdbuf[bufferpos++] = OPAL_TOKEN::CALL;
+	addToken(InvokingUid);
+    cmdbuf[bufferpos++] = OPAL_SHORT_ATOM::BYTESTRING8;
+    memcpy(&cmdbuf[bufferpos], &OPALMETHOD[method][0], 8); /* bytes 11-18 */
+    bufferpos += 8;
+}
+void
 DtaCommand::reset(OPAL_UID InvokingUid, OPAL_METHOD method)
 {
     LOG(D1) << "Entering DtaCommand::reset(OPAL_UID, OPAL_METHOD)";
-    reset(); 
+    reset();
     cmdbuf[bufferpos++] = OPAL_TOKEN::CALL;
 	addToken(InvokingUid);
     cmdbuf[bufferpos++] = OPAL_SHORT_ATOM::BYTESTRING8;
@@ -244,10 +257,10 @@ DtaCommand::dumpResponse()
 	OPALHeader *hdr = (OPALHeader *)respbuf;
 	DtaHexDump(respbuf, SWAP32(hdr->cp.length) + sizeof(OPALComPacket));
 }
-uint16_t 
+uint16_t
 DtaCommand::outputBufferSize() {
 //	if (MIN_BUFFER_LENGTH + 1 > bufferpos) return(MIN_BUFFER_LENGTH);
-	if(bufferpos % 512) 
+	if(bufferpos % 512)
 		return(((uint16_t)(bufferpos / 512) + 1) * 512);
 	else
 		return((uint16_t)(bufferpos / 512) * 512);

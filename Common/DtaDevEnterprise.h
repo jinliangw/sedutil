@@ -38,12 +38,12 @@ using namespace std;
 class DtaDevEnterprise : public DtaDevOS {
 public:
         /** Constructor using an OS specific device descriptor.
-         * @param devref reference to device is OS specific lexicon 
+         * @param devref reference to device is OS specific lexicon
          *  */
 	DtaDevEnterprise(const char * devref);
          /** Default destructor, does nothing*/
 	~DtaDevEnterprise();
-        /** Inform TPer of the communication propertied I wiah to use and 
+        /** Inform TPer of the communication propertied I wiah to use and
          * receive the TPer maximum values
          */
 	uint8_t properties();
@@ -55,11 +55,11 @@ public:
 	uint8_t exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol = 0x01);
          /** return the communications ID to be used for sessions to this device */
 	uint16_t comID();
-        /** Change the SID password from it's MSID default 
-         * @param newpassword  new password for SID 
+        /** Change the SID password from it's MSID default
+         * @param newpassword  new password for SID
          */
 	uint8_t takeOwnership(char * newpassword);
-        /** Change the passwords for the enabled Bandmasters and the Erasemaster 
+        /** Change the passwords for the enabled Bandmasters and the Erasemaster
          * from the MSID default.
          * @param defaultPassword the MSID password
          * @param newPassword the nesw password to be set
@@ -67,10 +67,10 @@ public:
 	uint8_t initLSPUsers(char * defaultPassword, char * newPassword);
         /** retrieve the MSID password */
 	uint8_t printDefaultPassword();
-        /** retrieve a single row from a table 
+        /** retrieve a single row from a table
          * @param table the UID of the table
          * @param startcol the starting column of data requested
-         * @param endcol the ending column of the data requested 
+         * @param endcol the ending column of the data requested
          */
 	uint8_t getTable(vector<uint8_t> table, const char * startcol,
 		const char * endcol);
@@ -80,20 +80,20 @@ public:
          * @param newpassword  value password is to be changed to
          * @param hasholdpwd  is the old password to be hashed before being added to the bytestream
          * @param hashnewpwd  is the new password to be hashed before being added to the bytestream
-         */ 
+         */
 	uint8_t setSIDPassword(char * oldpassword, char * newpassword,
 		uint8_t hasholdpwd = 1, uint8_t hashnewpwd = 1);
-        /** set a single column in an object table 
+        /** set a single column in an object table
          * @param table the UID of the table
          * @param name the column name to be set
-         * @param value data to be stored the the column 
+         * @param value data to be stored the the column
          */
 	uint8_t setTable(vector<uint8_t> table, const char *name,
 		vector<uint8_t> value);
-        /** set a single column in a table 
+        /** set a single column in a table
          * @param table the UID of the table
          * @param name the column name to be set
-         * @param value data to be stored the the column 
+         * @param value data to be stored the the column
          */
 	uint8_t setTable(vector<uint8_t> table, const char *name,
 		OPAL_TOKEN value);
@@ -110,19 +110,19 @@ public:
         /** Enable a Bandmaster Not functional */
 	uint8_t enableUser(char * password, char * userid, OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);
          /** Primitive to set the MBRDone flag.
-         * @param state 0 or 1  
+         * @param state 0 or 1
          * @param Admin1Password Locking SP authority with access to flag
          */
 	uint8_t setMBRDone(uint8_t state, char * Admin1Password);
         /** Primitive to set the MBREnable flag.
-         * @param state 0 or 1  
+         * @param state 0 or 1
          * @param Admin1Password Locking SP authority with access to flag
          */
 	uint8_t setMBREnable(uint8_t state, char * Admin1Password);
 
          /** Set the password of a locking SP user.
          * @param password  current password
-         * @param userid the userid whose password is to be changed 
+         * @param userid the userid whose password is to be changed
          * @param newpassword  value password is to be changed to
          */
 	uint8_t setPassword(char * password, char * userid, char * newpassword);
@@ -161,7 +161,7 @@ public:
 	*/
 	uint8_t rekeyLockingRange(uint8_t lockingrange, char * password);
 	uint8_t setBandsEnabled(int16_t lockingrange, char * password);
-        /** Reset the TPER to its factory condition   
+        /** Reset the TPER to its factory condition
          * ERASES ALL DATA!
          * @param password password of authority (SID or PSID)
          * @param PSID true or false is the authority the PSID
@@ -177,9 +177,9 @@ public:
          * @param filename the filename of the disk image
          */
 	uint8_t loadPBA(char * password, char * filename);
-         /** User command to prepare the device for management by sedutil. 
+         /** User command to prepare the device for management by sedutil.
          * Specific to the SSC that the device supports
-         * @param password the password that is to be assigned to the SSC master entities 
+         * @param password the password that is to be assigned to the SSC master entities
          */
 	uint8_t initialSetup(char * password);
 	/** dummy code not implemented in the enterprise SSC*/
@@ -200,10 +200,13 @@ public:
          * @param hexinvokingUID caller of the method
          * @param hexmethod the method to call
          * @param hexparms  the parameter list for the command
-         * 
+         *
          */
 	uint8_t rawCmd(char *sp, char *hexauth, char *pass,
 		char *hexinvokingUID, char *hexmethod, char *hexparms);
+	/** print table contents.
+     */
+    uint8_t printTables(char* sp, char* password, uint8_t level);
 
 protected:
 	uint8_t getDefaultPassword();

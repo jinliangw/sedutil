@@ -29,7 +29,7 @@ class DtaSession;
 using namespace std;
 /** Base class for a disk device.
  * This is a virtual base class defining the minimum functionality of device
- * object.  The methods defined here are called by other parts of the program 
+ * object.  The methods defined here are called by other parts of the program
  * so must be present in all devices
  */
 class DtaDev {
@@ -186,7 +186,7 @@ public:
          */
 	virtual uint8_t setupLockingRange_SUM(uint8_t lockingrange, uint64_t start,
 		uint64_t length, char * password) = 0;
-	/** List status of locking ranges.  
+	/** List status of locking ranges.
 	*  @param password Password of administrator
 	*/
 	virtual uint8_t listLockingRanges(char * password, int16_t rangeid) = 0;
@@ -271,6 +271,9 @@ public:
 	/** Read MSID
 	 */
 	virtual uint8_t printDefaultPassword() = 0;
+	/** Print the tables supported by the TPER
+	 */
+	virtual uint8_t printTables(char* sp, char* password, uint8_t level) = 0;
 	/*
 	* virtual functions required to be implemented
 	* because they are called by DtaSession.cpp

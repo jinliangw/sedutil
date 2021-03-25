@@ -64,8 +64,10 @@ void usage()
 	printf("                                <SIDpassword> is new SID and Admin1 password\n");
 	printf("--setSIDPassword <SIDpassword> <newSIDpassword> <device> \n");
 	printf("                                Change the SID password\n");
+    printf("--takeOwnership <newSIDpassword> <device> \n");
+    printf("                                Change the SID password using the existing password\n");
 	printf("--setAdmin1Pwd <Admin1password> <newAdmin1password> <device> \n");
-	printf("                                Change the Admin1 password\n");
+	printf("                                Change the Admin1 password in the LockingSP\n");
 	printf("--setPassword <oldpassword, \"\" for MSID> <userid> <newpassword> <device> \n");
 	printf("                                Change the Enterprise password for userid\n");
 	printf("                                \"EraseMaster\" or \"BandMaster<n>\", 0 <= n <= 1023\n");
@@ -84,6 +86,9 @@ void usage()
 	printf("                                set|unset MBRDone\n");
 	printf("--loadPBAimage <Admin1password> <file> <device> \n");
 	printf("                                Write <file> to MBR Shadow area\n");
+    printf("--activateLockingSP <SIDpassword> <device>\n");
+    printf("                                Activate the LockingSP. Admin1 password\n");
+    printf("                                in LockingSP will be set to SIDpassword.\n");
     printf("--revertTPer <SIDpassword> <device>\n");
     printf("                                set the device back to factory defaults \n");
 	printf("                                This **ERASES ALL DATA** \n");
@@ -95,6 +100,11 @@ void usage()
     printf("                                revert the device using the PSID *ERASING* *ALL* the data \n");
     printf("--printDefaultPassword <device>\n");
     printf("                                print MSID \n");
+    printf("--printTables <SP> <password> <level> <device>\n");
+    printf("                                get and print table values for a SP\n");
+    printf("                                SP is Admin or Locking\n");
+    printf("                                use \"\" as password for MSID.\n");
+    printf("                                level 0 is tables only, 1 for details.\n");
     printf("\n");
     printf("Examples \n");
     printf("sedutil-cli --scan \n");
@@ -139,14 +149,14 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			opts->output_format = sedutilNormal;
 			outputFormat = sedutilNormal;
 		}
-		else if (!(('-' == argv[i][0]) && ('-' == argv[i][1])) && 
+		else if (!(('-' == argv[i][0]) && ('-' == argv[i][1])) &&
 			(0 == opts->action))
 		{
 			LOG(E) << "Argument " << (uint16_t) i << " (" << argv[i] << ") should be a command";
 			return DTAERROR_INVALID_COMMAND;
 		}
 		BEGIN_OPTION(initialSetup, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
-		BEGIN_OPTION(setSIDPassword, 3) OPTION_IS(password) OPTION_IS(newpassword) 
+		BEGIN_OPTION(setSIDPassword, 3) OPTION_IS(password) OPTION_IS(newpassword)
 		         OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(setup_SUM, 6)
 			TESTARG(0, lockingrange, 0)
@@ -172,17 +182,17 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			OPTION_IS(newpassword)
 			OPTION_IS(device)
 			END_OPTION
-		BEGIN_OPTION(setAdmin1Pwd, 3) OPTION_IS(password) OPTION_IS(newpassword) 
+		BEGIN_OPTION(setAdmin1Pwd, 3) OPTION_IS(password) OPTION_IS(newpassword)
 			OPTION_IS(device) END_OPTION
-		BEGIN_OPTION(loadPBAimage, 3) OPTION_IS(password) OPTION_IS(pbafile) 
+		BEGIN_OPTION(loadPBAimage, 3) OPTION_IS(password) OPTION_IS(pbafile)
 			OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(revertTPer, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(revertNoErase, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(PSIDrevert, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(PSIDrevertAdminSP, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
-		BEGIN_OPTION(yesIreallywanttoERASEALLmydatausingthePSID, 2) OPTION_IS(password) 
+		BEGIN_OPTION(yesIreallywanttoERASEALLmydatausingthePSID, 2) OPTION_IS(password)
 			OPTION_IS(device) END_OPTION
-		BEGIN_OPTION(enableuser, 2) OPTION_IS(password) OPTION_IS(userid) 
+		BEGIN_OPTION(enableuser, 2) OPTION_IS(password) OPTION_IS(userid)
 			OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(activateLockingSP, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(activateLockingSP_SUM, 3)
@@ -223,11 +233,19 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			TESTARG(15, lockingrange, 15)
 			TESTFAIL("Invalid Locking Range (1-15)")
 			OPTION_IS(password) OPTION_IS(device) END_OPTION
+        BEGIN_OPTION(printTables, 4)
+            OPTION_IS(userid)
+            OPTION_IS(password)
+            TESTARG(0, level, 0)
+            TESTARG(1, level, 1)
+            TESTARG(2, level, 2)
+            TESTFAIL("Invalid level (0-2)")
+            OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(query, 1) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(scan, 0)  END_OPTION
 		BEGIN_OPTION(isValidSED, 1) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(eraseLockingRange, 3)
-			TESTARG(0, lockingrange, 0)
+            TESTARG(0, lockingrange, 0)
 			TESTARG(1, lockingrange, 1)
 			TESTARG(2, lockingrange, 2)
 			TESTARG(3, lockingrange, 3)

@@ -212,7 +212,7 @@ std::string DtaResponse::getString(uint32_t tokenNum)
     return s;
 }
 
-void DtaResponse::getBytes(uint32_t tokenNum, uint8_t bytearray[])
+int DtaResponse::getBytes(uint32_t tokenNum, uint8_t bytearray[])
 {
     LOG(D1) << "Entering  DtaResponse::getBytes";
     int overhead = 0;
@@ -234,9 +234,11 @@ void DtaResponse::getBytes(uint32_t tokenNum, uint8_t bytearray[])
 		exit(EXIT_FAILURE);
     }
 
-    for (uint32_t i = overhead; i < response[tokenNum].size(); i++) {
+    int size = response[tokenNum].size();
+    for (int i = overhead; i < size; i++) {
         bytearray[i - overhead] = response[tokenNum][i];
     }
+    return size - overhead;
 }
 
 uint32_t DtaResponse::getTokenCount()

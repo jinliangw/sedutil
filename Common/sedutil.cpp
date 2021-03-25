@@ -57,8 +57,8 @@ int main(int argc, char * argv[])
 	if (DtaOptions(argc, argv, &opts)) {
 		return DTAERROR_COMMAND_ERROR;
 	}
-	
-	if ((opts.action != sedutiloption::scan) && 
+
+	if ((opts.action != sedutiloption::scan) &&
 		(opts.action != sedutiloption::validatePBKDF2) &&
 		(opts.action != sedutiloption::isValidSED)) {
 		if (opts.device > (argc - 1)) opts.device = 0;
@@ -262,6 +262,10 @@ int main(int argc, char * argv[])
 	case sedutiloption::rawCmd:
 		LOG(D) << "Performing cmdDump ";
 		return d->rawCmd(argv[argc - 7], argv[argc - 6], argv[argc - 5], argv[argc - 4], argv[argc - 3], argv[argc - 2]);
+		break;
+	case sedutiloption::printTables:
+		LOG(D) << "Performing printTables";
+		return d->printTables(argv[opts.userid], argv[opts.password], opts.level);
 		break;
     default:
         LOG(E) << "Unable to determine what you want to do ";

@@ -24,7 +24,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
-#include<iomanip>
+#include <iomanip>
 #include "DtaDevOpal.h"
 #include "DtaHashPwd.h"
 #include "DtaEndianFixup.h"
@@ -78,7 +78,7 @@ uint8_t DtaDevOpal::initialSetup(char * password)
 		LOG(E) << "Initial setup failed - unable to Enable MBR shadow";
 		return lastRC;
 	}
-	
+
 	LOG(I) << "Initial setup of TPer complete on " << dev;
 	LOG(D1) << "Exiting initialSetup()";
 	return 0;
@@ -180,7 +180,7 @@ DtaDevOpal::lrStatus_t DtaDevOpal::getLockingRange_status(uint8_t lockingrange, 
 	}
 	if (0 != lockingrange) {
 		LR[8] = lockingrange & 0xff;
-		LR[6] = 0x03;  // non global ranges are 00000802000300nn 
+		LR[6] = 0x03;  // non global ranges are 00000802000300nn
 	}
 	if ((lastRC = getTable(LR, _OPAL_TOKEN::RANGESTART, _OPAL_TOKEN::WRITELOCKED)) != 0) {
 		delete session;
@@ -218,7 +218,7 @@ uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
 	for (int i = 0; i < 8; i++) {
 		LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKINGRANGE_GLOBAL][i]);
 	}
-	
+
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
@@ -250,7 +250,7 @@ uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
 			delete session;
 			return lastRC;
 		}
-		LR[6] = 0x03;  // non global ranges are 00000802000300nn 
+		LR[6] = 0x03;  // non global ranges are 00000802000300nn
 		LOG(I) << "LR" << i << " Begin " << response.getUint64(4) <<
 			" for " << response.getUint64(8);
 		LOG(I)	<< "            RLKEna =" << (response.getUint8(12) ? " Y " : " N ") <<
@@ -297,7 +297,7 @@ uint8_t DtaDevOpal::setupLockingRange(uint8_t lockingrange, uint64_t start,
 	set->changeInvokingUid(LR);
 	set->addToken(OPAL_TOKEN::STARTLIST);
 	set->addToken(OPAL_TOKEN::STARTNAME);
-	set->addToken(OPAL_TOKEN::VALUES); 
+	set->addToken(OPAL_TOKEN::VALUES);
 	set->addToken(OPAL_TOKEN::STARTLIST);
 	set->addToken(OPAL_TOKEN::STARTNAME);
 	set->addToken(OPAL_TOKEN::RANGESTART);
@@ -487,8 +487,8 @@ uint8_t DtaDevOpal::configureLockingRange(uint8_t lockingrange, uint8_t enabled,
 	}
 	delete set;
 	delete session;
-	LOG(I) << "LockingRange" << (uint16_t) lockingrange 
-		<< (enabled ? " enabled " : " disabled ") 
+	LOG(I) << "LockingRange" << (uint16_t) lockingrange
+		<< (enabled ? " enabled " : " disabled ")
 		<< ((enabled & DTA_READLOCKINGENABLED) ? "ReadLocking" : "")
 		<< ((enabled == (DTA_WRITELOCKINGENABLED | DTA_READLOCKINGENABLED)) ? "," : "")
 		<< ((enabled & DTA_WRITELOCKINGENABLED) ? "WriteLocking" : "");
@@ -662,7 +662,7 @@ uint8_t DtaDevOpal::getAuth4User(char * userid, uint8_t uidorcpin, std::vector<u
 		LOG(E) << "Invalid Userid data requested" << (uint16_t)uidorcpin;
 		return DTAERROR_INVALID_PARAMETER;
 	}
-	if(uidorcpin) 
+	if(uidorcpin)
 		userData.push_back(0x0b);
 	else
 		userData.push_back(0x09);
@@ -671,7 +671,7 @@ uint8_t DtaDevOpal::getAuth4User(char * userid, uint8_t uidorcpin, std::vector<u
 		userData.push_back(0x03);
 		userData.push_back(0x00);
 		userData.push_back(atoi(&userid[4]) &0xff );
-	} 
+	}
 	else {
 		if (!memcmp("Admin", userid, 5)) {
 			userData.push_back(0x00);
@@ -790,7 +790,7 @@ uint8_t DtaDevOpal::setMBREnable(uint8_t mbrstate,	char * Admin1Password)
 		else {
 			LOG(I) << "MBREnable set on ";
 		}
-	} 
+	}
 	else {
 		if ((lastRC = setLockingSPvalue(OPAL_UID::OPAL_MBRCONTROL, OPAL_TOKEN::MBRENABLE,
 				OPAL_TOKEN::OPAL_FALSE, Admin1Password, NULL)) != 0) {
@@ -1018,7 +1018,7 @@ uint8_t DtaDevOpal::setLockingRange_SUM(uint8_t lockingrange, uint8_t lockingsta
 	LOG(D1) << "Exiting DtaDevOpal::setLockingRange_SUM";
 	return 0;
 }
-uint8_t DtaDevOpal::setLockingSPvalue(OPAL_UID table_uid, OPAL_TOKEN name, 
+uint8_t DtaDevOpal::setLockingSPvalue(OPAL_UID table_uid, OPAL_TOKEN name,
 	OPAL_TOKEN value,char * password, char * msg)
 {
 	LOG(D1) << "Entering DtaDevOpal::setLockingSPvalue";
@@ -1045,7 +1045,7 @@ uint8_t DtaDevOpal::setLockingSPvalue(OPAL_UID table_uid, OPAL_TOKEN name,
 	if (NULL != msg) {
 		LOG(I) << msg;
 	}
-	
+
 	delete session;
 	LOG(D1) << "Exiting DtaDevOpal::setLockingSPvalue()";
 	return 0;
@@ -1056,7 +1056,7 @@ uint8_t DtaDevOpal::enableUser(char * password, char * userid, OPAL_TOKEN status
 	LOG(D1) << "Entering DtaDevOpal::enableUser";
 	uint8_t lastRC;
 	vector<uint8_t> userUID;
-	
+
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
@@ -1140,7 +1140,7 @@ uint8_t DtaDevOpal::loadPBA(char * password, char * filename) {
 		return DTAERROR_OPEN_ERR;
 	}
 	pbafile.seekg(0, pbafile.end);
-	eofpos = (uint32_t) pbafile.tellg(); 
+	eofpos = (uint32_t) pbafile.tellg();
 	pbafile.seekg(0, pbafile.beg);
 
 	DtaCommand *cmd = new DtaCommand();
@@ -1161,7 +1161,7 @@ uint8_t DtaDevOpal::loadPBA(char * password, char * filename) {
 		return lastRC;
 	}
 	LOG(I) << "Writing PBA to " << dev;
-	
+
 	while (!pbafile.eof()) {
 		if (eofpos == filepos) break;
 		if ((eofpos - filepos) < blockSize) {
@@ -1497,7 +1497,7 @@ uint8_t DtaDevOpal::setTable(vector<uint8_t> table, OPAL_TOKEN name,
 	return(setTable(table, name, token));
 }
 
-uint8_t DtaDevOpal::setTable(vector<uint8_t> table, OPAL_TOKEN name, 
+uint8_t DtaDevOpal::setTable(vector<uint8_t> table, OPAL_TOKEN name,
 	vector<uint8_t> value)
 {
 	LOG(D1) << "Entering DtaDevOpal::setTable";
@@ -1530,7 +1530,7 @@ uint8_t DtaDevOpal::setTable(vector<uint8_t> table, OPAL_TOKEN name,
 	LOG(D1) << "Leaving DtaDevOpal::setTable";
 	return 0;
 }
-uint8_t DtaDevOpal::getTable(vector<uint8_t> table, uint16_t startcol, 
+uint8_t DtaDevOpal::getTable(vector<uint8_t> table, uint16_t startcol,
 	uint16_t endcol)
 {
 	LOG(D1) << "Entering DtaDevOpal::getTable";
@@ -1686,7 +1686,7 @@ uint8_t DtaDevOpal::objDump(char *sp, char * auth, char *pass,
 	char * objID)
 {
 
-	LOG(D1) << "Entering DtaDevEnterprise::objDump";
+	LOG(D1) << "Entering DtaDevOpal::objDump";
 	LOG(D1) << sp << " " << auth << " " << pass << " " << objID;
 	uint8_t lastRC;
 	DtaCommand *get = new DtaCommand();
@@ -1745,12 +1745,12 @@ uint8_t DtaDevOpal::objDump(char *sp, char * auth, char *pass,
 	get->dumpResponse();
 	delete get;
 	delete session;
-	LOG(D1) << "Exiting DtaDevEnterprise::objDump";
+	LOG(D1) << "Exiting DtaDevOpal::objDump";
 	return 0;
 }
 uint8_t DtaDevOpal::rawCmd(char *sp, char * hexauth, char *pass,
 	char *hexinvokingUID, char *hexmethod, char *hexparms) {
-	LOG(D1) << "Entering DtaDevEnterprise::rawCmd";
+	LOG(D1) << "Entering DtaDevOpal::rawCmd";
 	LOG(D1) << sp << " " << hexauth << " " << pass << " ";
 	LOG(D1) << hexinvokingUID << " " << hexmethod << " " << hexparms;
 	uint8_t lastRC;
@@ -1831,6 +1831,1159 @@ uint8_t DtaDevOpal::rawCmd(char *sp, char * hexauth, char *pass,
 	cmd->dumpResponse();
 	delete cmd;
 	delete session;
-	LOG(D1) << "Exiting DtaDevEnterprise::rawCmd";
+	LOG(D1) << "Exiting DtaDevOpal::rawCmd";
+	return 0;
+}
+
+//
+// Print Tables code.
+//
+const tableDesc_t UnknownTableDesc =
+{
+	"Unknown",
+	"",
+	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+	1,
+	1,
+	1,
+	{
+		"UID",
+	}
+};
+
+const tableDesc_t TableTableDesc =
+{
+	"Table",
+	"",
+	{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 },
+	1,
+	0,
+	15,
+	{
+		"UID",
+		"Name",
+		"CommonName",
+		"TemplateID",
+		"Kind",
+		"Column",
+		"NumCol",
+		"Rows",
+		"RowsFree",
+		"RowBytes",
+		"LastID",
+		"MinSize",
+		"MaxSize",
+		"MadatoryWriteGran",
+		"RecomendWriteGran"
+	}
+};
+
+const tableDesc_t SPInfoTableDesc =
+{
+	"SPInfo",
+	"",
+	{ 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	7,
+	{
+		"UID",
+		"SPID",
+		"Name",
+		"Size",
+		"SizeInUse",
+		"SPSessionTimeout",
+		"Enabled"
+	}
+};
+
+const tableDesc_t SPTemplateTableDesc =
+{
+	"SPTemplate",
+	"",
+	{ 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	4,
+	{
+		"UID",
+		"TemplateID",
+		"Name",
+		"Version"
+	}
+};
+
+const tableDesc_t MethodIDTableDesc =
+{
+	"MethodID",
+	"",
+	{ 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	4,
+	{
+		"UID",
+		"Name",
+		"CommonName",
+		"TemplateID"
+	}
+};
+
+const tableDesc_t AccessControlTableDesc =
+{
+	"AccessControl",
+	"",
+	{ 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	15,
+	{
+		"UID",
+		"InvokingID",
+		"MethodID",
+		"CommonName",
+		"ACL",
+		"Log",
+		"AddACEACL",
+		"RemoveACEACL",
+		"GetACLACL",
+		"DeleteMethodACL",
+		"AddACELog",
+		"RemoveACELog",
+		"GetACLLog",
+		"DeleteMethodLog",
+		"LogTo"
+	}
+};
+
+const tableDesc_t ACETableDesc =
+{
+	"ACE",
+	"An <empty List> value in the 'columns' column indicates the entry applies to all comlumns.",
+	{ 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	5,
+	{
+		"UID",
+		"Name",
+		"CommonName",
+		"BooleanExpr",
+		"Columns"
+	}
+};
+
+const tableDesc_t AuthorityTableDesc =
+{
+	"Authority",
+	"",
+	{ 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	19,
+	{
+		"UID",
+		"Name",
+		"CommonName",
+		"IsClass",
+		"Class",
+		"Enabled",
+		"Secure",
+		"HashAndSign",
+		"PresentCertificate",
+		"Operation",
+		"Credential",
+		"ResponseSign",
+		"ResponseExch",
+		"ClockStart",
+		"ClockEnd",
+		"Limit",
+		"Uses",
+		"Log",
+		"LogTo"
+	}
+};
+
+const tableDesc_t C_PINTableDesc =
+{
+	"C_PIN",
+	"",
+	{ 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	8,
+	{
+		"UID",
+		"Name",
+		"CommonName",
+		"PIN",
+		"CharSet",
+		"TryLimit",
+		"Tries",
+		"Persistence"
+	}
+};
+const tableDesc_t SecretProtectTableDesc =
+{
+	"SecretProtect",
+	"",
+	{ 0x00, 0x00, 0x00, 0x1d, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x00, 0x1d, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	4,
+	{
+		"UID",
+		"Table",
+		"ColumnNumber",
+		"ProtectMechanisms"
+	}
+};
+
+const tableDesc_t TPerInfoTableDesc =
+{
+	"TPerInfo",
+	"",
+	{ 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x02, 0x01, 0x00, 0x03, 0x00, 0x01 },
+	1,
+	0,		// skip
+	9,
+	{
+		"UID",
+		"Bytes",
+		"GUDID",
+		"Generation",
+		"FirmwareVersion",
+		"ProtocolVersion",
+		"SpaceForIssuance",
+		"SSC",
+		"ProgResetEnable"
+	}
+};
+
+const tableDesc_t TemplateTableDesc =
+{
+	"Template",
+	"",
+	{ 0x00, 0x00, 0x02, 0x04, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x02, 0x04, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	5,
+	{
+		"UID",
+		"Name",
+		"RevisionNumber",
+		"Instances",
+		"MaxInstances"
+	}
+};
+
+const tableDesc_t SPTableDesc =
+{
+	"SP",
+	"",
+	{ 0x00, 0x00, 0x02, 0x05, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x02, 0x05, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	8,
+	{
+		"UID",
+		"Name",
+		"Org",
+		"EffectiveAuth",
+		"DateOfIssue",
+		"Bytes",
+		"LifeCycleState",
+		"Frozen"
+	}
+};
+
+const tableDesc_t LockingInfoTableDesc =
+{
+	"LockingInfo",
+	"",
+	{ 0x00, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	11,
+	{
+		"UID",
+		"Name",
+		"Version",
+		"EncryptionSupport",
+		"MaxRanges",
+		"MaxReEncryptions",
+		"KeysAvailableConfig",
+		"AlignmentRequired",
+		"LogicalBlockSize",
+		"AlignmentGranularity",
+		"LowestAlignedLBA"
+	}
+};
+
+const tableDesc_t LockingTableDesc =
+{
+	"Locking",
+	"",
+	{ 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	20,
+	{
+		"UID",
+		"Name",
+		"CommonName",
+		"RangeStart",
+		"RangeLength",
+		"RdLkEnabled",
+		"WrLkEnabled",
+		"RdLocked",
+		"WrLocked",
+		"LkOnReset",
+		"ActiveKey",
+		"NextKey",
+		"ReEncState",
+		"ReEncReq",
+		"AdvKeyMode",
+		"VerifyMode",
+		"ContOnReset",
+		"LastReEncLBA",
+		"LastReEncState",
+		"GeneralStatus"
+	}
+};
+
+const tableDesc_t MBRControlTableDesc =
+{
+	"MBRControl",
+	"",
+	{ 0x00, 0x00, 0x08, 0x03, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x08, 0x03, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	4,
+	{
+		"UID",
+		"Enable",
+		"Done",
+		"DoneOnReset"
+	}
+};
+
+const tableDesc_t MBRTableDesc =
+{
+	"MBR",
+	"",
+	{ 0x00, 0x00, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00 },
+	0,
+	1,		// skip
+	0,
+	{}
+};
+
+const tableDesc_t K_AES_128TableDesc =
+{
+	"K_AES_128",
+	"",
+	{ 0x00, 0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	5,
+	{
+		"UID",
+		"Name",
+		"CommonName",
+		"Key",
+		"Mode"
+	}
+};
+
+const tableDesc_t K_AES_256TableDesc =
+{
+	"K_AES_256",
+	"",
+	{ 0x00, 0x00, 0x08, 0x06, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x08, 0x06, 0x00, 0x00, 0x00, 0x01 },
+	1,
+	0,		// skip
+	5,
+	{
+		"UID",
+		"Name",
+		"CommonName",
+		"Key",
+		"Mode"
+	}
+};
+
+const tableDesc_t DataStoreTableDesc =
+{
+	"DataStore",
+	"",
+	{ 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00 },
+	{ 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00 },
+	0,
+	1,		// skip
+	0,
+	{}
+};
+
+const tableDesc_t* tableDescriptors[] =
+{
+	// Defined in TCG Storage Architecture
+	&TableTableDesc,
+	&SPInfoTableDesc,
+	&SPTemplateTableDesc,
+	&MethodIDTableDesc,
+	&AccessControlTableDesc,
+	&ACETableDesc,
+	&AuthorityTableDesc,
+	&C_PINTableDesc,
+	&SecretProtectTableDesc,
+	&TPerInfoTableDesc,
+	&TemplateTableDesc,
+	&SPTableDesc,
+	// Defined in Opal SSC
+	&LockingInfoTableDesc,
+	&LockingTableDesc,
+	&MBRControlTableDesc,
+	&MBRTableDesc,
+	&K_AES_128TableDesc,
+	&K_AES_256TableDesc,
+	&DataStoreTableDesc
+};
+
+int anybody;
+int authenticated;
+int failed;
+
+uint8_t DtaDevOpal::verifyPassword(OPAL_UID sp, std::string& pw)
+{
+	LOG(D1) << "Entering DtaDevOpal::verifyPassword()";
+
+	uint8_t lastRC = 0xff;
+
+	session = new DtaSession(this);
+	if (NULL == session) {
+		LOG(E) << "Unable to create session object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+
+	if (pw.length() != 0) {
+		if ((lastRC = session->start(sp, (char*)pw.c_str(),
+									 OPAL_UID::OPAL_ADMINSP_UID)) != 0) {
+			LOG(E) << "Unable to start Admin session" << dev;
+		} else {
+			std::vector<uint8_t> uidtok = {OPAL_SHORT_ATOM::BYTESTRING8,
+										   0x00, 0x00, 0x00, 0x0b, 0x00, 0x00, 0x00, 0x01};
+			lastRC = getTable(uidtok, 0, 4);
+		}
+	}
+
+	delete session;
+	LOG(D1) << "Exiting verifyPassword()";
+	return lastRC;
+}
+
+uint8_t DtaDevOpal::nextTable(vector<uint8_t>& table)
+{
+	LOG(D1) << "Entering DtaDevOpal::nextTable";
+	uint8_t lastRC;
+	DtaCommand *cmd = new DtaCommand();
+	if (NULL == cmd) {
+		LOG(E) << "Unable to create command object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+
+	std::vector<uint8_t> tableTok(table);
+	tableTok.insert(tableTok.begin(), OPAL_SHORT_ATOM::BYTESTRING8);
+
+	cmd->reset(tableTok, OPAL_METHOD::NEXT);
+	cmd->addToken(OPAL_TOKEN::STARTLIST);
+	cmd->addToken(OPAL_TOKEN::ENDLIST);
+	cmd->complete();
+
+	lastRC = session->sendCommand(cmd, response);
+	delete cmd;
+	return lastRC;
+}
+
+uint8_t DtaDevOpal::nextTableRow(OPAL_UID sp, std::string& pw, vector<uint8_t>& tableUID)
+{
+	LOG(D1) << "Entering DtaDevOpal::()";
+	uint8_t lastRC;
+	vector<uint8_t> hash;
+	session = new DtaSession(this);
+	if (NULL == session) {
+		LOG(E) << "Unable to create session object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+
+	if (pw.length() != 0) {
+		if ((lastRC = session->start(sp, (char*)pw.c_str(),
+									 OPAL_UID::OPAL_ADMINSP_UID)) != 0) {
+			LOG(E) << "Unable to start Admin session " << dev;
+		}
+	}
+	else if ((lastRC = session->start(sp, NULL,
+									  OPAL_UID::OPAL_ANYBODY_UID)) != 0) {
+		LOG(E) << "Unable to start Anybody session " << dev;
+		delete session;
+		return lastRC;
+	}
+
+	if ((lastRC = nextTable(tableUID)) != 0) {
+		delete session;
+		return lastRC;
+	}
+	delete session;
+	LOG(D1) << "Exiting nextTableRow()";
+	return 0;
+}
+
+uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
+								const tableDesc_t* TableDesc,
+								OPAL_UID sp,
+								OPAL_UID auth,
+								std::string& password,
+								rowMap_t& rowMap,
+								uint8_t level)
+{
+	LOG(D1) << "Entering DtaDevOpal::getTableRow()";\
+
+	if (level > 0) {
+		cout << "\nGetTable contents for table row ";
+		printUID(uid);
+		printf("h, columns 0 through %d\n", TableDesc->columnCount - 1);
+	}
+
+	uint8_t lastRC = 1;
+
+	std::vector<uint8_t> uidtok(uid);
+	uidtok.insert(uidtok.begin(), OPAL_SHORT_ATOM::BYTESTRING8);
+
+	if (password.length() != 0)
+	{
+		if (level > 1) cout << "Attempting password authentication.\n";
+		session = new DtaSession(this);
+		if (NULL == session) {
+			LOG(E) << "Unable to create session object ";
+			return DTAERROR_OBJECT_CREATE_FAILED;
+		}
+		if ((lastRC = session->start(sp, (char*)password.c_str(), auth)) != 0) {
+			if (level > 1) cout << "Unable to start authenticated session.\n";
+			delete session;
+		} else {
+			if (level > 0) cout << "Session opened with password authentication.\n";
+			if ((lastRC = getTable(uidtok, 0, TableDesc->columnCount - 1)) != 0) {
+				delete session;
+			}
+			authenticated++;
+		}
+	}
+
+	if (lastRC != 0) {
+		// Try as anybody
+		if (level > 1) cout << "Attempting anybody authorization.\n";
+		session = new DtaSession(this);
+		if (NULL == session) {
+			LOG(E) << "Unable to create session object ";
+			return DTAERROR_OBJECT_CREATE_FAILED;
+		}
+		if ((lastRC = session->start(sp, NULL, OPAL_UID::OPAL_ANYBODY_UID)) != 0) {
+			if (level > 1) cout << "Unable to start anybody session.\n";
+		} else {
+			if (level > 0) cout << "Session opened with Anybody authorization.\n";
+			lastRC = getTable(uidtok, 0, TableDesc->columnCount - 1);
+			if (lastRC == 0) {
+				anybody++;
+			}
+		}
+	}
+	if (lastRC != 0) {
+		delete session;
+		failed++;
+		return lastRC;
+	}
+
+	uint32_t tokenCount = response.getTokenCount();
+	for (uint32_t i = 0; i < tokenCount; i++) {
+		OPAL_TOKEN tokenType = response.tokenIs(i);
+		if (tokenType == OPAL_TOKEN::STARTNAME) {
+			char valueStr[100] = "<empty list>";
+			char* valuePtr = valueStr;
+
+			// the first ertry after a start name in the column number
+			uint32_t column = response.getUint32(++i);
+			// if the column number is followed by a start list token, then
+			// the colun contains a list of values.
+			if (response.tokenIs(++i) == OPAL_TOKEN::STARTLIST) {
+				while (response.tokenIs(++i) != OPAL_TOKEN::ENDLIST) {
+					// skip end name tokens
+					if (response.tokenIs(i) == OPAL_TOKEN::ENDNAME) {
+						continue;
+					}
+					// look for start name token
+					if (response.tokenIs(i) == OPAL_TOKEN::STARTNAME) {
+						// if the previous token was a end name, add a ',' to
+						// the output stream.
+						if (response.tokenIs(i-1) == OPAL_TOKEN::ENDNAME) {
+							valuePtr += sprintf(valuePtr, ", ");
+						}
+						continue;
+					}
+					// If the previous token was not a start name, add a space.
+					if (response.tokenIs(i-1) != OPAL_TOKEN::STARTNAME &&
+					    response.tokenIs(i-1) != OPAL_TOKEN::STARTLIST) {
+						valuePtr += sprintf(valuePtr, " ");
+					}
+
+					uint32_t valueLength = response.getLength(i);
+
+					if (valueLength <= 4) {
+						valuePtr += sprintf(valuePtr, "%xh", response.getUint32(i));
+					} else {
+						uint8_t buffer[64];
+						char    str[140];
+
+						int size = response.getBytes(i, buffer);
+						printBytes(buffer, size, str);
+						valuePtr += sprintf(valuePtr, "%s", str);
+					}
+				}
+				if (level > 0) {
+					printf("  Column: %2d, Name: '%s', Value (list): %s\n",
+					       column, TableDesc->columns[column], valueStr);
+				}
+			}
+			else {
+				uint32_t valueLength = response.getLength(i);
+
+				if (valueLength <= 4) {
+					if (level > 0) {
+						printf("  Column: %2d, Name: '%s', Value: %xh\n",
+						       column, TableDesc->columns[column], response.getUint32(i));
+					}
+					sprintf(valueStr, "%xh", response.getUint32(i));
+				} else {
+					uint8_t buffer[64];
+					char    str[140];
+
+					int size = response.getBytes(i, buffer);
+					printBytes(buffer, size, str);
+					if (level > 0) {
+						printf("  Column: %2d, Name: '%s', Value: %s\n",
+						       column, TableDesc->columns[column], str);
+					}
+					sprintf(valueStr, "%s", str);
+				}
+			}
+			rowMap[column] = valueStr;
+		}
+	}
+
+	delete session;
+	LOG(D1) << "Exiting getTableRow()";
+	return 0;
+}
+
+uint8_t DtaDevOpal::getACLCmd(const std::vector<uint8_t>& object,
+							  const std::vector<uint8_t>& method)
+{
+	LOG(D1) << "Entering DtaDevOpal::getACLCmd";
+
+	std::vector<uint8_t> methodTok(method);
+	methodTok.insert(methodTok.begin(), OPAL_SHORT_ATOM::BYTESTRING8);
+
+	std::vector<uint8_t> uidTok(object);
+	uidTok.insert(uidTok.begin(), OPAL_SHORT_ATOM::BYTESTRING8);
+
+	uint8_t lastRC;
+	DtaCommand *get = new DtaCommand();
+	if (NULL == get) {
+		LOG(E) << "Unable to create command object";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+	get->reset(OPAL_UID::ACCESS_CONTROL_TABLE, OPAL_METHOD::GETACL);
+	get->addToken(OPAL_TOKEN::STARTLIST);
+	get->addToken(uidTok);
+	get->addToken(methodTok);
+	get->addToken(OPAL_TOKEN::ENDLIST);
+	get->complete();
+	if ((lastRC = session->sendCommand(get, response)) != 0) {
+		delete get;
+		return lastRC;
+	}
+	delete get;
+	return 0;
+}
+
+uint8_t DtaDevOpal::getACL(OPAL_UID sp, OPAL_UID auth,
+						   std::string& password,
+						   const std::vector<uint8_t>& object,
+						   const std::vector<uint8_t>& method,
+						   std::string& str,
+						   uint8_t level)
+{
+	uint8_t lastRC;
+
+	// first try as anybody
+	if (level > 1) cout << "Attempting anybody authorization.\n";
+	session = new DtaSession(this);
+	if (NULL == session) {
+		LOG(E) << "Unable to create session object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+    if ((lastRC = session->start(sp, NULL, OPAL_UID::OPAL_ANYBODY_UID)) != 0) {
+		if (level > 1) cout << "Unable to start anybody session.\n";
+	} else {
+		if (level > 0) cout << "Session opened with Anybody authorization.\n";
+		lastRC = getACLCmd(object, method);
+		if (lastRC == 0) anybody++;
+	}
+#if 0
+	if (lastRC != 0)
+	{
+		// Anybody failed, try with the suppied password.
+//		cout << "Attempting password authentication.\n";
+		delete session;
+		session = new DtaSession(this);
+		if (NULL == session) {
+			LOG(E) << "Unable to create session object ";
+			return DTAERROR_OBJECT_CREATE_FAILED;
+		}
+		if ((lastRC = session->start(sp, (char*)password.c_str(), auth)) != 0) {
+			if (level > 1) cout << "Unable to start authenticated session.\n";
+			delete session;
+			return lastRC;
+		} else {
+			if (level > 0) cout << "Session opened with password authentication.\n";
+			if ((lastRC = getACLCmd(object, method)) != 0) {
+				delete session;
+				failed++;
+				return lastRC;
+			}
+			authenticated++;
+		}
+	}
+#else
+	if (lastRC != 0) {
+		delete session;
+		failed++;
+		LOG(D1) << "Exiting getACL()";
+		return lastRC;
+	}
+#endif
+
+	char valueStr[100] = "<empty list>";
+	char* valuePtr = valueStr;
+	uint32_t tokenCount = response.getTokenCount();
+	for (uint32_t i = 0; i < tokenCount; i++) {
+		OPAL_TOKEN tokenType = response.tokenIs(i);
+
+		if (tokenType == OPAL_TOKEN::STARTLIST) {
+			continue;
+		} else if (tokenType == OPAL_TOKEN::ENDLIST) {
+			break;
+
+		} else {
+			uint32_t valueLength = response.getLength(i);
+
+			if (valuePtr != valueStr) {
+				valuePtr += sprintf(valuePtr, " ");
+			}
+
+			if (valueLength <= 4) {
+				valuePtr += sprintf(valuePtr, "%xh", response.getUint32(i));
+			} else {
+				uint8_t buffer[64];
+				char    str[140];
+
+				int size = response.getBytes(i, buffer);
+				printBytes(buffer, size, str);
+				valuePtr += sprintf(valuePtr, "%s", str);
+			}
+		}
+	}
+
+	str = valueStr;
+
+	delete session;
+	LOG(D1) << "Exiting getACL()";
+	return 0;
+}
+
+uint8_t DtaDevOpal::getACLRow(const std::vector<uint8_t>& object,
+				              const std::vector<std::vector<uint8_t>>& methods,
+				              OPAL_UID sp, OPAL_UID auth, std::string& password,
+				              tableRows_t& output, uint8_t level)
+{
+	LOG(D1) << "Entering DtaDevOpal::getACLRow()";
+
+	std::string objectStr;
+	printUID(object, objectStr);
+	objectStr.push_back('h');
+
+	if (level > 0) {
+		printf("\nGetTable ACL for table for object %s\n", objectStr.c_str());
+	}
+
+	for (auto it = methods.begin(); it != methods.end(); ++it) {
+		std::string aclStr;
+		getACL(sp, auth, password, object, *it, aclStr, level);
+		if (aclStr.length() != 0) {
+			std::string methodStr;
+			printUID(*it, methodStr);
+			methodStr.push_back('h');
+
+			rowMap_t entry;
+			entry[0] = objectStr;
+			entry[1] = methodStr;
+			entry[2] = aclStr;
+
+			output.push_back(entry);
+
+			if (level > 0) {
+				printf("  Object: %s, Method: %s, Value: %s\n", objectStr.c_str(),
+						methodStr.c_str(), aclStr.c_str());
+			}
+		}
+	}
+
+	LOG(D1) << "Exiting DtaDevOpal::getACLRow()";
+
+	return 0;
+}
+
+void DtaDevOpal::printUID(const std::vector<uint8_t>& uid)
+{
+	for (auto it = uid.cbegin(); it != uid.cend(); ++it) {
+		printf("%02x", *it);
+	}
+}
+
+void DtaDevOpal::printUID(const std::vector<uint8_t>& uid, std::string& str)
+{
+	char buffer[20];
+	int index = 0;
+	for (auto it = uid.cbegin(); it != uid.cend(); ++it) {
+		index += sprintf(&buffer[index], "%02x", *it);
+	}
+
+	str = buffer;
+}
+
+void DtaDevOpal::printUID(const uint8_t* uid)
+{
+	for (int i = 0; i < 8; i++) {
+		printf("%02x", uid[i]);
+	}
+}
+
+void DtaDevOpal::printBytes(const uint8_t* uid, int length, char* str)
+{
+	int index = 0;
+
+	for (int i = 0;;)
+	{
+		// if all of the bytes are printable, print the string.
+		if (isprint(uid[i]) == 0) {
+			index = 0;
+			break;
+		}
+		str[index++] = uid[i++];
+		if (i == length) {
+			str[index] = '\0';
+			return;
+		}
+	}
+	// If we got here, some of the bytes are not ASCII, convert hex to ASCII.
+	for (int i = 0; i < length; i++) {
+		index += sprintf(&str[index], "%02x", uid[i]);
+	}
+	str[index++] = 'h';
+	str[index]   = '\0';
+}
+
+uint8_t DtaDevOpal::printTables(char* sp, char* password, uint8_t level)
+{
+	printf("DtaDevOpal::printTables() called, security provider = %s, password = '%s', level = %d\n",
+			sp, password, level);
+
+	if (level < 2) {
+		RCLog::Level() = RCLog::FromInt(0);
+	}
+
+	std::string spStr("LockingSP");
+
+	anybody = authenticated = failed = 0;
+
+	std::string pw(password);
+	if ((sp[0] == 'a') || (sp[0] == 'A')) {
+		// Request is for the AdminSP
+		spStr = "AdminSP";
+
+		if (pw.length() == 0) {
+			// No password was supplied, use the MSID
+			if (getDefaultPassword() != 0) {
+				printf("Unable to read MSID password\n");
+			} else {
+				pw = response.getString(4);
+				// Since this is the default password, no hashing.
+				no_hash_passwords = true;
+			}
+		}
+	}
+
+	if (spStr.compare("AdminSP") == 0) {
+		printTablesForSP("AdminSP", OPAL_UID::OPAL_ADMINSP_UID, OPAL_UID::OPAL_SID_UID, pw, level);
+	} else {
+		printTablesForSP("LockingSP", OPAL_UID::OPAL_LOCKINGSP_UID, OPAL_UID::OPAL_ADMIN1_UID, pw, level);
+	}
+
+	printf("\n\nEnd of table list for Security Provider %s\n", spStr.c_str());
+	printf("Statistics: anybody = %d, authenticated = %d, failed = %d\n",
+			anybody, authenticated, failed);
+
+	return 0;
+}
+
+uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
+									 OPAL_UID auth, std::string& pw,
+									 uint8_t level)
+{
+	printf("***** %s Security Provider ******\n", spStr);
+
+#if 0
+	if (verifyPassword(sp, pw) != 0) {
+		printf("Password verification failed, using Anyone authority.\n");
+		pw.clear();
+	} else {
+		printf("Password verified.\n");
+	}
+#endif
+
+	printf("\nTable Table\n");
+
+	vector<uint8_t> table{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 };
+	uint8_t rc = nextTableRow(sp, pw, table);
+	if (rc) {
+		printf("Unable to read table rows.\n");
+		return rc;
+	}
+
+	uint32_t tokenCount = response.getTokenCount();
+
+	uint8_t uid[8];
+	std::vector<std::vector<uint8_t>> rows;
+	for (uint32_t i = 0; i < tokenCount; i++) {
+		if (response.tokenIs(i) == DTA_TOKENID_BYTESTRING) {
+			response.getBytes(i, uid);
+			std::vector<uint8_t> uidv;
+			for (int ii = 0; ii < 8; ii++) {
+				uidv.push_back(uid[ii]);
+			}
+			rows.push_back(uidv);
+		}
+	}
+	printf("Returned table table list has %d rows\n", (int)rows.size());
+	if (level > 1) {
+		for (auto it = rows.cbegin(); it != rows.cend(); it++) {
+			printUID(*it);
+			cout << "\n";
+		}
+	}
+
+	// For the ACL, we need the methods list supported by this SP.
+	std::vector<std::vector<uint8_t>> methodsList;
+
+	std::vector<uint8_t> methodTable = { 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00 };
+	rc = nextTableRow(sp, pw, methodTable);
+	if (rc) {
+		printf("Unable to read MethodID table rows.\n");
+	} else {
+		uint32_t tokenCount = response.getTokenCount();
+		uint8_t  uid[8];
+		for (uint32_t i = 0; i < tokenCount; i++) {
+			if (response.tokenIs(i) == DTA_TOKENID_BYTESTRING) {
+				response.getBytes(i, uid);
+				std::vector<uint8_t> uidv;
+				for (int ii = 0; ii < 8; ii++) {
+					uidv.push_back(uid[ii]);
+				}
+				methodsList.push_back(uidv);
+			}
+		}
+	}
+
+	printf("Returned MethodID table list has %d rows\n", (int)methodsList.size());
+	if (level > 1) {
+		for (auto it = methodsList.cbegin(); it != methodsList.cend(); it++) {
+			printUID(*it);
+			cout << "\n";
+		}
+	}
+
+    //
+	// iterate through the table from the table table
+	//
+	for (auto it = rows.cbegin(); it != rows.cend(); it++) {
+		std::vector<uint8_t> table;
+		for (int i = 4; i < 8; i++) {
+			table.push_back((*it)[i]);
+		}
+		for (int i = 4; i < 8; i++) {
+			table.push_back(0);
+		}
+
+		// Find the table Descriptor.
+		const tableDesc_t* tableDescPtr = &UnknownTableDesc;
+		for (unsigned int i = 0;
+			 i < (sizeof(tableDescriptors) / sizeof(const tableDesc_t*)); i++) {
+			if (memcmp(table.data(), tableDescriptors[i]->uid, 8) == 0) {
+				tableDescPtr = tableDescriptors[i];
+				break;
+			}
+		}
+
+		printf("\nWorking on %s::%s table (", spStr, tableDescPtr->name);
+		printUID(table);
+		printf(")\n");
+
+		if (tableDescPtr->kind == 0) {
+			printf("Table is a byte table, skipping.\n");
+			continue;
+		}
+
+		if (tableDescPtr->skip != 0) {
+			printf("Skipping table.\n");
+			continue;
+		}
+
+		std::vector<std::vector<uint8_t>> rowUIDs;
+
+		uint8_t rc = nextTableRow(sp, pw, table);
+		if (rc) {
+			printf("Unable to read table rows list, use the default.\n");
+			std::vector<uint8_t> oneRow(tableDescPtr->defaultRow, tableDescPtr->defaultRow + 8);
+			rowUIDs.push_back(oneRow);
+		} else {
+			uint32_t tokenCount = response.getTokenCount();
+			uint8_t uid[8];
+			for (uint32_t i = 0; i < tokenCount; i++) {
+				if (response.tokenIs(i) == DTA_TOKENID_BYTESTRING) {
+					response.getBytes(i, uid);
+					std::vector<uint8_t> uidv;
+					for (int ii = 0; ii < 8; ii++) {
+						uidv.push_back(uid[ii]);
+					}
+					rowUIDs.push_back(uidv);
+				}
+			}
+		}
+
+		if (level > 0) {
+			printf("Table has the following rows:\n");
+
+			for (auto it = rowUIDs.cbegin(); it != rowUIDs.cend(); it++) {
+				printUID(*it);
+				cout << "\n";
+			}
+		}
+
+		tableRows_t tableRows;
+
+		// retrieve each row and save the values returned.
+		for (auto it = rowUIDs.cbegin(); it != rowUIDs.cend(); it++) {
+			rowMap_t rowMap;
+			for (uint32_t i = 0; i < tableDescPtr->columnCount; i++) {
+				rowMap[i] = "N/A";
+			}
+			getTableRow(*it, tableDescPtr, sp, auth, pw, rowMap, level);
+			tableRows.push_back(rowMap);
+		}
+
+		// Print the table.
+		printf("\nTable %s::%s:\n", spStr, tableDescPtr->name);
+		// This first part is calculating column widths based
+		// on the largest string in each column
+		uint32_t columns = tableDescPtr->columnCount;
+		uint32_t columnWidth[32];
+		for (uint32_t i = 0; i < columns; i++) {
+			columnWidth[i] = strlen(tableDescPtr->columns[i]) + 1;
+		}
+		for (auto it = tableRows.begin(); it != tableRows.cend(); it++) {
+			for (uint32_t i = 0; i < columns; i++) {
+				if ((*it)[i].length() + 1 > columnWidth[i]) {
+					columnWidth[i] = (*it)[i].length() + 1;
+				}
+			}
+		}
+
+		for (uint32_t i = 0; i < tableDescPtr->columnCount; i++) {
+			printf("%-*s", columnWidth[i], tableDescPtr->columns[i]);
+		}
+		for (auto it = tableRows.begin(); it != tableRows.cend(); it++) {
+			printf("\n");
+			for (uint32_t i = 0; i < tableDescPtr->columnCount; i++) {
+				printf("%-*s", columnWidth[i], (*it)[i].c_str());
+			}
+		}
+		if (strlen(tableDescPtr->notes)) {
+			printf("\nNote: %s", tableDescPtr->notes);
+		}
+		printf("\nTable %s::%s complete.\n", spStr, tableDescPtr->name);
+
+		// Get and print the ACL for this table.
+		tableRows_t aclRows;
+		getACLRow(table, methodsList, sp, auth, pw, aclRows, level);
+		// retrieve ACL values for each row and save the values returned.
+		for (auto it = rowUIDs.cbegin(); it != rowUIDs.cend(); it++) {
+			getACLRow(*it, methodsList, sp, auth, pw, aclRows, level);
+		}
+
+		if (aclRows.size() == 0) {
+			printf("\nNo ACL entried retrieved for table %s::%s\n",
+			       spStr, tableDescPtr->name);
+		} else {
+			// Calculate the column widths.
+			uint32_t columnWidthAcl[3] = {4, 7, 4};
+			for (auto it = aclRows.begin(); it != aclRows.cend(); it++) {
+				for (uint32_t i = 0; i < 4; i++) {
+					if ((*it)[i].length() + 1 > columnWidthAcl[i]) {
+						columnWidthAcl[i] = (*it)[i].length() + 1;
+					}
+				}
+			}
+
+			printf("\nACL for Table %s::%s:\n", spStr, tableDescPtr->name);
+			printf("%-*s%-*s%-*s", columnWidthAcl[0], "UID",
+			       columnWidthAcl[1], "Method", columnWidthAcl[2], "ACL");
+			for (auto it = aclRows.begin(); it != aclRows.cend(); it++) {
+				printf("\n");
+				for (uint32_t i = 0; i < 3; i++) {
+					printf("%-*s", columnWidthAcl[i], (*it)[i].c_str());
+				}
+			}
+			printf("\nACL for Table %s::%s complete.\n\n", spStr, tableDescPtr->name);
+		}
+	}
+
 	return 0;
 }

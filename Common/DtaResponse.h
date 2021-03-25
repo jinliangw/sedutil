@@ -38,7 +38,7 @@ public:
     /** (re)initialize the object using a new buffer
      * @param buffer the response returned by a TCG command */
     void init(void * buffer);
-    /** return the type of token 
+    /** return the type of token
      * @param tokenNum the 0 based number of the token*/
     OPAL_TOKEN tokenIs(uint32_t tokenNum);
     /** return the length of a token
@@ -58,23 +58,21 @@ public:
     uint8_t getUint8(uint32_t tokenNum);
     /** return the number of tokens in the response */
     uint32_t getTokenCount();
-    /** return a string of the token 
+    /** return a string of the token
      * @param tokenNum the 0 based number of the token*/
     std::string getString(uint32_t tokenNum);
-    /** return the entire token including TCG token overhead 
+    /** return the entire token including TCG token overhead
     * @param tokenNum the 0 based number of the token*/
     std::vector<uint8_t> getRawToken(uint32_t tokenNum);
-    /** return the token in an array of uint8_t  
+    /** return the token in an array of uint8_t
     * @param tokenNum the 0 based number of the token
-    * @param bytearray pointer to array for return data */
-    void getBytes(uint32_t tokenNum, uint8_t bytearray[]);
-    
+    * @param bytearray pointer to array for return data
+    * @return number of bytes put in the bytearray */
+    int getBytes(uint32_t tokenNum, uint8_t bytearray[]);
+
     OPALHeader h; /**< TCG Header fields of the response */
 
 private:
 
     std::vector<std::vector<uint8_t>> response;   /**< tokenized resonse  */
 };
-
-
-

@@ -41,6 +41,7 @@ typedef struct _DTA_OPTIONS {
 	uint8_t lockingstate;  /**< locking state to set a lockingrange to */
 	uint8_t lrstart;		/** the starting block of a lockingrange */
 	uint8_t lrlength;		/** the length in blocks of a lockingrange */
+	uint8_t level;			/** output level, for print operations */
 
 	bool no_hash_passwords; /** global parameter, disables hashing of passwords */
 	sedutiloutput output_format;
@@ -48,7 +49,7 @@ typedef struct _DTA_OPTIONS {
 /** Print a usage message */
 void usage();
 /** Parse the command line and return a structure that describes the action desired
- * @param argc program argc parameter 
+ * @param argc program argc parameter
  * @param argv program argv paramater
  * @param opts pointer to options structure to be filled out
  */
@@ -96,6 +97,7 @@ typedef enum _sedutiloption {
 	objDump,
     printDefaultPassword,
 	rawCmd,
+	printTables,
 
 } sedutiloption;
 /** verify the number of arguments passed */
@@ -126,6 +128,6 @@ i++;
 
 /** set the argc value for this parameter in the options structure */
 #define OPTION_IS(option_field) \
-				opts->option_field = ++i; 
+				opts->option_field = ++i;
 
 #endif /* _DTAOPTIONS_H */

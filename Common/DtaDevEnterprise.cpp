@@ -185,13 +185,13 @@ uint8_t DtaDevEnterprise::initialSetup(char * password)
 		LOG(E) << "Initial setup failed - unable to unlock for read/write";
 		return lastRC;
 	}
-	
+
 	if ((lastRC = configureLockingRange(0,
 		(DTA_READLOCKINGENABLED | DTA_WRITELOCKINGENABLED), password)) != 0) {
 		LOG(E) << "Initial setup failed - unable to enable read/write locking";
 		return lastRC;
 	}
-	
+
 	LOG(I) << "Initial setup of TPer complete on " << dev;
 	LOG(D1) << "Exiting initialSetup()";
 	return 0;
@@ -227,7 +227,7 @@ uint8_t DtaDevEnterprise::configureLockingRange(uint8_t lockingrange, uint8_t en
 		return lastRC;
 	}
 
-	/* can't use settable because the segate drives require that both the 
+	/* can't use settable because the segate drives require that both the
 	 * read & write lockenabled be changed at the same time.  I can find no
 	 * written doc on such a restriction but .....
 	 */
@@ -762,7 +762,7 @@ uint8_t DtaDevEnterprise::setLockingRange(uint8_t lockingrange, uint8_t lockings
 	LOG(D1) << "Entering DtaDevEnterprise::setLockingRange";
 	uint8_t lastRC;
 
-    // convert Opal lockingstate to boolean	
+    // convert Opal lockingstate to boolean
     OPAL_TOKEN locked;
     switch (lockingstate) {
 	case OPAL_LOCKINGSTATE::READWRITE:
@@ -778,7 +778,7 @@ uint8_t DtaDevEnterprise::setLockingRange(uint8_t lockingrange, uint8_t lockings
     	LOG(E) << "Invalid locking state for setLockingRange (RW=1, LOCKED=3)";
     	return DTAERROR_INVALID_PARAMETER;
 	}
-	
+
     // look up MaxRanges
 	uint16_t MaxRanges;
 
@@ -1269,6 +1269,11 @@ uint8_t DtaDevEnterprise::printDefaultPassword()
     fprintf(stdout, "MSID: %s\n", (char *)defaultPassword.c_str());
     return 0;
 }
+uint8_t DtaDevEnterprise::printTables(char* sp, char* password, uint8_t level)
+{
+    cout << "printTables feature not supported for TCG enterprise devices";
+    return 0xff;
+}
 uint8_t DtaDevEnterprise::setSIDPassword(char * oldpassword, char * newpassword,
 	uint8_t hasholdpwd, uint8_t hashnewpwd)
 {
@@ -1343,7 +1348,7 @@ uint8_t DtaDevEnterprise::setTable(vector<uint8_t> table, const char *name,
 	token.push_back((uint8_t) value);
 	return(setTable(table, name, token));
 }
-uint8_t DtaDevEnterprise::setTable(vector<uint8_t> table, const char *name, 
+uint8_t DtaDevEnterprise::setTable(vector<uint8_t> table, const char *name,
 	vector<uint8_t> value)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setTable";
@@ -1377,7 +1382,7 @@ uint8_t DtaDevEnterprise::setTable(vector<uint8_t> table, const char *name,
 	LOG(D1) << "Leaving DtaDevEnterprise::setTable";
 	return 0;
 }
-uint8_t DtaDevEnterprise::getTable(vector<uint8_t> table, const char * startcol, 
+uint8_t DtaDevEnterprise::getTable(vector<uint8_t> table, const char * startcol,
 	const char * endcol)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::getTable";
@@ -1462,7 +1467,7 @@ uint8_t DtaDevEnterprise::properties()
 	}
 	props->addToken(OPAL_TOKEN::STARTLIST);
 	props->addToken(OPAL_TOKEN::STARTNAME);
-	props->addToken("HostProperties");	
+	props->addToken("HostProperties");
 	props->addToken(OPAL_TOKEN::STARTLIST);
 	props->addToken(OPAL_TOKEN::STARTNAME);
 	props->addToken("MaxComPacketSize");
@@ -1529,7 +1534,7 @@ void DtaDevEnterprise::puke()
 					j++;
 					if (!(j % 3)) cout << std::endl;
 				}
-			}	
+			}
 		}
 		if ((j % 3) != 0)
 			cout << std::endl;

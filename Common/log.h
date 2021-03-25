@@ -47,7 +47,7 @@
 inline std::string NowTime();
 
 enum TLogLevel {
-    E, W, I, D, D1, D2, D3, D4
+    O, E, W, I, D, D1, D2, D3, D4
 };
 
 template <typename T>
@@ -116,28 +116,32 @@ TLogLevel Log<T>::FromString(const std::string& level) {
         return W;
     if (level == "ERROR")
         return E;
+    if (level == "OFF")
+        return O;
     Log<T>().Get(W) << "Unknown logging level '" << level << "'. Using INFO level as default.";
     return I;
 }
 
 template <typename T>
 TLogLevel Log<T>::FromInt(const int level) {
-    if (level == 7)
+    if (level == 8)
         return D4;
-    if (level == 6)
+    if (level == 7)
         return D3;
-    if (level == 5)
+    if (level == 6)
         return D2;
-    if (level == 4)
+    if (level == 5)
         return D1;
-    if (level == 3)
+    if (level == 4)
         return D;
-    if (level == 2)
+    if (level == 3)
         return I;
-    if (level == 1)
+    if (level == 2)
         return W;
-    if (level == 0)
+    if (level == 1)
         return E;
+    if (level == 0)
+        return O;
     Log<T>().Get(W) << "Unknown logging level '" << level << "'. Using INFO level as default.";
     return I;
 }
@@ -195,7 +199,7 @@ TLogLevel& RLog<T>::Level() {
 
 template <typename T>
 std::string RLog<T>::ToString(TLogLevel level) {
-    static const char* const buffer[] = {"ERR ", "WARN", "INFO", "DBG ", "DBG1", "DBG2", "DBG3", "DBG4"};
+    static const char* const buffer[] = {"OFF ", "ERR ", "WARN", "INFO", "DBG ", "DBG1", "DBG2", "DBG3", "DBG4"};
     return buffer[level];
 }
 
@@ -217,28 +221,33 @@ TLogLevel RLog<T>::FromString(const std::string& level) {
         return W;
     if (level == "ERROR")
         return E;
+    if (level == "OFF")
+        return O;
     RLog<T>().Get(W, sedutilNormal) << "Unknown logging level '" << level << "'. Using INFO level as default.";
     return I;
 }
 
 template <typename T>
 TLogLevel RLog<T>::FromInt(const int level) {
-    if (level == 7)
+    if (level == 8)
         return D4;
-    if (level == 6)
+    if (level == 7)
         return D3;
-    if (level == 5)
+    if (level == 6)
         return D2;
-    if (level == 4)
+    if (level == 5)
         return D1;
-    if (level == 3)
+    if (level == 4)
         return D;
-    if (level == 2)
+    if (level == 3)
         return I;
-    if (level == 1)
+    if (level == 2)
         return W;
-    if (level == 0)
+    if (level == 1)
         return E;
+    if (level == 0)
+        return O;
+    if (level)
     RLog<T>().Get(W, sedutilNormal) << "Unknown logging level '" << level << "'. Using INFO level as default.";
     return I;
 }

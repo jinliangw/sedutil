@@ -27,8 +27,25 @@ class DtaSession;
 #include "DtaLexicon.h"
 #include "DtaResponse.h"   // wouldn't take class
 #include <vector>
+#include <map>
 
 using namespace std;
+
+typedef struct _tableDesc
+{
+	const char* name;
+	const char* notes;
+	uint8_t 	uid[8];
+	uint8_t		defaultRow[8];
+	uint8_t 	kind;
+	uint8_t		skip;
+	uint32_t	columnCount;
+	const char* columns[];
+}	tableDesc_t;
+
+typedef std::map<uint32_t, std::string> rowMap_t;
+typedef std::vector<rowMap_t> tableRows_t;
+
 /** Common code for OPAL SSCs.
  * most of the code that works for OPAL 2.0 also works for OPAL 1.0
  * that common code is implemented in this class
@@ -59,16 +76,18 @@ public:
 	uint8_t exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol = 0x01);
          /** return the communications ID to be used for sessions to this device */
 	virtual uint16_t comID() = 0;
-        /** Change the SID password from it's MSID default 
-         * @param newpassword  new password for SID 
+        /** Change the SID password from it's MSID default
+         * @param newpassword  new password for SID
          */
 	uint8_t takeOwnership(char * newpassword);
         /** retrieve the MSID password */
 	uint8_t printDefaultPassword();
-        /** retrieve a single row from a table 
+	    /** Print the supported tables */
+	uint8_t printTables(char* sp, char* password, uint8_t level);
+        /** retrieve a single row from a table
          * @param table the UID of the table
          * @param startcol the starting column of data requested
-         * @param endcol the ending column of the data requested 
+         * @param endcol the ending column of the data requested
          */
 	uint8_t getTable(vector<uint8_t> table, uint16_t startcol,
 		uint16_t endcol);
@@ -78,25 +97,25 @@ public:
          * @param newpassword  value password is to be changed to
          * @param hasholdpwd  is the old password to be hashed before being added to the bytestream
          * @param hashnewpwd  is the new password to be hashed before being added to the bytestream
-         */ 
+         */
 	uint8_t setSIDPassword(char * oldpassword, char * newpassword,
 		uint8_t hasholdpwd = 1, uint8_t hashnewpwd = 1);
-         /** set a single column in an object table 
+         /** set a single column in an object table
          * @param table the UID of the table
          * @param name the column name to be set
-         * @param value data to be stored the the column 
+         * @param value data to be stored the the column
          */
 	uint8_t setTable(vector<uint8_t> table, OPAL_TOKEN name,
 		vector<uint8_t> value);
-         /** set a single column in an object table 
+         /** set a single column in an object table
          * @param table the UID of the table
          * @param name the column name to be set
-         * @param value data to be stored the the column 
+         * @param value data to be stored the the column
          */
 	uint8_t setTable(vector<uint8_t> table, OPAL_TOKEN name,
 		OPAL_TOKEN value);
         /** Change state of the Locking SP to active.
-         * Enables locking 
+         * Enables locking
          * @param password  current SID password
          */
 	uint8_t activateLockingSP(char * password);
@@ -112,7 +131,7 @@ public:
          */
         uint8_t eraseLockingRange_SUM(uint8_t lockingrange, char * password);
         /** Restore the state of the Locking SP to factory defaults.
-         * Enables locking 
+         * Enables locking
          * @param password  current SID password
          * @param keep boolean keep the data (NOT FUNCTIONAL)
          */
@@ -123,25 +142,25 @@ public:
           *  @param userData The UIS or CPIN of the USER
           */
 	uint8_t getAuth4User(char * userid, uint8_t column, std::vector<uint8_t> &userData);
-        /**  Enable a user in the Locking SP  
-         * @param password the password of the Locking SP administrative authority 
+        /**  Enable a user in the Locking SP
+         * @param password the password of the Locking SP administrative authority
          * @param userid Character name of the user to be enabled
          */
 	uint8_t enableUser(char * password, char * userid, OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);
         /** Primitive to set the MBRDone flag.
-         * @param state 0 or 1  
+         * @param state 0 or 1
          * @param Admin1Password Locking SP authority with access to flag
 		 * @param status true or false to enable/disable
          */
 	uint8_t setMBRDone(uint8_t state, char * Admin1Password);
           /** Primitive to set the MBREnable flag.
-         * @param state 0 or 1  
+         * @param state 0 or 1
          * @param Admin1Password Locking SP authority with access to flag
          */
 	uint8_t setMBREnable(uint8_t state, char * Admin1Password);
         /** Set the password of a locking SP user.
          * @param password  current password
-         * @param userid the userid whose password is to be changed 
+         * @param userid the userid whose password is to be changed
          * @param newpassword  value password is to be changed to
          */
 	uint8_t setPassword(char * password, char * userid, char * newpassword);
@@ -155,7 +174,7 @@ public:
          * RW|RO|LK are the supported states @see OPAL_LOCKINGSTATE
          * @param lockingrange locking range number
          * @param lockingstate desired locking state (see above)
-         * @param Admin1Password password of the locking administrative authority 
+         * @param Admin1Password password of the locking administrative authority
          */
 	uint8_t setLockingRange(uint8_t lockingrange, uint8_t lockingstate,
 		char * Admin1Password);
@@ -192,7 +211,7 @@ public:
          * RW|RO|LK are the supported states @see OPAL_LOCKINGSTATE
          * @param lockingrange locking range number
          * @param enabled boolean true = enabled, false = disabled
-         * @param password password of the locking administrative authority 
+         * @param password password of the locking administrative authority
          */
 	uint8_t configureLockingRange(uint8_t lockingrange, uint8_t enabled, char * password);
 	/** Generate a new encryption key for a locking range.
@@ -206,7 +225,7 @@ public:
         * @param password password of the UID authority
         */
 	uint8_t rekeyLockingRange_SUM(vector<uint8_t> LR, vector<uint8_t>  UID, char * password);
-	/** Reset the TPER to its factory condition   
+	/** Reset the TPER to its factory condition
          * ERASES ALL DATA!
          * @param password password of authority (SID or PSID)
          * @param PSID true or false is the authority the PSID
@@ -226,9 +245,9 @@ public:
          * @param filename the filename of the disk image
          */
 	uint8_t loadPBA(char * password, char * filename);
-        /** User command to prepare the device for management by sedutil. 
+        /** User command to prepare the device for management by sedutil.
          * Specific to the SSC that the device supports
-         * @param password the password that is to be assigned to the SSC master entities 
+         * @param password the password that is to be assigned to the SSC master entities
          */
 	uint8_t initialSetup(char * password);
 	/** User command to prepare the drive for Single User Mode and rekey a SUM locking range.
@@ -256,16 +275,16 @@ public:
          * @param invoker caller of the method
          * @param method the method to call
          * @param plist  the parameter list for the command
-         * 
+         *
          */
 	uint8_t rawCmd(char *sp, char * auth, char *pass,
 		char *invoker, char *method, char *plist);
 protected:
         /** Primitive to handle the setting of a value in the locking sp.
-         * @param table_uid UID of the table 
+         * @param table_uid UID of the table
          * @param name column to be altered
          * @param value the value to be set
-         * @param password password for the administrative authority 
+         * @param password password for the administrative authority
          * @param msg message to be displayed upon successful update;
          */
 	uint8_t setLockingSPvalue(OPAL_UID table_uid, OPAL_TOKEN name, OPAL_TOKEN value,
@@ -289,4 +308,26 @@ protected:
 	 */
 	lrStatus_t getLockingRange_status(uint8_t lockingrange, char * password);
 
+	uint8_t verifyPassword(OPAL_UID sp, std::string& pw);
+	uint8_t nextTable(vector<uint8_t>& table);
+	uint8_t nextTableRow(OPAL_UID sp, std::string& pw, vector<uint8_t>& uid);
+	uint8_t getTableRow(const vector<uint8_t>& uid, const tableDesc_t* tableDesc,
+						OPAL_UID sp, OPAL_UID auth, std::string& password,
+						rowMap_t& rowMap, uint8_t level);
+	uint8_t getACLCmd(const std::vector<uint8_t>& object,
+		              const std::vector<uint8_t>& method);
+	uint8_t getACL(OPAL_UID sp, OPAL_UID auth, std::string& password,
+				   const std::vector<uint8_t>& object,
+				   const std::vector<uint8_t>& method,
+				   std::string& str, uint8_t level);
+    uint8_t getACLRow(const std::vector<uint8_t>& object,
+		              const std::vector<std::vector<uint8_t>>& methods,
+				      OPAL_UID sp, OPAL_UID auth, std::string& password,
+					  tableRows_t& output, uint8_t level);
+	void printUID(const std::vector<uint8_t>& uid);
+	void printUID(const uint8_t* uid);
+	void printUID(const std::vector<uint8_t>& uid, std::string& str);
+	void printBytes(const uint8_t* uid, int length, char* str);
+	uint8_t printTablesForSP(const char* spStr, OPAL_UID sp, OPAL_UID auth,
+							 std::string& pw, uint8_t level);
 };
