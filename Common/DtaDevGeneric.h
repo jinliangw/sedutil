@@ -227,4 +227,8 @@ public:
 	 uint8_t exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol = 1) ;
          /** return the communications ID to be used for sessions to this device */
 	 uint16_t comID() ;
+
+     // virtual methods from DtaDev class
+     uint8_t assign(char* password, uint32_t ns, uint64_t start = 0, uint64_t length = 0);
+     uint8_t deassign(char* password, uint8_t lockingrange, bool keep);
 };

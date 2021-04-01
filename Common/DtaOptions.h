@@ -93,6 +93,8 @@ typedef enum _sedutiloption {
 	isValidSED,
     eraseLockingRange,
 	takeOwnership,
+	assign,
+	deassign,
 	validatePBKDF2,
 	objDump,
     printDefaultPassword,

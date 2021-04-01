@@ -249,12 +249,27 @@ public:
 	 * @param password Password of administrative authority for locking range
 	 */
 	virtual uint8_t eraseLockingRange(uint8_t lockingrange, char * password) = 0;
+	/** Assign a locking range to a Namespace
+	 * @param password for Admin1
+	 * @param namespace
+	 * @param global - bool, true for a global range
+	 * @param start - N/A if global is true
+	 * @param length - N/A if global is true
+	 */
+	virtual uint8_t assign(char* password, uint32_t ns,
+	                       uint64_t start = 0, uint64_t length = 0) = 0;
+	/** Deassign a locking range
+	 * @param password for Admin1
+	 * @param lockingrange The number of the locking range
+	 * @param keep True to keep the global range Key
+	 */
+	virtual uint8_t deassign(char* password, uint8_t lockingrange, bool keep) = 0;
 	/** Dumps an object for diagnostic purposes
 	 * @param sp index into the OPALUID table for the SP the object is in
 	 * @param auth the authority ti use for the dump
 	 * @param pass the password for the suthority
 	 * @param objID the UID of the object to dump
-	 *  */
+	 */
 	virtual uint8_t objDump(char *sp, char * auth, char *pass,
 		char * objID) = 0;
 	/** Issue any command to the drive for diagnostic purposes

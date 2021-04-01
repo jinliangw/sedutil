@@ -25,10 +25,14 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #define FC_LOCKING    0x0002
 #define FC_GEOMETRY   0x0003
 #define FC_ENTERPRISE 0x0100
-#define FC_DATASTORE  0x0202
-#define FC_SINGLEUSER 0x0201
 #define FC_OPALV100   0x0200
+#define FC_SINGLEUSER 0x0201
+#define FC_DATASTORE  0x0202
 #define FC_OPALV200   0x0203
+#define FC_BLOCK_SID  0x0402
+#define FC_OPAL_CNL   0x0403
+#define FC_NS_GEO     0x0405
+
 /** The Discovery 0 Header. As defined in
 * Opal SSC Documentation
 */
@@ -111,7 +115,7 @@ typedef struct _Discovery0LockingFeatures {
  * OPAL terminology
  */
 typedef struct _Discovery0GeometryFeatures {
-    uint16_t featureCode; /* 0x0003 in 2.00.100 */
+    uint16_t featureCode; /* 0x0003 in 2.00.100, 0x0405 in CNL */
     uint8_t reserved_v : 4;
     uint8_t version : 4;
     uint8_t length;
@@ -127,7 +131,7 @@ typedef struct _Discovery0GeometryFeatures {
     uint64_t lowestAlighedLBA;
 } Discovery0GeometryFeatures;
 
-/** Enterprise SSC Feature 
+/** Enterprise SSC Feature
  */
 typedef struct _Discovery0EnterpriseSSC {
     uint16_t featureCode; /* 0x0100 */
@@ -149,7 +153,7 @@ typedef struct _Discovery0EnterpriseSSC {
     uint32_t reserved05;
 } Discovery0EnterpriseSSC;
 
-/** Opal V1 feature 
+/** Opal V1 feature
  */
 typedef struct _Discovery0OpalV100 {
 	uint16_t featureCode; /* 0x0200 */
@@ -159,7 +163,7 @@ typedef struct _Discovery0OpalV100 {
 	uint16_t baseComID;
 	uint16_t numberComIDs;
 } Discovery0OpalV100;
-/** Single User Mode feature 
+/** Single User Mode feature
  */
 typedef struct _Discovery0SingleUserMode {
     uint16_t featureCode; /* 0x0201 */
@@ -186,7 +190,7 @@ typedef struct _Discovery0SingleUserMode {
 /** Additonal Datastores feature .
  */
 typedef struct _Discovery0DatastoreTable {
-    uint16_t featureCode; /* 0x0203 */
+    uint16_t featureCode; /* 0x0202 */
     uint8_t reserved_v : 4;
     uint8_t version : 4;
     uint8_t length;
@@ -196,7 +200,7 @@ typedef struct _Discovery0DatastoreTable {
     uint32_t tableSizeAlignment;
 } Discovery0DatastoreTable;
 
-/** OPAL 2.0 feature 
+/** OPAL 2.0 feature
  */
 typedef struct _Discovery0OPALV200 {
     uint16_t featureCode; /* 0x0203 */
@@ -219,6 +223,57 @@ typedef struct _Discovery0OPALV200 {
     uint8_t reserved02;
     uint32_t reserved03;
 } Discovery0OPALV200;
+
+/** Block SID Authentication
+ */
+typedef struct _Discovery0BlockSID {
+    uint16_t featureCode; /* 0x0402 */
+    uint8_t reserved_v : 4;
+    uint8_t version : 4;
+    uint8_t length;
+
+    /* big endian
+    uint8_t reserved04 : 6;
+    uint8_t sidValueState : 1
+    uint8_t isdBlockedState : 1;
+     */
+    uint8_t sidValueState : 1;
+    uint8_t sidBlockedState : 1;
+    uint8_t reserved04 : 6;
+
+    /* big endian
+    uint8_t reserved05 : 7;
+    uint8_t hardwareReset : 1
+     */
+    uint8_t hardwareReset : 1;
+    uint8_t reserved05 : 6;
+
+    uint8_t reserved06[10];
+} Discovery0BlockSID;
+
+/** OPAL Configurable Namespace Locking Feature (CNL)
+ */
+typedef struct _Discovery0CNL {
+    uint16_t featureCode; /* 0x0403 */
+    uint8_t reserved_v : 4;
+    uint8_t version : 4;
+    uint8_t length;
+    /* big endian
+    uint8_t reserved04 : 6;
+    uint8_t range_P : 1
+    uint8_t rannge_C : 1;
+     */
+    uint8_t range_C : 1;
+    uint8_t range_P : 1;
+    uint8_t reserved04 : 6;
+
+    uint8_t reserved05[3];
+
+    uint32_t maxKeyCount;
+    uint32_t unusedKeyCount;
+    uint32_t maxRangesPerNS;
+} Discovery0CNL;
+
 /** Union of features used to parse the discovery 0 response */
 union Discovery0Features {
     Discovery0TPerFeatures TPer;
@@ -229,6 +284,8 @@ union Discovery0Features {
     Discovery0OPALV200 opalv200;
 	Discovery0OpalV100 opalv100;
     Discovery0DatastoreTable datastore;
+    Discovery0BlockSID blockSID;
+    Discovery0CNL cnl;
 };
 
 /** ComPacket (header) for transmissions. */
@@ -292,6 +349,9 @@ typedef struct _OPAL_DiskInfo {
     uint8_t DataStore : 1;
     uint8_t OPAL20 : 1;
 	uint8_t OPAL10 : 1;
+    uint8_t BlockSID : 1;
+    uint8_t NSGeometry : 1;
+    uint8_t CNL : 1;
 	uint8_t Properties : 1;
 	uint8_t ANY_OPAL_SSC : 1;
     // values ONLY VALID IF FUNCTION ABOVE IS TRUE!!!!!
@@ -330,6 +390,18 @@ typedef struct _OPAL_DiskInfo {
     uint16_t OPAL20_numAdmins;
     uint16_t OPAL20_numUsers;
     uint8_t OPAL20_rangeCrossing;
+    uint8_t BlockSID_sidValueState : 1;
+    uint8_t BlockSID_sidBlockedState : 1;
+    uint8_t BlockSID_hardwareReset : 1;
+    uint8_t NSGeometry_align : 1;
+    uint32_t NSGeometry_logicalBlockSize;
+    uint64_t NSGeometry_alignmentGranularity;
+    uint64_t NSGeometry_lowestAlignedLBA;
+    uint8_t CNL_rangeC : 1;
+    uint8_t CNL_rangeP : 1;
+    uint32_t CNL_maxKeyCount;
+    uint32_t CNL_unusedKeyCount;
+    uint32_t CNL_maxRangesPerNS;
     // IDENTIFY information
     DTA_DEVICE_TYPE devType;
     uint8_t serialNum[20];

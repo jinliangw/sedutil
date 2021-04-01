@@ -279,6 +279,11 @@ public:
          */
 	uint8_t rawCmd(char *sp, char * auth, char *pass,
 		char *invoker, char *method, char *plist);
+
+	// virtual methods from DtaDev class
+	uint8_t assign(char* password, uint32_t ns, uint64_t start = 0, uint64_t length = 0);
+	uint8_t deassign(char* password, uint8_t lockingrange, bool keep);
+
 protected:
         /** Primitive to handle the setting of a value in the locking sp.
          * @param table_uid UID of the table
@@ -308,7 +313,7 @@ protected:
 	 */
 	lrStatus_t getLockingRange_status(uint8_t lockingrange, char * password);
 
-	uint8_t verifyPassword(OPAL_UID sp, std::string& pw);
+	uint8_t verifyPassword(OPAL_UID sp, OPAL_UID auth, std::string& pw);
 	uint8_t nextTable(vector<uint8_t>& table);
 	uint8_t nextTableRow(OPAL_UID sp, std::string& pw, vector<uint8_t>& uid);
 	uint8_t getTableRow(const vector<uint8_t>& uid, const tableDesc_t* tableDesc,

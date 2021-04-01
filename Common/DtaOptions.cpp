@@ -28,7 +28,7 @@ void usage()
     printf("to the Trusted Computing Group OPAL 2.0 SSC specification\n");
     printf("General Usage:                     (see readme for extended commandset)\n");
     printf("sedutil-cli <-v> <-n> <action> <options> <device>\n");
-    printf("-v (optional)                       increase verbosity, one to five v's\n");
+    printf("-v (optional)                       increase verbosity, one to eight v's\n");
     printf("-n (optional)                       no password hashing. Passwords will be sent in clear text!\n");
     printf("-l (optional)                       log style output to stderr only\n");
     printf("actions \n");
@@ -89,6 +89,10 @@ void usage()
     printf("--activateLockingSP <SIDpassword> <device>\n");
     printf("                                Activate the LockingSP. Admin1 password\n");
     printf("                                in LockingSP will be set to SIDpassword.\n");
+    printf("--assign <Admin1Password> <namespace> <rangeStart> <rangeLength> <device>\n");
+    printf("                                Assign a locking range for a namespace\n");
+    printf("--deassign <Admin1password> <1...n> <keep> <device>\n");
+    printf("                                1...n - LRn, keep = T or F\n");
     printf("--revertTPer <SIDpassword> <device>\n");
     printf("                                set the device back to factory defaults \n");
 	printf("                                This **ERASES ALL DATA** \n");
@@ -117,10 +121,10 @@ void usage()
 uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 {
     memset(opts, 0, sizeof (DTA_OPTIONS));
-    uint16_t loggingLevel = 2;
+    uint16_t loggingLevel = 3;
 	uint8_t baseOptions = 2; // program and option
     CLog::Level() = CLog::FromInt(loggingLevel);
-    RCLog::Level() = RCLog::FromInt(loggingLevel);
+    RCLog::Level() = RCLog::FromString("INFO");
     if (2 > argc) {
         usage();
 		return DTAERROR_INVALID_COMMAND;
@@ -134,7 +138,7 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 		{
 			baseOptions += 1;
 			loggingLevel += (uint16_t)(strlen(argv[i]) - 1);
-			if (loggingLevel > 7) loggingLevel = 7;
+			if (loggingLevel > 8) loggingLevel = 8;
 			CLog::Level() = CLog::FromInt(loggingLevel);
 			LOG(D) << "Log level set to " << CLog::ToString(CLog::FromInt(loggingLevel));
 			LOG(D) << "sedutil version : " << GIT_VERSION;
@@ -526,6 +530,23 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			OPTION_IS(password)
 			OPTION_IS(device)
 			END_OPTION
+        BEGIN_OPTION(assign, 5)
+            OPTION_IS(password)
+            OPTION_IS(lockingrange)
+            OPTION_IS(lrstart)
+            OPTION_IS(lrlength)
+            OPTION_IS(device)
+            END_OPTION
+        BEGIN_OPTION(deassign, 4)
+            OPTION_IS(password)
+            OPTION_IS(lockingrange)
+            TESTARG(t, lockingstate, 1)
+            TESTARG(T, lockingstate, 1)
+            TESTARG(f, lockingstate, 0)
+            TESTARG(F, lockingstate, 0)
+            TESTFAIL("Invalid value for keep argument (T or F)")
+            OPTION_IS(device)
+            END_OPTION
 		BEGIN_OPTION(objDump, 5) i += 4; OPTION_IS(device) END_OPTION
         BEGIN_OPTION(printDefaultPassword, 1) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(rawCmd, 7) i += 6; OPTION_IS(device) END_OPTION

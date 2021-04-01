@@ -19,7 +19,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
  * C:E********************************************************************** */
 /** Base device class.
  * An OS port must create a subclass of this class
- * implementing sendcmd, osmsSleep and identify 
+ * implementing sendcmd, osmsSleep and identify
  * specific to the IO requirements of that OS
  */
 #include "os.h"
@@ -194,6 +194,27 @@ void DtaDev::discovery0()
             disk_info.OPAL20_numUsers = SWAP16(body->opalv200.numlockingUserAuth);
             disk_info.OPAL20_rangeCrossing = body->opalv200.rangeCrossing;
             break;
+        case FC_BLOCK_SID: /* Block SID Authentication */
+            disk_info.BlockSID = 1;
+            disk_info.BlockSID_sidValueState = body->blockSID.sidValueState;
+            disk_info.BlockSID_sidBlockedState = body->blockSID.sidBlockedState;
+            disk_info.BlockSID_hardwareReset = body->blockSID.hardwareReset;
+            break;
+        case FC_OPAL_CNL: /* Configurable Namespace Locking */
+            disk_info.CNL = 1;
+            disk_info.CNL_rangeC = body->cnl.range_C;
+            disk_info.CNL_rangeP = body->cnl.range_P;
+            disk_info.CNL_maxKeyCount = SWAP32(body->cnl.maxKeyCount);
+            disk_info.CNL_unusedKeyCount = SWAP32(body->cnl.unusedKeyCount);
+            disk_info.CNL_maxRangesPerNS = SWAP32(body->cnl.maxRangesPerNS);
+            break;
+        case FC_NS_GEO: /* Namespace Geometry Features (from CNL specification) */
+            disk_info.NSGeometry = 1;
+            disk_info.NSGeometry_align = body->geometry.align;
+            disk_info.NSGeometry_alignmentGranularity = SWAP64(body->geometry.alignmentGranularity);
+            disk_info.NSGeometry_logicalBlockSize = SWAP32(body->geometry.logicalBlockSize);
+            disk_info.NSGeometry_lowestAlignedLBA = SWAP64(body->geometry.lowestAlighedLBA);
+            break;
         default:
 			if (0xbfff < (SWAP16(body->TPer.featureCode))) {
 				// silently ignore vendor specific segments as there is no public doc on them
@@ -215,8 +236,8 @@ void DtaDev::puke()
 {
 	LOG(D1) << "Entering DtaDev::puke()";
 	/* IDENTIFY */
-	cout << endl << dev << (disk_info.devType == DEVICE_TYPE_ATA ? " ATA " : 
-            disk_info.devType == DEVICE_TYPE_SAS ? " SAS " : 
+	cout << endl << dev << (disk_info.devType == DEVICE_TYPE_ATA ? " ATA " :
+            disk_info.devType == DEVICE_TYPE_SAS ? " SAS " :
             disk_info.devType == DEVICE_TYPE_USB ? " USB " :
             disk_info.devType == DEVICE_TYPE_NVME ? " NVMe " :
                     " OTHER ");
@@ -296,6 +317,34 @@ void DtaDev::puke()
 		cout << ", Locking Users = " << disk_info.OPAL20_numUsers;
 		cout << ", Range Crossing = " << (disk_info.OPAL20_rangeCrossing ? "Y" : "N");
 		cout << std::endl;
+	}
+    if (disk_info.BlockSID) {
+        cout << "Block SID Authentication feature (" << HEXON(4) << FC_BLOCK_SID
+             << HEXOFF << ")" << std::endl;
+        cout << "    SID Value State = " << disk_info.BlockSID_sidValueState
+             << ", SID Blocked State = " << disk_info.BlockSID_sidBlockedState
+             << ", Hardware Reset = " << disk_info.BlockSID_hardwareReset << std::endl;
+    }
+    if (disk_info.CNL) {
+		cout << "Configurable Namespace Locking feature (" << HEXON(4)
+		     << FC_OPAL_CNL << ")" << HEXOFF << std::endl;
+		cout << "    Range_C = " << disk_info.CNL_rangeC << ", Range_P = " << disk_info.CNL_rangeP << std::endl;
+		cout << "    MaxKeyCount = " << disk_info.CNL_maxKeyCount
+		     << ", UnusedKeyCount = " << disk_info.CNL_unusedKeyCount
+		     << ", MaxRangesPerNamespace = " << disk_info.CNL_maxRangesPerNS << std::endl;
+	}
+	if (disk_info.NSGeometry) {
+
+		cout << "Namesapce Geometry Reporting function (" << HEXON(4) << FC_NS_GEO << HEXOFF << ")" << std::endl;
+		cout << "    Align = " << (disk_info.NSGeometry_align ? "Y, " : "N, ")
+			<< "Alignment Granularity = " << disk_info.NSGeometry_alignmentGranularity
+			<< " (" << // display bytes
+			(disk_info.NSGeometry_alignmentGranularity *
+			disk_info.NSGeometry_logicalBlockSize)
+			<< ")"
+			<< ", Logical Block size = " << disk_info.NSGeometry_logicalBlockSize
+			<< ", Lowest Aligned LBA = " << disk_info.NSGeometry_lowestAlignedLBA
+			<< std::endl;
 	}
 	if (disk_info.Unknown)
 		cout << "**** " << (uint16_t)disk_info.Unknown << " **** Unknown function codes IGNORED " << std::endl;

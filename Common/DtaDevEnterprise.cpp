@@ -1506,6 +1506,19 @@ uint8_t DtaDevEnterprise::properties()
 	LOG(D1) << "Leaving DtaDevEnterprise::properties()";
 	return 0;
 }
+
+uint8_t DtaDevEnterprise::assign(char* password, uint32_t ns,
+                                 uint64_t start, uint64_t length)
+{
+    cout << "TCG Enterprise SSC does not include the assign method.\n";
+    return 0xff;
+}
+uint8_t DtaDevEnterprise::deassign(char* password, uint8_t lockingrange, bool keep)
+{
+    cout << "TCG Enterprise SSC does not include the deassign method.\n";
+    return 0xff;
+}
+
 void DtaDevEnterprise::puke()
 {
 

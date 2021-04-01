@@ -204,8 +204,10 @@ public:
          */
 	uint8_t rawCmd(char *sp, char *hexauth, char *pass,
 		char *hexinvokingUID, char *hexmethod, char *hexparms);
-	/** print table contents.
-     */
+
+	// virtual methods from DtaDev class
+	uint8_t assign(char* password, uint32_t ns, uint64_t start = 0, uint64_t length = 0);
+	uint8_t deassign(char* password, uint8_t lockingrange, bool keep);
     uint8_t printTables(char* sp, char* password, uint8_t level);
 
 protected:

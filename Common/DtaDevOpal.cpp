@@ -250,13 +250,23 @@ uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
 			delete session;
 			return lastRC;
 		}
-		LR[6] = 0x03;  // non global ranges are 00000802000300nn
+
 		LOG(I) << "LR" << i << " Begin " << response.getUint64(4) <<
 			" for " << response.getUint64(8);
 		LOG(I)	<< "            RLKEna =" << (response.getUint8(12) ? " Y " : " N ") <<
 			" WLKEna =" << (response.getUint8(16) ? " Y " : " N ") <<
 			" RLocked =" << (response.getUint8(20) ? " Y " : " N ") <<
 			" WLocked =" << (response.getUint8(24) ? " Y " : " N ");
+
+		if (disk_info.CNL) {
+			if ((lastRC = getTable(LR, OPAL_TOKEN::NAMESPACEID, OPAL_TOKEN::NAMESPACEGLOBAL)) != 0) {
+				LOG(W) << "Device supports CNL but a Get for the namespace fields failed " << lastRC;
+			} else {
+				LOG(I)	<< "            NamespaceID = " << response.getUint32(4) <<
+					" Global = " << (response.getUint8(8) ? "Y" : "N");
+			}
+		}
+		LR[6] = 0x03;  // non global ranges are 00000802000300nn
 	}
 	delete session;
 	LOG(D1) << "Exiting DtaDevOpal:listLockingRanges()";
@@ -585,6 +595,128 @@ uint8_t DtaDevOpal::rekeyLockingRange_SUM(vector<uint8_t> LR, vector<uint8_t>  U
 	LOG(D1) << "Exiting DtaDevOpal::rekeyLockingRange_SUM()";
 	return 0;
 }
+
+uint8_t DtaDevOpal::assign(char* password, uint32_t ns,
+                           uint64_t start, uint64_t length)
+{
+	uint8_t lastRC;
+	LOG(D1) << "Entering DtaDevOpal::assign()";
+
+	session = new DtaSession(this);
+	if (NULL == session) {
+		LOG(E) << "Unable to create session object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password,
+	                             OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+		delete session;
+		return lastRC;
+	}
+	DtaCommand *cmd = new DtaCommand();
+	if (NULL == cmd) {
+		LOG(E) << "Unable to create command object ";
+		delete session;
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+	cmd->reset(OPAL_UID::OPAL_LOCKING_TABLE, OPAL_METHOD::ASSIGN);
+	cmd->addToken(OPAL_TOKEN::STARTLIST);
+		cmd->addToken(ns),							// first required argument, Namespace
+		cmd->addToken(OPAL_TOKEN::STARTNAME);
+			cmd->addToken((uint64_t)0);
+			cmd->addToken(start);					// first optional argument, RangeStart
+		cmd->addToken(OPAL_TOKEN::ENDNAME);
+		cmd->addToken(OPAL_TOKEN::STARTNAME);
+			cmd->addToken((uint64_t)1);
+			cmd->addToken(length);					// second optional argument, Rangelength
+		cmd->addToken(OPAL_TOKEN::ENDNAME);
+	cmd->addToken(OPAL_TOKEN::ENDLIST);
+	cmd->complete();
+	if ((lastRC = session->sendCommand(cmd, response)) != 0) {
+		LOG(E) << "assign call Failed ";
+		delete cmd;
+		delete session;
+		return lastRC;
+	}
+	delete cmd;
+
+	// Assign call returns 2 values, the UID of the Locking table row that was
+	// configured for the new locking range, and an indicatgor if the range is
+	// global to the namespace.
+	if (response.getTokenCount() < 5)
+	{
+		LOG(E) << "assign command did not return enough data, token count is " <<
+			response.getTokenCount();
+		delete session;
+		return DTAERROR_NO_LOCKING_INFO;
+	}
+
+	uint8_t uid[8];
+	char    uidStr[20];
+	response.getBytes(1, uid);
+	uint32_t lr = (uid[6] << 8) + uid[7];
+	printBytes(uid, 8, uidStr);
+
+	LOG(I) << "Locking Range UID: " << uidStr << " (LR" << lr << ") assigned to namespace "
+		<< ns << ", global: " << (response.getUint8(2) ? "T" : "F");
+
+	delete session;
+	return 0;
+}
+
+uint8_t DtaDevOpal::deassign(char* password, uint8_t lockingrange, bool keep)
+{
+	uint8_t lastRC;
+	LOG(D1) << "Entering DtaDevOpal::deassign()";
+
+	std::vector<uint8_t> uid = {OPAL_SHORT_ATOM::BYTESTRING8, 0x00, 0x00, 0x08, 0x02, 0x00, 0x03};
+	uid.push_back((lockingrange >> 8) & 0xFF);
+	uid.push_back(lockingrange & 0xFF);
+
+	session = new DtaSession(this);
+	if (NULL == session) {
+		LOG(E) << "Unable to create session object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password,
+	                             OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+		delete session;
+		return lastRC;
+	}
+	DtaCommand *cmd = new DtaCommand();
+	if (NULL == cmd) {
+		LOG(E) << "Unable to create command object ";
+		delete session;
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+	cmd->reset(OPAL_UID::OPAL_LOCKING_TABLE, OPAL_METHOD::DEASSIGN);
+	cmd->addToken(OPAL_TOKEN::STARTLIST);
+		cmd->addToken(uid);							// first required argument, range UID
+	if (keep) {
+		cmd->addToken(OPAL_TOKEN::STARTNAME);
+			cmd->addToken((uint64_t)0);				// first optional argument
+			cmd->addToken(OPAL_TOKEN::OPAL_TRUE);	// KeepNamespaceGlobalRnageKey
+		cmd->addToken(OPAL_TOKEN::ENDNAME);
+	}
+	cmd->addToken(OPAL_TOKEN::ENDLIST);
+	cmd->complete();
+	if ((lastRC = session->sendCommand(cmd, response)) != 0) {
+		LOG(E) << "deassign call Failed ";
+		delete cmd;
+		delete session;
+		return lastRC;
+	}
+
+	std::string uidStr;
+	uid.erase(uid.begin());
+	printUID(uid, uidStr);
+
+	LOG(I) << "Locking Range UID: " << uidStr << " (LR" << lockingrange << ") deassigned";
+
+	delete cmd;
+	delete session;
+	return 0;
+}
+
 uint8_t DtaDevOpal::setBandsEnabled(int16_t lockingrange, char * password)
 {
 	if (password == NULL) { LOG(D4) << "Password is NULL"; } // unreferenced formal paramater
@@ -2142,7 +2274,7 @@ const tableDesc_t LockingTableDesc =
 	{ 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x01 },
 	1,
 	0,		// skip
-	20,
+	22,
 	{
 		"UID",
 		"Name",
@@ -2163,7 +2295,9 @@ const tableDesc_t LockingTableDesc =
 		"ContOnReset",
 		"LastReEncLBA",
 		"LastReEncState",
-		"GeneralStatus"
+		"GeneralStatus",
+		"NamespaceID",
+		"NamespaceGlobal"
 	}
 };
 
@@ -2175,12 +2309,13 @@ const tableDesc_t MBRControlTableDesc =
 	{ 0x00, 0x00, 0x08, 0x03, 0x00, 0x00, 0x00, 0x01 },
 	1,
 	0,		// skip
-	4,
+	5,
 	{
 		"UID",
 		"Enable",
 		"Done",
-		"DoneOnReset"
+		"DoneOnReset",
+		"NamespaceID"
 	}
 };
 
@@ -2191,7 +2326,7 @@ const tableDesc_t MBRTableDesc =
 	{ 0x00, 0x00, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00 },
 	{ 0x00, 0x00, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00 },
 	0,
-	1,		// skip
+	0,		// skip
 	0,
 	{}
 };
@@ -2239,7 +2374,7 @@ const tableDesc_t DataStoreTableDesc =
 	{ 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00 },
 	{ 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00 },
 	0,
-	1,		// skip
+	0,		// skip
 	0,
 	{}
 };
@@ -2273,7 +2408,7 @@ int anybody;
 int authenticated;
 int failed;
 
-uint8_t DtaDevOpal::verifyPassword(OPAL_UID sp, std::string& pw)
+uint8_t DtaDevOpal::verifyPassword(OPAL_UID sp, OPAL_UID authority, std::string& pw)
 {
 	LOG(D1) << "Entering DtaDevOpal::verifyPassword()";
 
@@ -2286,17 +2421,16 @@ uint8_t DtaDevOpal::verifyPassword(OPAL_UID sp, std::string& pw)
 	}
 
 	if (pw.length() != 0) {
-		if ((lastRC = session->start(sp, (char*)pw.c_str(),
-									 OPAL_UID::OPAL_ADMINSP_UID)) != 0) {
-			LOG(E) << "Unable to start Admin session" << dev;
+		if ((lastRC = session->start(sp, (char*)pw.c_str(), authority)) != 0) {
+			LOG(E) << "Unable to start session" << dev;
 		} else {
-			std::vector<uint8_t> uidtok = {OPAL_SHORT_ATOM::BYTESTRING8,
-										   0x00, 0x00, 0x00, 0x0b, 0x00, 0x00, 0x00, 0x01};
-			lastRC = getTable(uidtok, 0, 4);
-		}
+            std::vector<uint8_t> auth(OPALUID[authority], OPALUID[authority] + 8);
+            auth.insert(auth.begin(), OPAL_SHORT_ATOM::BYTESTRING8);
+            lastRC = session->authenticate(auth, (char*)pw.c_str());
+        }
 	}
 
-	delete session;
+    delete session;
 	LOG(D1) << "Exiting verifyPassword()";
 	return lastRC;
 }
@@ -2410,7 +2544,7 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 			if (level > 1) cout << "Unable to start anybody session.\n";
 		} else {
 			if (level > 0) cout << "Session opened with Anybody authorization.\n";
-			lastRC = getTable(uidtok, 0, TableDesc->columnCount - 1);
+			lastRC = getTable(uidtok, 0, 0);
 			if (lastRC == 0) {
 				anybody++;
 			}
@@ -2770,14 +2904,13 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
 {
 	printf("***** %s Security Provider ******\n", spStr);
 
-#if 0
-	if (verifyPassword(sp, pw) != 0) {
+
+	if (verifyPassword(sp, auth, pw) != 0) {
 		printf("Password verification failed, using Anyone authority.\n");
 		pw.clear();
 	} else {
 		printf("Password verified.\n");
 	}
-#endif
 
 	printf("\nTable Table\n");
 
@@ -2840,7 +2973,7 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
 		}
 	}
 
-    //
+	//
 	// iterate through the table from the table table
 	//
 	for (auto it = rows.cbegin(); it != rows.cend(); it++) {
@@ -2866,100 +2999,101 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
 		printUID(table);
 		printf(")\n");
 
+        if (tableDescPtr->skip != 0) {
+            printf("Skipping table.\n");
+            continue;
+        }
+
+        // Get the ACL for this table.
+        tableRows_t aclRows;
+        getACLRow(table, methodsList, sp, auth, pw, aclRows, level);
+
 		if (tableDescPtr->kind == 0) {
-			printf("Table is a byte table, skipping.\n");
-			continue;
-		}
+			printf("Table is a byte table, skipping rows.\n");
+ 		} else {
+            std::vector<std::vector<uint8_t>> rowUIDs;
 
-		if (tableDescPtr->skip != 0) {
-			printf("Skipping table.\n");
-			continue;
-		}
+    		uint8_t rc = nextTableRow(sp, pw, table);
+    		if (rc) {
+    			printf("Unable to read table rows list, use the default.\n");
+    			std::vector<uint8_t> oneRow(tableDescPtr->defaultRow, tableDescPtr->defaultRow + 8);
+    			rowUIDs.push_back(oneRow);
+    		} else {
+    			uint32_t tokenCount = response.getTokenCount();
+    			uint8_t uid[8];
+    			for (uint32_t i = 0; i < tokenCount; i++) {
+    				if (response.tokenIs(i) == DTA_TOKENID_BYTESTRING) {
+    					response.getBytes(i, uid);
+    					std::vector<uint8_t> uidv;
+    					for (int ii = 0; ii < 8; ii++) {
+    						uidv.push_back(uid[ii]);
+    					}
+    					rowUIDs.push_back(uidv);
+    				}
+    			}
+    		}
 
-		std::vector<std::vector<uint8_t>> rowUIDs;
+    		if (level > 0) {
+    			printf("Table has the following rows:\n");
 
-		uint8_t rc = nextTableRow(sp, pw, table);
-		if (rc) {
-			printf("Unable to read table rows list, use the default.\n");
-			std::vector<uint8_t> oneRow(tableDescPtr->defaultRow, tableDescPtr->defaultRow + 8);
-			rowUIDs.push_back(oneRow);
-		} else {
-			uint32_t tokenCount = response.getTokenCount();
-			uint8_t uid[8];
-			for (uint32_t i = 0; i < tokenCount; i++) {
-				if (response.tokenIs(i) == DTA_TOKENID_BYTESTRING) {
-					response.getBytes(i, uid);
-					std::vector<uint8_t> uidv;
-					for (int ii = 0; ii < 8; ii++) {
-						uidv.push_back(uid[ii]);
-					}
-					rowUIDs.push_back(uidv);
-				}
-			}
-		}
+    			for (auto it = rowUIDs.cbegin(); it != rowUIDs.cend(); it++) {
+    				printUID(*it);
+    				cout << "\n";
+    			}
+    		}
 
-		if (level > 0) {
-			printf("Table has the following rows:\n");
+    		tableRows_t tableRows;
 
-			for (auto it = rowUIDs.cbegin(); it != rowUIDs.cend(); it++) {
-				printUID(*it);
-				cout << "\n";
-			}
-		}
+    		// retrieve each row and save the values returned.
+    		for (auto it = rowUIDs.cbegin(); it != rowUIDs.cend(); it++) {
+    			rowMap_t rowMap;
+    			for (uint32_t i = 0; i < tableDescPtr->columnCount; i++) {
+    				rowMap[i] = "N/A";
+    			}
+    			getTableRow(*it, tableDescPtr, sp, auth, pw, rowMap, level);
+    			tableRows.push_back(rowMap);
+    		}
 
-		tableRows_t tableRows;
+    		// Print the table contents as reported.
+    		printf("\nTable %s::%s:\n", spStr, tableDescPtr->name);
+    		// This first part is calculating column widths based
+    		// on the largest string in each column
+    		uint32_t columns = tableDescPtr->columnCount;
+    		uint32_t columnWidth[32];
+    		for (uint32_t i = 0; i < columns; i++) {
+    			columnWidth[i] = strlen(tableDescPtr->columns[i]) + 1;
+    		}
+    		for (auto it = tableRows.begin(); it != tableRows.cend(); it++) {
+    			for (uint32_t i = 0; i < columns; i++) {
+    				if ((*it)[i].length() + 1 > columnWidth[i]) {
+    					columnWidth[i] = (*it)[i].length() + 1;
+    				}
+    			}
+    		}
 
-		// retrieve each row and save the values returned.
-		for (auto it = rowUIDs.cbegin(); it != rowUIDs.cend(); it++) {
-			rowMap_t rowMap;
-			for (uint32_t i = 0; i < tableDescPtr->columnCount; i++) {
-				rowMap[i] = "N/A";
-			}
-			getTableRow(*it, tableDescPtr, sp, auth, pw, rowMap, level);
-			tableRows.push_back(rowMap);
-		}
+    		for (uint32_t i = 0; i < tableDescPtr->columnCount; i++) {
+    			printf("%-*s", columnWidth[i], tableDescPtr->columns[i]);
+    		}
+    		for (auto it = tableRows.begin(); it != tableRows.cend(); it++) {
+    			printf("\n");
+    			for (uint32_t i = 0; i < tableDescPtr->columnCount; i++) {
+    				printf("%-*s", columnWidth[i], (*it)[i].c_str());
+    			}
+    		}
+    		if (strlen(tableDescPtr->notes)) {
+    			printf("\nNote: %s", tableDescPtr->notes);
+    		}
+    		printf("\nTable %s::%s complete.\n", spStr, tableDescPtr->name);
 
-		// Print the table.
-		printf("\nTable %s::%s:\n", spStr, tableDescPtr->name);
-		// This first part is calculating column widths based
-		// on the largest string in each column
-		uint32_t columns = tableDescPtr->columnCount;
-		uint32_t columnWidth[32];
-		for (uint32_t i = 0; i < columns; i++) {
-			columnWidth[i] = strlen(tableDescPtr->columns[i]) + 1;
-		}
-		for (auto it = tableRows.begin(); it != tableRows.cend(); it++) {
-			for (uint32_t i = 0; i < columns; i++) {
-				if ((*it)[i].length() + 1 > columnWidth[i]) {
-					columnWidth[i] = (*it)[i].length() + 1;
-				}
-			}
-		}
+    		// retrieve ACL values for each row and save the values returned.
+    		for (auto it = rowUIDs.cbegin(); it != rowUIDs.cend(); it++) {
+    			getACLRow(*it, methodsList, sp, auth, pw, aclRows, level);
+    		}
+        }
 
-		for (uint32_t i = 0; i < tableDescPtr->columnCount; i++) {
-			printf("%-*s", columnWidth[i], tableDescPtr->columns[i]);
-		}
-		for (auto it = tableRows.begin(); it != tableRows.cend(); it++) {
-			printf("\n");
-			for (uint32_t i = 0; i < tableDescPtr->columnCount; i++) {
-				printf("%-*s", columnWidth[i], (*it)[i].c_str());
-			}
-		}
-		if (strlen(tableDescPtr->notes)) {
-			printf("\nNote: %s", tableDescPtr->notes);
-		}
-		printf("\nTable %s::%s complete.\n", spStr, tableDescPtr->name);
-
-		// Get and print the ACL for this table.
-		tableRows_t aclRows;
-		getACLRow(table, methodsList, sp, auth, pw, aclRows, level);
-		// retrieve ACL values for each row and save the values returned.
-		for (auto it = rowUIDs.cbegin(); it != rowUIDs.cend(); it++) {
-			getACLRow(*it, methodsList, sp, auth, pw, aclRows, level);
-		}
-
+        // Print the ACL
 		if (aclRows.size() == 0) {
-			printf("\nNo ACL entried retrieved for table %s::%s\n",
+			printf("\nNo ACL entries retrieved for table %s::%s\n",
 			       spStr, tableDescPtr->name);
 		} else {
 			// Calculate the column widths.
@@ -2984,6 +3118,43 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
 			printf("\nACL for Table %s::%s complete.\n\n", spStr, tableDescPtr->name);
 		}
 	}
+
+    // Print the ACL for this security Protocol
+    tableRows_t aclRows;
+
+    // This SP UID
+    std::vector<uint8_t> thisUID(OPALUID[OPAL_UID::OPAL_THISSP_UID], 
+                                 OPALUID[OPAL_UID::OPAL_THISSP_UID] + 8);
+    getACLRow(thisUID, methodsList, sp, auth, pw, aclRows, level);
+
+    // Actual SP UID
+    std::vector<uint8_t> spUID(OPALUID[sp], OPALUID[sp] + 8);
+    getACLRow(spUID, methodsList, sp, auth, pw, aclRows, level);
+
+    if (aclRows.size() == 0) {
+        printf("\nNo ACL entries retrieved for Security Protocol %s\n", spStr);
+    } else {
+        // Calculate the column widths.
+        uint32_t columnWidthAcl[3] = {4, 7, 4};
+        for (auto it = aclRows.begin(); it != aclRows.cend(); it++) {
+            for (uint32_t i = 0; i < 4; i++) {
+                if ((*it)[i].length() + 1 > columnWidthAcl[i]) {
+                    columnWidthAcl[i] = (*it)[i].length() + 1;
+                }
+            }
+        }
+
+        printf("\nACL for Security Protocol %s\n", spStr);
+        printf("%-*s%-*s%-*s", columnWidthAcl[0], "UID",
+               columnWidthAcl[1], "Method", columnWidthAcl[2], "ACL");
+        for (auto it = aclRows.begin(); it != aclRows.cend(); it++) {
+            printf("\n");
+            for (uint32_t i = 0; i < 3; i++) {
+                printf("%-*s", columnWidthAcl[i], (*it)[i].c_str());
+            }
+        }
+        printf("\nACL for Security Protocol %s complete.\n\n", spStr);
+    }
 
 	return 0;
 }

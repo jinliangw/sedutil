@@ -195,6 +195,16 @@ int main(int argc, char * argv[])
 		LOG(D) << "Erasing LockingRange " << opts.lockingrange << " on" << argv[opts.device];
 		return d->eraseLockingRange_SUM(opts.lockingrange, argv[opts.password]);
 		break;
+	case sedutiloption::assign:
+		LOG(D) << "Assign a LockingRange to a namespace " << argv[opts.lockingrange];
+		return (d->assign(argv[opts.password], atoi(argv[opts.lockingrange]),
+		                  atoll(argv[opts.lrstart]), atoll(argv[opts.lrlength])));
+		break;
+	case sedutiloption::deassign:
+		LOG(D) << "Deassign a LockingRangee " << argv[opts.lockingrange];
+		return (d->deassign(argv[opts.password], atoi(argv[opts.lockingrange]),
+		                    opts.lockingstate));
+		break;
     case sedutiloption::query:
 		LOG(D) << "Performing diskquery() on " << argv[opts.device];
         d->puke();
