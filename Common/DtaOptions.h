@@ -128,6 +128,11 @@ if((x+baseOptions) != argc) { \
 	} \
 i++;
 
+#define TESTARG_RANGE(structfield, minValue, maxValue, errorStr) \
+    opts->structfield = atoi(argv[i + 1]); \
+    if ((opts->structfield < minValue) || (opts->structfield > maxValue)) \
+    TESTFAIL(errorStr)
+
 /** set the argc value for this parameter in the options structure */
 #define OPTION_IS(option_field) \
 				opts->option_field = ++i;

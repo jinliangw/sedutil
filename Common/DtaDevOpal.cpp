@@ -1261,7 +1261,7 @@ uint8_t DtaDevOpal::loadPBA(char * password, char * filename) {
 	uint32_t filepos = 0;
 	uint32_t eofpos;
 	ifstream pbafile;
-	(MAX_BUFFER_LENGTH > tperMaxPacket) ? blockSize = tperMaxPacket : blockSize = MAX_BUFFER_LENGTH;
+	(PROP_BUFFER_LENGTH > tperMaxPacket) ? blockSize = tperMaxPacket : blockSize = PROP_BUFFER_LENGTH;
 	if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
 	vector <uint8_t> buffer, lengthtoken;
 	blockSize -= sizeof(OPALHeader) + 50;  // packet overhead
@@ -1707,8 +1707,8 @@ uint8_t DtaDevOpal::exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol)
     hdr = (OPALHeader *) cmd->getRespBuffer();
     do {
         osmsSleep(25);
-        memset(cmd->getRespBuffer(), 0, MIN_BUFFER_LENGTH);
-        lastRC = sendCmd(IF_RECV, protocol, comID(), cmd->getRespBuffer(), MIN_BUFFER_LENGTH);
+        memset(cmd->getRespBuffer(), 0, PROP_BUFFER_LENGTH);
+        lastRC = sendCmd(IF_RECV, protocol, comID(), cmd->getRespBuffer(), PROP_BUFFER_LENGTH);
 
     }
     while ((0 != hdr->cp.outstandingData) && (0 == hdr->cp.minTransfer));
@@ -1744,15 +1744,15 @@ uint8_t DtaDevOpal::properties()
 	props->addToken(OPAL_TOKEN::STARTLIST);
 	props->addToken(OPAL_TOKEN::STARTNAME);
 	props->addToken("MaxComPacketSize");
-	props->addToken(2048);
+	props->addToken(PROP_BUFFER_LENGTH);
 	props->addToken(OPAL_TOKEN::ENDNAME);
 	props->addToken(OPAL_TOKEN::STARTNAME);
 	props->addToken("MaxPacketSize");
-	props->addToken(2028);
+	props->addToken(PROP_BUFFER_LENGTH);
 	props->addToken(OPAL_TOKEN::ENDNAME);
 	props->addToken(OPAL_TOKEN::STARTNAME);
 	props->addToken("MaxIndTokenSize");
-	props->addToken(1992);
+	props->addToken(PROP_BUFFER_LENGTH - 56);
 	props->addToken(OPAL_TOKEN::ENDNAME);
 	props->addToken(OPAL_TOKEN::STARTNAME);
 	props->addToken("MaxPackets");
@@ -3123,7 +3123,7 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
     tableRows_t aclRows;
 
     // This SP UID
-    std::vector<uint8_t> thisUID(OPALUID[OPAL_UID::OPAL_THISSP_UID], 
+    std::vector<uint8_t> thisUID(OPALUID[OPAL_UID::OPAL_THISSP_UID],
                                  OPALUID[OPAL_UID::OPAL_THISSP_UID] + 8);
     getACLRow(thisUID, methodsList, sp, auth, pw, aclRows, level);
 

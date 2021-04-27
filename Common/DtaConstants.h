@@ -19,11 +19,13 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
  * C:E********************************************************************** */
  /** MAX Length of input the IO buffers used */
 #define MAX_BUFFER_LENGTH 61440
-/** Length of input the IO buffers used */
+/** MIN length of com packets per Opal requirements */
 #define MIN_BUFFER_LENGTH 2048
+/** Length of input the IO buffers reported via Properties exchange */
+#define PROP_BUFFER_LENGTH 16384
 /** Alignment of the IO buffers.
 * generic align on 1k boundary probably not needed
-* but when things weren't working this was one of the 
+* but when things weren't working this was one of the
 * things I tried to make it work.
 */
 #define IO_BUFFER_ALIGNMENT 1024
