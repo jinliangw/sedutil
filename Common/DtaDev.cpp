@@ -198,6 +198,8 @@ void DtaDev::discovery0()
             disk_info.BlockSID = 1;
             disk_info.BlockSID_sidValueState = body->blockSID.sidValueState;
             disk_info.BlockSID_sidBlockedState = body->blockSID.sidBlockedState;
+            disk_info.BlockSID_lockingSPFreezeSup = body->blockSID.lockingSPFreezeSup;
+            disk_info.BlockSID_lockingSPFreezeState = body->blockSID.lockingSPFreezeState;
             disk_info.BlockSID_hardwareReset = body->blockSID.hardwareReset;
             break;
         case FC_OPAL_CNL: /* Configurable Namespace Locking */
@@ -246,9 +248,9 @@ void DtaDev::puke()
 	if (disk_info.TPer) {
 		cout << "TPer function (" << HEXON(4) << FC_TPER << HEXOFF << ")" << std::endl;
 		cout << "    ACKNAK = " << (disk_info.TPer_ACKNACK ? "Y, " : "N, ")
-			<< "ASYNC = " << (disk_info.TPer_async ? "Y, " : "N. ")
+			<< "ASYNC = " << (disk_info.TPer_async ? "Y, " : "N, ")
 			<< "BufferManagement = " << (disk_info.TPer_bufferMgt ? "Y, " : "N, ")
-			<< "comIDManagement  = " << (disk_info.TPer_comIDMgt ? "Y, " : "N, ")
+			<< "comIDManagement = " << (disk_info.TPer_comIDMgt ? "Y, " : "N, ")
 			<< "Streaming = " << (disk_info.TPer_streaming ? "Y, " : "N, ")
 			<< "SYNC = " << (disk_info.TPer_sync ? "Y" : "N")
 			<< std::endl;
@@ -309,8 +311,8 @@ void DtaDev::puke()
 	if (disk_info.OPAL20) {
 		cout << "OPAL 2.0 function (" << HEXON(4) << FC_OPALV200 << ")" << HEXOFF << std::endl;
 		cout << "    Base comID = " << HEXON(4) << disk_info.OPAL20_basecomID << HEXOFF;
-		cout << ", Initial PIN = " << HEXON(2) << disk_info.OPAL20_initialPIN << HEXOFF;
-		cout << ", Reverted PIN = " << HEXON(2) << disk_info.OPAL20_revertedPIN << HEXOFF;
+		cout << ", Initial PIN = " << HEXON(2) << (uint32_t)disk_info.OPAL20_initialPIN << HEXOFF;
+		cout << ", Reverted PIN = " << HEXON(2) << (uint32_t)disk_info.OPAL20_revertedPIN << HEXOFF;
 		cout << ", comIDs = " << disk_info.OPAL20_numcomIDs;
 		cout << std::endl;
 		cout << "    Locking Admins = " << disk_info.OPAL20_numAdmins;
@@ -321,17 +323,24 @@ void DtaDev::puke()
     if (disk_info.BlockSID) {
         cout << "Block SID Authentication feature (" << HEXON(4) << FC_BLOCK_SID
              << HEXOFF << ")" << std::endl;
-        cout << "    SID Value State = " << disk_info.BlockSID_sidValueState
-             << ", SID Blocked State = " << disk_info.BlockSID_sidBlockedState
-             << ", Hardware Reset = " << disk_info.BlockSID_hardwareReset << std::endl;
+        cout << "    SID Value State = " << (disk_info.BlockSID_sidValueState ? "Y" : "N")
+             << ", SID Blocked State = " << (disk_info.BlockSID_sidBlockedState ? "Y" : "N")
+             << ", LockingSP Freeze Lock Supported = " << (disk_info.BlockSID_sidBlockedState ? "Y" : "N") << std::endl
+             << "    LockingSP Freeze Lock State = " << (disk_info.BlockSID_lockingSPFreezeState ? "Y" : "N")
+             << ", Hardware Reset = " << (disk_info.BlockSID_hardwareReset  ? "Y" : "N") << std::endl;
     }
     if (disk_info.CNL) {
 		cout << "Configurable Namespace Locking feature (" << HEXON(4)
 		     << FC_OPAL_CNL << ")" << HEXOFF << std::endl;
-		cout << "    Range_C = " << disk_info.CNL_rangeC << ", Range_P = " << disk_info.CNL_rangeP << std::endl;
+		cout << "    Range_C = " << (disk_info.CNL_rangeC ? "Y" : "N")
+                     << ", Range_P = " << (disk_info.CNL_rangeP ? "Y" : "N") << std::endl;
 		cout << "    MaxKeyCount = " << disk_info.CNL_maxKeyCount
-		     << ", UnusedKeyCount = " << disk_info.CNL_unusedKeyCount
-		     << ", MaxRangesPerNamespace = " << disk_info.CNL_maxRangesPerNS << std::endl;
+		     << ", UnusedKeyCount = " << disk_info.CNL_unusedKeyCount;
+                if (disk_info.CNL_maxRangesPerNS == 0xFFFFFFFF) {
+                    cout << ", MaxRangesPerNamespace = No Limit" << std::endl;
+                } else {
+                    cout << ", MaxRangesPerNamespace = " << disk_info.CNL_maxRangesPerNS << std::endl;
+                }
 	}
 	if (disk_info.NSGeometry) {
 

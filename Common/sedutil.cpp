@@ -110,7 +110,7 @@ int main(int argc, char * argv[])
         return d->setSIDPassword(argv[opts.password], argv[opts.newpassword]);
 		break;
 	case sedutiloption::setAdmin1Pwd:
-        LOG(D) << "Performing setPAdmin1Pwd ";
+        LOG(D) << "Performing setAdmin1Pwd ";
         return d->setPassword(argv[opts.password], (char *) "Admin1",
                             argv[opts.newpassword]);
 		break;

@@ -211,6 +211,8 @@ DtaDevOpal::lrStatus_t DtaDevOpal::getLockingRange_status(uint8_t lockingrange, 
 }
 uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
 {
+        int firstRange = (int)rangeid;
+        int lastRange = (int)rangeid;
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal:listLockingRanges()" << rangeid;
 	vector<uint8_t> LR;
@@ -228,24 +230,31 @@ uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
 		delete session;
 		return lastRC;
 	}
-	vector<uint8_t> table;
-	table.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
-	for (int i = 0; i < 8; i++) {
-		table.push_back(OPALUID[OPAL_UID::OPAL_LOCKING_INFO_TABLE][i]);
-	}
-	if ((lastRC = getTable(table, _OPAL_TOKEN::MAXRANGES, _OPAL_TOKEN::MAXRANGES)) != 0) {
-		delete session;
-		return lastRC;
-	}
-	if (response.tokenIs(4) != _OPAL_TOKEN::DTA_TOKENID_UINT) {
-		LOG(E) << "Unable to determine number of ranges ";
-		delete session;
-		return DTAERROR_NO_LOCKING_INFO;
-	}
-	LOG(I) << "Locking Range Configuration for " << dev;
-	uint32_t numRanges = response.getUint32(4) + 1;
-	for (uint32_t i = 0; i < numRanges; i++){
-		if(0 != i) LR[8] = i & 0xff;
+        if (rangeid == -1) {
+            vector<uint8_t> table;
+            table.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+            for (int i = 0; i < 8; i++) {
+                    table.push_back(OPALUID[OPAL_UID::OPAL_LOCKING_INFO_TABLE][i]);
+            }
+            if ((lastRC = getTable(table, _OPAL_TOKEN::MAXRANGES, _OPAL_TOKEN::MAXRANGES)) != 0) {
+                    delete session;
+                    return lastRC;
+            }
+            if (response.tokenIs(4) != _OPAL_TOKEN::DTA_TOKENID_UINT) {
+                    LOG(E) << "Unable to determine number of ranges ";
+                    delete session;
+                    return DTAERROR_NO_LOCKING_INFO;
+            }
+            firstRange = 0;
+            lastRange = (int)response.getUint32(4);
+        }
+
+        LOG(I) << "Locking Range Configuration for " << dev;
+	for (int i = firstRange; i <= lastRange; i++){
+		if(0 != i) {
+                    LR[6] = 0x03;  // non global ranges are 00000802000300nn
+                    LR[8] = i & 0xff;
+                }
 		if ((lastRC = getTable(LR, _OPAL_TOKEN::RANGESTART, _OPAL_TOKEN::WRITELOCKED)) != 0) {
 			delete session;
 			return lastRC;
@@ -266,7 +275,6 @@ uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
 					" Global = " << (response.getUint8(8) ? "Y" : "N");
 			}
 		}
-		LR[6] = 0x03;  // non global ranges are 00000802000300nn
 	}
 	delete session;
 	LOG(D1) << "Exiting DtaDevOpal:listLockingRanges()";
@@ -786,7 +794,7 @@ uint8_t DtaDevOpal::getAuth4User(char * userid, uint8_t uidorcpin, std::vector<u
 {
 	LOG(D1) << "Entering DtaDevOpal::getAuth4User()";
 	userData.clear();
-	userData. push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+	userData.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
 	userData.push_back(0x00);
 	userData.push_back(0x00);
 	userData.push_back(0x00);
@@ -1701,7 +1709,7 @@ uint8_t DtaDevOpal::exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol)
     LOG(D3) << endl << "Dumping command buffer";
     IFLOG(D3) DtaHexDump(cmd->getCmdBuffer(), SWAP32(hdr->cp.length) + sizeof (OPALComPacket));
     if((lastRC = sendCmd(IF_SEND, protocol, comID(), cmd->getCmdBuffer(), cmd->outputBufferSize())) != 0) {
-		LOG(E) << "Command failed on send " << (uint16_t) lastRC;
+		LOG(E) << "Command failed on send, status code = " << (uint16_t) lastRC;
         return lastRC;
     }
     hdr = (OPALHeader *) cmd->getRespBuffer();
@@ -1713,9 +1721,9 @@ uint8_t DtaDevOpal::exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol)
     }
     while ((0 != hdr->cp.outstandingData) && (0 == hdr->cp.minTransfer));
     LOG(D3) << std::endl << "Dumping reply buffer";
-    IFLOG(D3) DtaHexDump(cmd->getRespBuffer(), SWAP32(hdr->cp.length) + sizeof (OPALComPacket));
+    IFLOG(D3) DtaHexDump(cmd->getRespBuffer(), SWAP32(hdr->cp.length) + sizeof(OPALComPacket));
 	if (0 != lastRC) {
-        LOG(E) << "Command failed on recv" << (uint16_t) lastRC;
+        LOG(E) << "Command failed on recv, status code = " << (uint16_t)lastRC;
         return lastRC;
     }
     resp.init(cmd->getRespBuffer());

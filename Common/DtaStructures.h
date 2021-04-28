@@ -233,13 +233,17 @@ typedef struct _Discovery0BlockSID {
     uint8_t length;
 
     /* big endian
-    uint8_t reserved04 : 6;
+    uint8_t reserved04 : 4;
+    uint8_t lockingSPFreezeSup : 1;
+    uint8_t lockingSPFreezeState : 1;
     uint8_t sidValueState : 1
-    uint8_t isdBlockedState : 1;
+    uint8_t sidBlockedState : 1;
      */
     uint8_t sidValueState : 1;
     uint8_t sidBlockedState : 1;
-    uint8_t reserved04 : 6;
+    uint8_t lockingSPFreezeSup : 1;
+    uint8_t lockingSPFreezeState : 1;
+    uint8_t reserved04 : 4;
 
     /* big endian
     uint8_t reserved05 : 7;
@@ -392,6 +396,8 @@ typedef struct _OPAL_DiskInfo {
     uint8_t OPAL20_rangeCrossing;
     uint8_t BlockSID_sidValueState : 1;
     uint8_t BlockSID_sidBlockedState : 1;
+    uint8_t BlockSID_lockingSPFreezeSup : 1;
+    uint8_t BlockSID_lockingSPFreezeState : 1;
     uint8_t BlockSID_hardwareReset : 1;
     uint8_t NSGeometry_align : 1;
     uint32_t NSGeometry_logicalBlockSize;
