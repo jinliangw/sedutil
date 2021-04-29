@@ -72,7 +72,7 @@ uint8_t DtaDevLinuxNvme::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16_t comI
     struct nvme_admin_cmd nvme_cmd;
 	int err;
 
-    LOG(D1) << "Entering DtaDevLinuxNvme::sendCmd";
+	LOG(D1) << "Entering DtaDevLinuxNvme::sendCmd";
 
 	memset(&nvme_cmd, 0, sizeof(nvme_cmd));
 

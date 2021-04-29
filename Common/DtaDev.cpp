@@ -38,12 +38,16 @@ using namespace std;
 /** Device Class (Base) represents a single disk device.
  *  This is the functionality that is common to all OS's and SSC's
  */
-DtaDev::DtaDev()
+DtaDev::DtaDev() :
+    tperMaxPacket(MIN_BUFFER_LENGTH),
+    tperMaxToken(MIN_BUFFER_LENGTH - 56)
 {
 }
+
 DtaDev::~DtaDev()
 {
 }
+
 uint8_t DtaDev::isOpal2()
 {
 	LOG(D1) << "Entering DtaDev::isOpal2 " << (uint16_t) disk_info.OPAL20;

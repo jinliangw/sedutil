@@ -214,7 +214,7 @@ uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
         int firstRange = (int)rangeid;
         int lastRange = (int)rangeid;
 	uint8_t lastRC;
-	LOG(D1) << "Entering DtaDevOpal:listLockingRanges()" << rangeid;
+	LOG(D1) << "Entering DtaDevOpal:listLockingRanges() " << rangeid;
 	vector<uint8_t> LR;
 	LR.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
 	for (int i = 0; i < 8; i++) {
@@ -1713,10 +1713,11 @@ uint8_t DtaDevOpal::exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol)
         return lastRC;
     }
     hdr = (OPALHeader *) cmd->getRespBuffer();
+    uint32_t receiveLength = (PROP_BUFFER_LENGTH < tperMaxPacket) ? PROP_BUFFER_LENGTH : tperMaxPacket;
     do {
         osmsSleep(25);
-        memset(cmd->getRespBuffer(), 0, PROP_BUFFER_LENGTH);
-        lastRC = sendCmd(IF_RECV, protocol, comID(), cmd->getRespBuffer(), PROP_BUFFER_LENGTH);
+        memset(cmd->getRespBuffer(), 0, receiveLength);
+        lastRC = sendCmd(IF_RECV, protocol, comID(), cmd->getRespBuffer(), receiveLength);
 
     }
     while ((0 != hdr->cp.outstandingData) && (0 == hdr->cp.minTransfer));
