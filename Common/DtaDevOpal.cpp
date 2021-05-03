@@ -1756,6 +1756,10 @@ uint8_t DtaDevOpal::properties()
 	props->addToken(PROP_BUFFER_LENGTH);
 	props->addToken(OPAL_TOKEN::ENDNAME);
 	props->addToken(OPAL_TOKEN::STARTNAME);
+	props->addToken("MaxResponseComPacketSize");
+	props->addToken(PROP_BUFFER_LENGTH);
+	props->addToken(OPAL_TOKEN::ENDNAME);
+	props->addToken(OPAL_TOKEN::STARTNAME);
 	props->addToken("MaxPacketSize");
 	props->addToken(PROP_BUFFER_LENGTH);
 	props->addToken(OPAL_TOKEN::ENDNAME);
@@ -1981,411 +1985,411 @@ uint8_t DtaDevOpal::rawCmd(char *sp, char * hexauth, char *pass,
 //
 const tableDesc_t UnknownTableDesc =
 {
-	"Unknown",
-	"",
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-	1,
-	1,
-	1,
-	{
-		"UID",
-	}
+    "Unknown",
+    "",
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+    1,
+    1,
+    1,
+    {
+        { 0, "UID" }
+    }
 };
 
 const tableDesc_t TableTableDesc =
 {
-	"Table",
-	"",
-	{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 },
-	1,
-	0,
-	15,
-	{
-		"UID",
-		"Name",
-		"CommonName",
-		"TemplateID",
-		"Kind",
-		"Column",
-		"NumCol",
-		"Rows",
-		"RowsFree",
-		"RowBytes",
-		"LastID",
-		"MinSize",
-		"MaxSize",
-		"MadatoryWriteGran",
-		"RecomendWriteGran"
-	}
+    "Table",
+    "",
+    { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 },
+    1,
+    0,
+    15,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "TemplateID" },
+        { 4, "Kind" },
+        { 5, "Column" },
+        { 6, "NumCol" },
+        { 7, "Rows" },
+        { 8, "RowsFree" },
+        { 9, "RowBytes" },
+        { 10, "LastID" },
+        { 11, "MinSize" },
+        { 12, "MaxSize" },
+        { 13, "MadatoryWriteGran" },
+        { 14, "RecomendWriteGran" }
+    }
 };
 
 const tableDesc_t SPInfoTableDesc =
 {
-	"SPInfo",
-	"",
-	{ 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	7,
-	{
-		"UID",
-		"SPID",
-		"Name",
-		"Size",
-		"SizeInUse",
-		"SPSessionTimeout",
-		"Enabled"
-	}
+    "SPInfo",
+    "",
+    { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,              // skip
+    7,
+    {
+        { 0, "UID" },
+        { 1, "SPID" },
+        { 2, "Name" },
+        { 3, "Size" },
+        { 4, "SizeInUse" },
+        { 5, "SPSessionTimeout" },
+        { 6, "Enabled" }
+    }
 };
 
 const tableDesc_t SPTemplateTableDesc =
 {
-	"SPTemplate",
-	"",
-	{ 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	4,
-	{
-		"UID",
-		"TemplateID",
-		"Name",
-		"Version"
-	}
+    "SPTemplate",
+    "",
+    { 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,              // skip
+    4,
+    {
+        { 0, "UID" },
+        { 1, "TemplateID" },
+        { 2, "Name" },
+        { 3, "Version" }
+    }
 };
 
 const tableDesc_t MethodIDTableDesc =
 {
-	"MethodID",
-	"",
-	{ 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	4,
-	{
-		"UID",
-		"Name",
-		"CommonName",
-		"TemplateID"
-	}
+    "MethodID",
+    "",
+    { 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,              // skip
+    4,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "TemplateID" }
+    }
 };
 
 const tableDesc_t AccessControlTableDesc =
 {
-	"AccessControl",
-	"",
-	{ 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	15,
-	{
-		"UID",
-		"InvokingID",
-		"MethodID",
-		"CommonName",
-		"ACL",
-		"Log",
-		"AddACEACL",
-		"RemoveACEACL",
-		"GetACLACL",
-		"DeleteMethodACL",
-		"AddACELog",
-		"RemoveACELog",
-		"GetACLLog",
-		"DeleteMethodLog",
-		"LogTo"
-	}
+    "AccessControl",
+    "",
+    { 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,              // skip
+    15,
+    {
+        { 0, "UID" },
+        { 1, "InvokingID" },
+        { 2, "MethodID" },
+        { 3, "CommonName" },
+        { 4, "ACL" },
+        { 5, "Log" },
+        { 6, "AddACEACL" },
+        { 7, "RemoveACEACL" },
+        { 8, "GetACLACL" },
+        { 9, "DeleteMethodACL" },
+        { 10, "AddACELog" },
+        { 11, "RemoveACELog" },
+        { 12, "GetACLLog" },
+        { 13, "DeleteMethodLog" },
+        { 14, "LogTo" }
+    }
 };
 
 const tableDesc_t ACETableDesc =
 {
-	"ACE",
-	"An <empty List> value in the 'columns' column indicates the entry applies to all comlumns.",
-	{ 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	5,
-	{
-		"UID",
-		"Name",
-		"CommonName",
-		"BooleanExpr",
-		"Columns"
-	}
+    "ACE",
+    "An <empty List> value in the 'columns' column indicates the entry applies to all comlumns.",
+    { 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,              // skip
+    5,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "BooleanExpr" },
+        { 4, "Columns" }
+    }
 };
 
 const tableDesc_t AuthorityTableDesc =
 {
-	"Authority",
-	"",
-	{ 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	19,
-	{
-		"UID",
-		"Name",
-		"CommonName",
-		"IsClass",
-		"Class",
-		"Enabled",
-		"Secure",
-		"HashAndSign",
-		"PresentCertificate",
-		"Operation",
-		"Credential",
-		"ResponseSign",
-		"ResponseExch",
-		"ClockStart",
-		"ClockEnd",
-		"Limit",
-		"Uses",
-		"Log",
-		"LogTo"
-	}
+    "Authority",
+    "",
+    { 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,              // skip
+    19,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "IsClass" },
+        { 4, "Class" },
+        { 5, "Enabled" },
+        { 6, "Secure" },
+        { 7, "HashAndSign" },
+        { 8, "PresentCertificate" },
+        { 9, "Operation" },
+        { 10, "Credential" },
+        { 11, "ResponseSign" },
+        { 12, "ResponseExch" },
+        { 13, "ClockStart" },
+        { 14, "ClockEnd" },
+        { 15, "Limit" },
+        { 16, "Uses" },
+        { 17, "Log" },
+        { 18, "LogTo" }
+    }
 };
 
 const tableDesc_t C_PINTableDesc =
 {
-	"C_PIN",
-	"",
-	{ 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	8,
-	{
-		"UID",
-		"Name",
-		"CommonName",
-		"PIN",
-		"CharSet",
-		"TryLimit",
-		"Tries",
-		"Persistence"
-	}
+    "C_PIN",
+    "",
+    { 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    8,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "PIN" },
+        { 4, "CharSet" },
+        { 5, "TryLimit" },
+        { 6, "Tries" },
+        { 7, "Persistence" }
+    }
 };
 const tableDesc_t SecretProtectTableDesc =
 {
-	"SecretProtect",
-	"",
-	{ 0x00, 0x00, 0x00, 0x1d, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x00, 0x1d, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	4,
-	{
-		"UID",
-		"Table",
-		"ColumnNumber",
-		"ProtectMechanisms"
-	}
+    "SecretProtect",
+    "",
+    { 0x00, 0x00, 0x00, 0x1d, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x1d, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    4,
+    {
+        { 0, "UID" },
+        { 1, "Table" },
+        { 2, "ColumnNumber" },
+        { 3, "ProtectMechanisms" }
+    }
 };
 
 const tableDesc_t TPerInfoTableDesc =
 {
-	"TPerInfo",
-	"",
-	{ 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x02, 0x01, 0x00, 0x03, 0x00, 0x01 },
-	1,
-	0,		// skip
-	9,
-	{
-		"UID",
-		"Bytes",
-		"GUDID",
-		"Generation",
-		"FirmwareVersion",
-		"ProtocolVersion",
-		"SpaceForIssuance",
-		"SSC",
-		"ProgResetEnable"
-	}
+    "TPerInfo",
+    "",
+    { 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x02, 0x01, 0x00, 0x03, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    9,
+    {
+        { 0, "UID" },
+        { 1, "Bytes" },
+        { 2, "GUDID" },
+        { 3, "Generation" },
+        { 4, "FirmwareVersion" },
+        { 5, "ProtocolVersion" },
+        { 6, "SpaceForIssuance" },
+        { 7, "SSC" },
+        { 8, "ProgResetEnable" }
+    }
 };
 
 const tableDesc_t TemplateTableDesc =
 {
-	"Template",
-	"",
-	{ 0x00, 0x00, 0x02, 0x04, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x02, 0x04, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	5,
-	{
-		"UID",
-		"Name",
-		"RevisionNumber",
-		"Instances",
-		"MaxInstances"
-	}
+    "Template",
+    "",
+    { 0x00, 0x00, 0x02, 0x04, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x02, 0x04, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    5,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "RevisionNumber" },
+        { 3, "Instances" },
+        { 4, "MaxInstances" }
+    }
 };
 
 const tableDesc_t SPTableDesc =
 {
-	"SP",
-	"",
-	{ 0x00, 0x00, 0x02, 0x05, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x02, 0x05, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	8,
-	{
-		"UID",
-		"Name",
-		"Org",
-		"EffectiveAuth",
-		"DateOfIssue",
-		"Bytes",
-		"LifeCycleState",
-		"Frozen"
-	}
+    "SP",
+    "",
+    { 0x00, 0x00, 0x02, 0x05, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x02, 0x05, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                      // skip
+    8,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "Org" },
+        { 3, "EffectiveAuth" },
+        { 4, "DateOfIssue" },
+        { 5, "Bytes" },
+        { 6, "LifeCycleState" },
+        { 7, "Frozen" }
+    }
 };
 
 const tableDesc_t LockingInfoTableDesc =
 {
-	"LockingInfo",
-	"",
-	{ 0x00, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	11,
-	{
-		"UID",
-		"Name",
-		"Version",
-		"EncryptionSupport",
-		"MaxRanges",
-		"MaxReEncryptions",
-		"KeysAvailableConfig",
-		"AlignmentRequired",
-		"LogicalBlockSize",
-		"AlignmentGranularity",
-		"LowestAlignedLBA"
-	}
+    "LockingInfo",
+    "",
+    { 0x00, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    11,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "Version" },
+        { 3, "EncryptionSupport" },
+        { 4, "MaxRanges" },
+        { 5, "MaxReEncryptions" },
+        { 6, "KeysAvailableConfig" },
+        { 7, "AlignmentRequired" },
+        { 8, "LogicalBlockSize" },
+        { 9, "AlignmentGranularity" },
+        { 10, "LowestAlignedLBA" }
+    }
 };
 
 const tableDesc_t LockingTableDesc =
 {
-	"Locking",
-	"",
-	{ 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	22,
-	{
-		"UID",
-		"Name",
-		"CommonName",
-		"RangeStart",
-		"RangeLength",
-		"RdLkEnabled",
-		"WrLkEnabled",
-		"RdLocked",
-		"WrLocked",
-		"LkOnReset",
-		"ActiveKey",
-		"NextKey",
-		"ReEncState",
-		"ReEncReq",
-		"AdvKeyMode",
-		"VerifyMode",
-		"ContOnReset",
-		"LastReEncLBA",
-		"LastReEncState",
-		"GeneralStatus",
-		"NamespaceID",
-		"NamespaceGlobal"
-	}
+    "Locking",
+    "",
+    { 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    22,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "RangeStart" },
+        { 4, "RangeLength" },
+        { 5, "RdLkEnabled" },
+        { 6, "WrLkEnabled" },
+        { 7, "RdLocked" },
+        { 8, "WrLocked" },
+        { 9, "LkOnReset" },
+        { 10, "ActiveKey" },
+        { 11, "NextKey" },
+        { 12, "ReEncState" },
+        { 13, "ReEncReq" },
+        { 14, "AdvKeyMode" },
+        { 15, "VerifyMode" },
+        { 16, "ContOnReset" },
+        { 17, "LastReEncLBA" },
+        { 18, "LastReEncState" },
+        { 19, "GeneralStatus" },
+        { 20, "NamespaceID" },
+        { 21, "NamespaceGlobal" }
+    }
 };
 
 const tableDesc_t MBRControlTableDesc =
 {
-	"MBRControl",
-	"",
-	{ 0x00, 0x00, 0x08, 0x03, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x08, 0x03, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	5,
-	{
-		"UID",
-		"Enable",
-		"Done",
-		"DoneOnReset",
-		"NamespaceID"
-	}
+    "MBRControl",
+    "",
+    { 0x00, 0x00, 0x08, 0x03, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x08, 0x03, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    5,
+    {
+        { 0, "UID" },
+        { 1, "Enable" },
+        { 2, "Done" },
+        { 3, "DoneOnReset" },
+        { 4, "NamespaceID" }
+    }
 };
 
 const tableDesc_t MBRTableDesc =
 {
-	"MBR",
-	"",
-	{ 0x00, 0x00, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00 },
-	0,
-	0,		// skip
-	0,
-	{}
+    "MBR",
+    "",
+    { 0x00, 0x00, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00 },
+    0,
+    0,                      // skip
+    0,
+    {}
 };
 
 const tableDesc_t K_AES_128TableDesc =
 {
-	"K_AES_128",
-	"",
-	{ 0x00, 0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	5,
-	{
-		"UID",
-		"Name",
-		"CommonName",
-		"Key",
-		"Mode"
-	}
+    "K_AES_128",
+    "",
+    { 0x00, 0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                      // skip
+    5,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "Key" },
+        { 4, "Mode" }
+    }
 };
 
 const tableDesc_t K_AES_256TableDesc =
 {
-	"K_AES_256",
-	"",
-	{ 0x00, 0x00, 0x08, 0x06, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x08, 0x06, 0x00, 0x00, 0x00, 0x01 },
-	1,
-	0,		// skip
-	5,
-	{
-		"UID",
-		"Name",
-		"CommonName",
-		"Key",
-		"Mode"
-	}
+    "K_AES_256",
+    "",
+    { 0x00, 0x00, 0x08, 0x06, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x08, 0x06, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    5,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "Key" },
+        { 4, "Mode" }
+    }
 };
 
 const tableDesc_t DataStoreTableDesc =
 {
-	"DataStore",
-	"",
-	{ 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00 },
-	0,
-	0,		// skip
-	0,
-	{}
+    "DataStore",
+    "",
+    { 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00 },
+    0,
+    0,                      // skip
+    0,
+    {}
 };
 
 const tableDesc_t* tableDescriptors[] =
@@ -2572,8 +2576,9 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 			char valueStr[100] = "<empty list>";
 			char* valuePtr = valueStr;
 
-			// the first ertry after a start name in the column number
+			// the first entry after a start name in the column number
 			uint32_t column = response.getUint32(++i);
+			const char* columnName = TableDesc->columns.find(column)->second.c_str();
 			// if the column number is followed by a start list token, then
 			// the colun contains a list of values.
 			if (response.tokenIs(++i) == OPAL_TOKEN::STARTLIST) {
@@ -2612,7 +2617,7 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 				}
 				if (level > 0) {
 					printf("  Column: %2d, Name: '%s', Value (list): %s\n",
-					       column, TableDesc->columns[column], valueStr);
+					   column, columnName, valueStr); 
 				}
 			}
 			else {
@@ -2621,7 +2626,7 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 				if (valueLength <= 4) {
 					if (level > 0) {
 						printf("  Column: %2d, Name: '%s', Value: %xh\n",
-						       column, TableDesc->columns[column], response.getUint32(i));
+						       column, columnName, response.getUint32(i));
 					}
 					sprintf(valueStr, "%xh", response.getUint32(i));
 				} else {
@@ -2632,7 +2637,7 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 					printBytes(buffer, size, str);
 					if (level > 0) {
 						printf("  Column: %2d, Name: '%s', Value: %s\n",
-						       column, TableDesc->columns[column], str);
+						       column, columnName, str);
 					}
 					sprintf(valueStr, "%s", str);
 				}
@@ -3070,7 +3075,7 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
     		uint32_t columns = tableDescPtr->columnCount;
     		uint32_t columnWidth[32];
     		for (uint32_t i = 0; i < columns; i++) {
-    			columnWidth[i] = strlen(tableDescPtr->columns[i]) + 1;
+    			columnWidth[i] = strlen(tableDescPtr->columns.find(i)->second.c_str()) + 1;
     		}
     		for (auto it = tableRows.begin(); it != tableRows.cend(); it++) {
     			for (uint32_t i = 0; i < columns; i++) {
@@ -3081,7 +3086,7 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
     		}
 
     		for (uint32_t i = 0; i < tableDescPtr->columnCount; i++) {
-    			printf("%-*s", columnWidth[i], tableDescPtr->columns[i]);
+    			printf("%-*s", columnWidth[i], tableDescPtr->columns.find(i)->second.c_str());
     		}
     		for (auto it = tableRows.begin(); it != tableRows.cend(); it++) {
     			printf("\n");

@@ -33,15 +33,15 @@ using namespace std;
 
 typedef struct _tableDesc
 {
-	const char* name;
-	const char* notes;
-	uint8_t 	uid[8];
-	uint8_t		defaultRow[8];
-	uint8_t 	kind;
-	uint8_t		skip;
-	uint32_t	columnCount;
-	const char* columns[];
-}	tableDesc_t;
+    const char* name;
+    const char* notes;
+    uint8_t     uid[8];
+    uint8_t     defaultRow[8];
+    uint8_t     kind;
+    uint8_t     skip;
+    uint32_t    columnCount;
+    std::map<int, std::string> columns;
+} tableDesc_t;
 
 typedef std::map<uint32_t, std::string> rowMap_t;
 typedef std::vector<rowMap_t> tableRows_t;
