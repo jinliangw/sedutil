@@ -118,6 +118,21 @@ int main(int argc, char * argv[])
         LOG(D) << "Loading PBA image " << argv[opts.pbafile] << " to " << opts.device;
         return d->loadPBA(argv[opts.password], argv[opts.pbafile]);
 		break;
+    case sedutiloption::readMBR:
+        LOG(D) << "Read MBR data starting at " << argv[opts.offset] << " for " << argv[opts.count];
+        return d->readMBR(argv[opts.password], atoi(argv[opts.offset]), atoi(argv[opts.count]));
+        break;
+    case sedutiloption::loadDataStore:
+        LOG(D) << "Loading DataStore table " << argv[opts.lrstart] << " starting at " << argv[opts.offset]
+               << " for " << argv[opts.count] << " bytes from file " << argv[opts.pbafile];
+        return d->loadDataStore(argv[opts.password], atoi(argv[opts.lrstart]), atoi(argv[opts.offset]),
+                                atoi(argv[opts.count]), argv[opts.pbafile]);
+        break;
+    case sedutiloption::readDataStore:
+        LOG(D) << "Read DataStore starting at " << argv[opts.offset] << " for " << argv[opts.count];
+        return d->readDataStore(argv[opts.password], atoi(argv[opts.lrstart]), atoi(argv[opts.offset]),
+                                atoi(argv[opts.count]));
+        break;
 	case sedutiloption::setLockingRange:
         LOG(D) << "Setting Locking Range " << (uint16_t) opts.lockingrange << " " << (uint16_t) opts.lockingstate;
         return d->setLockingRange(opts.lockingrange, opts.lockingstate, argv[opts.password]);

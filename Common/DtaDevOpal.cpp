@@ -1262,6 +1262,7 @@ uint8_t DtaDevOpal::revertTPer(char * password, uint8_t PSID, uint8_t AdminSP)
 	LOG(D1) << "Exiting DtaDevOpal::revertTPer()";
 	return 0;
 }
+
 uint8_t DtaDevOpal::loadPBA(char * password, char * filename) {
 	LOG(D1) << "Entering DtaDevOpal::loadPBAimage()" << filename << " " << dev;
 	uint8_t lastRC;
@@ -1334,7 +1335,8 @@ uint8_t DtaDevOpal::loadPBA(char * password, char * filename) {
 			return lastRC;
 		}
 		filepos += blockSize;
-		cout << filepos << " of " << eofpos << " " << (uint16_t) (((float)filepos/(float)eofpos) * 100) << "% blk=" << blockSize << " \r";
+		cout << filepos << " of " << eofpos << " " << (uint16_t) (((float)filepos/(float)eofpos) * 100)
+             << "% blk=" << blockSize << " \r";
 	}
 	cout << "\n";
 	delete cmd;
@@ -1342,6 +1344,274 @@ uint8_t DtaDevOpal::loadPBA(char * password, char * filename) {
 	pbafile.close();
 	LOG(I) << "PBA image  " << filename << " written to " << dev;
 	LOG(D1) << "Exiting DtaDevOpal::loadPBAimage()";
+	return 0;
+}
+
+uint8_t DtaDevOpal::readMBR(char* password, uint32_t offset, uint32_t count)
+{
+    uint8_t buffer[PROP_BUFFER_LENGTH];
+    uint8_t  lastRC = 0;
+
+    // Set the table UID to the MBR table UID
+    std::vector<uint8_t> tableUID;
+    tableUID.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+    for (int i = 0; i < 8; i++) {
+        tableUID.push_back(OPALUID[OPAL_UID::OPAL_MBR][i]);
+    }
+
+    session = new DtaSession(this);
+    if (NULL == session) {
+        LOG(E) << "Unable to create session object ";
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+    if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+        LOG(E) << "session->start failed with code " << lastRC;
+        delete session;
+        return lastRC;
+    }
+
+    uint32_t chunkSize = 0;
+    uint32_t bytesRead = 0;
+
+    // Calculate the maximum number of rows we can request in a single Call
+    // that will fit in a response packet.
+    uint32_t maxChunkSize = MIN((tperMaxPacket - RESPONSE_COM_OVERHEAD),
+                                (tperMaxToken - MAX_TOKEN_OVERHEAD));
+    if (maxChunkSize > (PROP_BUFFER_LENGTH - (RESPONSE_COM_OVERHEAD + MAX_TOKEN_OVERHEAD))) {
+        maxChunkSize = PROP_BUFFER_LENGTH - (RESPONSE_COM_OVERHEAD + MAX_TOKEN_OVERHEAD);
+    }
+
+    for (bytesRead = 0; bytesRead < count; bytesRead += chunkSize) {
+        chunkSize = MIN(count - bytesRead, maxChunkSize);
+
+        lastRC = getByteTable(tableUID, offset + bytesRead, chunkSize, buffer);
+        if (lastRC != 0) {
+            LOG(E) << "Read MBR Failure at offset " << bytesRead;
+            break;
+        }
+
+        DtaHexDump(buffer, chunkSize);
+    }
+
+    delete session;
+
+    return lastRC;
+}
+
+uint8_t DtaDevOpal::loadDataStore(char* password, uint8_t table, uint32_t offset,
+                                  uint32_t count, const char* filename)
+{
+    LOG(D1) << "Entering DtaDevOpal::loadDataStore()" << filename << " " << dev;
+
+    // Set the table UID to the DataStore table UID using the table argument.
+    std::vector<uint8_t> tableUID;
+    tableUID.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+    for (int i = 0; i < 8; i++) {
+        if (i == 3) {
+            tableUID.push_back(table);
+        } else {
+            tableUID.push_back(OPALUID[OPAL_UID::OPAL_DATASTORE][i]);
+        }
+    }
+
+    uint8_t lastRC;
+    uint32_t filepos = 0;
+
+    uint32_t blockSize = MIN(PROP_BUFFER_LENGTH, tperMaxPacket);
+    if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
+    blockSize -= sizeof(OPALHeader) + 50;  // packet overhead
+
+    std::vector<uint8_t> buffer, lengthtoken;
+    buffer.resize(blockSize);
+
+    ifstream fileStream;
+    fileStream.open(filename, ios::in | ios::binary);
+    if (!fileStream) {
+        LOG(E) << "Unable to open PBA image file " << filename;
+        return DTAERROR_OPEN_ERR;
+    }
+    fileStream.seekg(0, fileStream.end);
+    uint32_t eofpos = (uint32_t)fileStream.tellg();
+    fileStream.seekg(0, fileStream.beg);
+
+    if (count == 0) {
+        count = eofpos;
+    }
+
+    DtaCommand *cmd = new DtaCommand();
+    if (NULL == cmd) {
+        LOG(E) << "Unable to create command object ";
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+
+    session = new DtaSession(this);
+    if (NULL == session) {
+        LOG(E) << "Unable to create session object ";
+        delete cmd;
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+    if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+        delete cmd;
+        delete session;
+        fileStream.close();
+        return lastRC;
+    }
+    LOG(I) << "Writing DataStore to " << dev;
+
+    uint32_t bytesWritten = 0;
+    while (bytesWritten < count) {
+        buffer.clear();
+        // last chunk handling
+        if (blockSize > (count - bytesWritten)) {
+            blockSize = count - bytesWritten;
+        }
+        buffer.resize(blockSize);
+        // Fill the buffer with data from the file.  If the file is smaller than the blockSize
+        // cycle through the file until we have read blockSize bytes.
+        uint32_t bytesFilled = 0;
+        uint32_t bufferOffset = 0;
+        for (; bufferOffset < blockSize; bufferOffset += bytesFilled) {
+            // Fill the buffer to either the end of the file or the end of the buffer, 
+            // whichever is less
+            bytesFilled = eofpos - filepos;
+            if (bytesFilled > (blockSize - bufferOffset)) {
+                bytesFilled = blockSize - bufferOffset;
+            }
+            fileStream.read((char*)buffer.data() + bufferOffset, bytesFilled);
+            filepos = (uint32_t)fileStream.tellg();
+            if (filepos >= eofpos) {
+                fileStream.seekg(0, fileStream.beg);
+                filepos = 0;
+            }
+        }
+
+        lengthtoken.clear();
+        lengthtoken.push_back(0xe2);
+        lengthtoken.push_back((uint8_t) ((blockSize >> 16) & 0x000000ff));
+        lengthtoken.push_back((uint8_t)((blockSize >> 8) & 0x000000ff));
+        lengthtoken.push_back((uint8_t)(blockSize & 0x000000ff));
+
+        cmd->reset(tableUID, OPAL_METHOD::SET);
+        cmd->addToken(OPAL_TOKEN::STARTLIST);
+        cmd->addToken(OPAL_TOKEN::STARTNAME);
+        cmd->addToken(OPAL_TOKEN::WHERE);
+        cmd->addToken(bytesWritten + offset);
+        cmd->addToken(OPAL_TOKEN::ENDNAME);
+        cmd->addToken(OPAL_TOKEN::STARTNAME);
+        cmd->addToken(OPAL_TOKEN::VALUES);
+        cmd->addToken(lengthtoken);
+        cmd->addToken(buffer);
+        cmd->addToken(OPAL_TOKEN::ENDNAME);
+        cmd->addToken(OPAL_TOKEN::ENDLIST);
+        cmd->complete();
+        if ((lastRC = session->sendCommand(cmd, response)) != 0) {
+            delete cmd;
+            delete session;
+            fileStream.close();
+            return lastRC;
+        }
+        bytesWritten += blockSize;
+        cout << bytesWritten << " of " << count << " "
+             << (uint16_t)(((float)bytesWritten/(float)count) * 100) << "% blk="
+             << blockSize << " \r";
+    }
+    cout << "\n";
+    delete cmd;
+    delete session;
+    fileStream.close();
+    LOG(I) << bytesWritten << " bytes from file " << filename << " written to DataStore on " << dev;
+    LOG(D1) << "Exiting DtaDevOpal::loadDataStore()";
+    return 0;
+}
+
+uint8_t DtaDevOpal::readDataStore(char* password, uint8_t table, uint32_t offset,
+                                  uint32_t count)
+{
+    uint8_t buffer[PROP_BUFFER_LENGTH];
+    uint8_t  lastRC = 0;
+
+    // Set the table UID to the MBR table UID
+    std::vector<uint8_t> tableUID;
+    tableUID.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+    for (int i = 0; i < 8; i++) {
+        if (i == 3) {
+            tableUID.push_back(table);
+        } else {
+            tableUID.push_back(OPALUID[OPAL_UID::OPAL_DATASTORE][i]);
+        }
+    }
+
+    session = new DtaSession(this);
+    if (NULL == session) {
+        LOG(E) << "Unable to create session object ";
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+    if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+        LOG(E) << "session->start failed with code " << lastRC;
+        delete session;
+        return lastRC;
+    }
+
+    uint32_t chunkSize = 0;
+    uint32_t bytesRead = 0;
+
+    // Calculate the maximum number of rows we can request in a single Call
+    // that will fit in a response packet.
+    uint32_t maxChunkSize = MIN((tperMaxPacket - RESPONSE_COM_OVERHEAD),
+                                (tperMaxToken - MAX_TOKEN_OVERHEAD));
+    if (maxChunkSize > (PROP_BUFFER_LENGTH - (RESPONSE_COM_OVERHEAD + MAX_TOKEN_OVERHEAD))) {
+        maxChunkSize = PROP_BUFFER_LENGTH - (RESPONSE_COM_OVERHEAD + MAX_TOKEN_OVERHEAD);
+    }
+
+    for (bytesRead = 0; bytesRead < count; bytesRead += chunkSize) {
+        chunkSize = MIN(count - bytesRead, maxChunkSize);
+
+        lastRC = getByteTable(tableUID, offset + bytesRead, chunkSize, buffer);
+        if (lastRC != 0) {
+            LOG(E) << "Read DataStore Failure at offset " << bytesRead;
+            break;
+        }
+
+        DtaHexDump(buffer, chunkSize);
+    }
+
+    delete session;
+
+    return lastRC;
+}
+
+uint8_t DtaDevOpal::getByteTable(std::vector<uint8_t>& tableUID, const uint32_t row,
+                                 const uint32_t count, uint8_t* buffer)
+{
+	LOG(D1) << "Entering DtaDevOpal::getByteTable";
+	uint8_t lastRC;
+	DtaCommand *get = new DtaCommand();
+	if (NULL == get) {
+		LOG(E) << "Unable to create command object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+	get->reset(tableUID, OPAL_METHOD::GET);
+	get->addToken(OPAL_TOKEN::STARTLIST);
+	get->addToken(OPAL_TOKEN::STARTLIST);
+	get->addToken(OPAL_TOKEN::STARTNAME);
+	get->addToken(OPAL_TOKEN::STARTROW);
+	get->addToken(row);
+	get->addToken(OPAL_TOKEN::ENDNAME);
+	get->addToken(OPAL_TOKEN::STARTNAME);
+	get->addToken(OPAL_TOKEN::ENDROW);
+	get->addToken(row + count - 1);
+	get->addToken(OPAL_TOKEN::ENDNAME);
+	get->addToken(OPAL_TOKEN::ENDLIST);
+	get->addToken(OPAL_TOKEN::ENDLIST);
+	get->complete();
+	if ((lastRC = session->sendCommand(get, response)) != 0) {
+		delete get;
+		return lastRC;
+	}
+
+	response.getBytes(1, buffer);
+
+	delete get;
 	return 0;
 }
 

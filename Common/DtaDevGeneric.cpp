@@ -96,6 +96,10 @@ uint8NOCODE(setSIDPassword,char * oldpassword, char * newpassword,
 uint8NOCODE(printTables, char* sp, char* password, uint8_t level)
 uint8NOCODE(assign, char* password, uint32_t ns, uint64_t start, uint64_t length)
 uint8NOCODE(deassign, char* password, uint8_t lockingrange, bool keep)
+uint8NOCODE(readMBR, char* password, uint32_t offset, uint32_t count)
+uint8NOCODE(loadDataStore, char* password, uint8_t table, uint32_t offset, uint32_t count,
+            const char* filename)
+uint8NOCODE(readDataStore, char* password, uint8_t table, uint32_t offset, uint32_t count)
 
 uint16_t DtaDevGeneric::comID()
 {

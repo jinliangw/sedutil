@@ -283,6 +283,10 @@ public:
 	// virtual methods from DtaDev class
 	uint8_t assign(char* password, uint32_t ns, uint64_t start = 0, uint64_t length = 0);
 	uint8_t deassign(char* password, uint8_t lockingrange, bool keep);
+	uint8_t readMBR(char* password, uint32_t offset, uint32_t count);
+	uint8_t loadDataStore(char* password, uint8_t table, uint32_t offset, uint32_t count,
+	                      const char* filename);
+	uint8_t readDataStore(char* password, uint8_t table, uint32_t offset, uint32_t count);
 
 protected:
         /** Primitive to handle the setting of a value in the locking sp.
@@ -312,6 +316,9 @@ protected:
 	 *  @param password Admin1 Password for TPer
 	 */
 	lrStatus_t getLockingRange_status(uint8_t lockingrange, char * password);
+
+    uint8_t getByteTable(std::vector<uint8_t>& tableUID, const uint32_t row, const uint32_t count,
+                         uint8_t* buffer);
 
 	uint8_t verifyPassword(OPAL_UID sp, OPAL_UID auth, std::string& pw);
 	uint8_t nextTable(vector<uint8_t>& table);

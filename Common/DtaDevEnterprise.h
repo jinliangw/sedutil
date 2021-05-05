@@ -209,6 +209,10 @@ public:
 	uint8_t assign(char* password, uint32_t ns, uint64_t start = 0, uint64_t length = 0);
 	uint8_t deassign(char* password, uint8_t lockingrange, bool keep);
     uint8_t printTables(char* sp, char* password, uint8_t level);
+	uint8_t readMBR(char* password, uint32_t offset, uint32_t count);
+	uint8_t loadDataStore(char* password, uint8_t table, uint32_t offset, uint32_t count,
+	                      const char* filename);
+	uint8_t readDataStore(char* password, uint8_t table, uint32_t offset, uint32_t count);
 
 protected:
 	uint8_t getDefaultPassword();

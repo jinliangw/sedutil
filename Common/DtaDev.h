@@ -23,6 +23,14 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include "DtaOptions.h"
 #include "DtaResponse.h"
+
+#ifndef MIN
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+#ifndef MAX
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
+
 class DtaCommand;
 class DtaSession;
 
@@ -147,6 +155,28 @@ public:
 	 * @param filename the filename of the disk image
 	 */
 	virtual uint8_t loadPBA(char * password, char * filename) = 0;
+	/** Prints the contents of the MBR as read from the table
+	 * @param password the password for the LockingSP Admin1 authority
+	 * @param offset offset from row 0 to begin the Get operartion
+	 * @param count number of bytes to get and print
+	 */
+	virtual uint8_t readMBR(char* password, uint32_t offset, uint32_t count) = 0;
+	/** Loads data from a disk file to the DataStore table.
+     * @param password the password for the administrative authority with access to
+     *                 the table
+	 * @param offset offset from row 0 to beging the Set operation.
+	 * @param count number of bytes to set.
+	 * @param filename the filename of the disk image
+	 */
+	virtual uint8_t loadDataStore(char* password, uint8_t table, uint32_t offset,
+                                  uint32_t count, const char* filename) = 0;
+	/** Prints the contents of the DataStore as read from the table
+	 * @param password the password for the LockingSP Admin1 authority
+	 * @param offset offset from row 0 to begin the Get operartion
+	 * @param count number of bytes to get and print
+	 */
+	virtual uint8_t readDataStore(char* password, uint8_t table, uint32_t offset,
+	                              uint32_t count) = 0;
 	/** Change the locking state of a locking range
 	 * @param lockingrange The number of the locking range (0 = global)
 	 * @param lockingstate  the locking state to set

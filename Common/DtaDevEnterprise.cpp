@@ -1519,6 +1519,26 @@ uint8_t DtaDevEnterprise::deassign(char* password, uint8_t lockingrange, bool ke
     return 0xff;
 }
 
+uint8_t DtaDevEnterprise::readMBR(char* password, uint32_t offset, uint32_t count)
+{
+    cout << "TCG Enterprise SSC does not include the readMBR function.\n";
+    return 0xff;
+}
+
+uint8_t DtaDevEnterprise::loadDataStore(char* password, uint8_t table, uint32_t offset,
+                                        uint32_t count, const char* filename)
+{
+    cout << "TCG Enterprise SSC does not include the loadDataStore function.\n";
+    return 0xff;
+}
+
+uint8_t DtaDevEnterprise::readDataStore(char* password, uint8_t table, uint32_t offset,
+                                        uint32_t count)
+{
+    cout << "TCG Enterprise SSC does not include the readDataStore function.\n";
+    return 0xff;
+}
+
 void DtaDevEnterprise::puke()
 {
 

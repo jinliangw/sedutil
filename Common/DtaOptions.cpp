@@ -86,6 +86,15 @@ void usage()
 	printf("                                set|unset MBRDone\n");
 	printf("--loadPBAimage <Admin1password> <file> <device> \n");
 	printf("                                Write <file> to MBR Shadow area\n");
+	printf("--readMBR <Admin1password> <offset> <count> <device>\n");
+	printf("                                Print MBR data starting at offset for count bytes.\n");
+	printf("--loadDataStore <Admin1password> <table> <offset> <count> <file> <device>\n");
+	printf("                                Load data from a file into the Datastore table.\n");
+	printf("                                count is maxiumum bytes to write, 0 for whole file.\n");
+	printf("                                table selects the DataStore table, 1 if no additional tables.\n");
+	printf("--readDataStore <Admin1password> <table> <offset> <count> <device>\n");
+	printf("                                Print DataStore data starting at offset for count bytes.\n");
+	printf("                                table selects the DataStore table, 1 if no additional tables.\n");
     printf("--activateLockingSP <SIDpassword> <device>\n");
     printf("                                Activate the LockingSP. Admin1 password\n");
     printf("                                in LockingSP will be set to SIDpassword.\n");
@@ -174,6 +183,27 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(loadPBAimage, 3) OPTION_IS(password) OPTION_IS(pbafile)
 			OPTION_IS(device) END_OPTION
+		BEGIN_OPTION(readMBR, 4)
+			OPTION_IS(password)
+			OPTION_IS(offset)
+			OPTION_IS(count)
+			OPTION_IS(device)
+			END_OPTION
+		BEGIN_OPTION(loadDataStore, 6)
+			OPTION_IS(password)
+			OPTION_IS(lrstart)
+			OPTION_IS(offset)
+			OPTION_IS(count)
+			OPTION_IS(pbafile)
+			OPTION_IS(device)
+			END_OPTION
+		BEGIN_OPTION(readDataStore, 5)
+			OPTION_IS(password)
+			OPTION_IS(lrstart)
+			OPTION_IS(offset)
+			OPTION_IS(count)
+			OPTION_IS(device)
+			END_OPTION
 		BEGIN_OPTION(revertTPer, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(revertNoErase, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(PSIDrevert, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION

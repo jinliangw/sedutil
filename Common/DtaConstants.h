@@ -29,6 +29,11 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 * things I tried to make it work.
 */
 #define IO_BUFFER_ALIGNMENT 1024
+
+/** for large table reads */
+#define RESPONSE_COM_OVERHEAD (sizeof(OPALHeader) + 5 + 7)
+#define MAX_TOKEN_OVERHEAD (4)
+
 /** maximum number of disks to be scanned */
 #define MAX_DISKS 20
 /** iomanip commands to hexdump a field */

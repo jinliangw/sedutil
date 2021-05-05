@@ -42,6 +42,8 @@ typedef struct _DTA_OPTIONS {
 	uint8_t lrstart;		/** the starting block of a lockingrange */
 	uint8_t lrlength;		/** the length in blocks of a lockingrange */
 	uint8_t level;			/** output level, for print operations */
+	uint8_t offset;			/** offset in table */
+	uint8_t count;			/** Count of bytes in table */
 
 	bool no_hash_passwords; /** global parameter, disables hashing of passwords */
 	sedutiloutput output_format;
@@ -64,6 +66,9 @@ typedef enum _sedutiloption {
 	setPassword,
 	setPassword_SUM,
 	loadPBAimage,
+	readMBR,
+	loadDataStore,
+	readDataStore,
 	setLockingRange,
 	revertTPer,
 	revertNoErase,
