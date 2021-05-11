@@ -267,12 +267,18 @@ uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
 			" RLocked =" << (response.getUint8(20) ? " Y " : " N ") <<
 			" WLocked =" << (response.getUint8(24) ? " Y " : " N ");
 
-		if (disk_info.CNL) {
+		if (disk_info.CNL && (i != 0)) {
 			if ((lastRC = getTable(LR, OPAL_TOKEN::NAMESPACEID, OPAL_TOKEN::NAMESPACEGLOBAL)) != 0) {
-				LOG(W) << "Device supports CNL but a Get for the namespace fields failed " << lastRC;
+				LOG(W) << "                Device supports CNL but a Get for the namespace fields failed " << lastRC;
 			} else {
-				LOG(I)	<< "            NamespaceID = " << response.getUint32(4) <<
-					" Global = " << (response.getUint8(8) ? "Y" : "N");
+                if ((response.getTokenCount() > 10) &&
+                    (response.tokenIs(2) == OPAL_TOKEN::STARTNAME) &&
+                    (response.tokenIs(6) == OPAL_TOKEN::STARTNAME)) {
+                    LOG(I) << "            NamespaceID = " << response.getUint32(4) <<
+                        " Global = " << (response.getUint8(8) ? "Y" : "N");
+                } else {
+                    LOG(I) << "            Missing value for NamespaceID and/or Global column.";
+                }
 			}
 		}
 	}
