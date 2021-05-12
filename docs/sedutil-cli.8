@@ -1,16 +1,17 @@
 .\" Manpage for sedutil-cli.
-.TH SEDUTIL\-CLI 8 "18 Feb 2016" "0.12" "sedutil-cli man page"
+.TH SEDUTIL\-CLI 8 "12 May 2021" "1.16" "sedutil-cli man page"
 .SH NAME
-sedutil-cli \- util to manage TCG Opal 2.0 self encrypting drives
+sedutil-cli \- util to manage TCG self encrypting drives.
 
 .SH SYNOPSIS
 sedutil\-cli <\-v> <\-n> <action> <options> <device>
 
 .SH DESCRIPTION
 sedutil-cli is a utility to manage self encrypting drives that conform
-to the Trusted Computing Group (TCG) OPAL 2.0 SSC specification.
+to the Trusted Computing Group (TCG) OPAL 1.0, TCG OPAL 2.0, or TCG 
+Enterprise SSC specification.
 
-In Linux libata.allow_tpm must be set to 1. Either via adding
+For SATA drives in Linux, libata.allow_tpm must be set to 1. Either via adding
 libata.allow_tpm=1 to the kernel flags at boot time or changing the
 contents of /sys/module/libata/parameters/allow_tpm to a from a
 "0" to a "1" on a running system.
@@ -24,8 +25,10 @@ increase verbosity, one to five v's
 no password hashing. Passwords will be sent in clear text!
 
 .SS Actions
+
+.SS Universal
 .IP \-\-scan
-Scans the devices on the system identifying Opal compliant devices
+Scans the devices on the system identifying TCG compliant devices
 .IP "\-\-query <device>"
 Display the Discovery 0 response of a device
 .IP "\-\-isValidSED <device>"
@@ -33,41 +36,85 @@ Verify whether the given device is SED or not
 .IP "\-\-listLockingRanges <password> <device>"
 List all Locking Ranges
 .IP "\-\-listLockingRange <0...n> <password> <device>"
-List all Locking Ranges, 0 = GLobal 1..n  = LRn
-.IP "\-\-eraseLockingRange <0...n> <password> <device>"
-Erase a Locking Range, 0 = GLobal 1..n  = LRn
+List an individual Locking Range, 0 = GLobal 1..n = LRn
+.IP "\-\-rekeyLockingRange <0...n> <password> <device>"
+Rekey a Locking Ranges, 0 = GLobal 1..n = LRn
 .IP "\-\-setupLockingRange <0...n> <RangeStart> <RangeLength> <password> <device>"
-Setup a new Locking Range, 0 = GLobal 1..n  = LRn
+Setup a new Locking Range, 0 = GLobal 1..n = LRn
 .IP "\-\-initialSetup <SIDpassword> <device>"
-Setup the device for use with sedutil, <SIDpassword> is new SID and Admin1 password
+Setup the device for use with sedutil, <SIDpassword> is new SID and Admin1 password (Opal) or the EraseMaster and all BandMasters (Enterprise).
 .IP "\-\-setSIDPassword <SIDpassword> <newSIDpassword> <device>"
 Change the SID password
+.IP "\-\-takeOwnership <newSIDpassword> <device>" 
+Change the SID password using the MSID password
+.IP "\-\-setPassword <oldpassword> <userid> <newpassword> <device>"
+Change the password of an authority. For Enterprise, userid = "EraseMaster" or "BandMaster<n>", 0 <= n <= 1023. For Opal, userid = Admin<n> or User<n>.  oldpassword = "" for MSID.
+.IP "\-\-setLockingRange <0...n> <RW|RO|LK> <password> <device>"
+Set the status of a Locking Range, 0 = GLobal 1..n = LRn
+.IP "\-\-enableLockingRange <0...n> <password> <device>"
+Enable a Locking Range, 0 = GLobal 1..n = LRn
+.IP "\-\-disableLockingRange <0...n> <Admin1password> <device>"
+Disable a Locking Range, 0 = GLobal 1..n = LRn
+.IP "\-\-revertTPer <SIDpassword> <device>"
+set the device back to factory defaults.
+.B This **ERASES ALL DATA**
+.IP "\-\-revertNoErase <Admin1password> <device>"
+deactivate the Locking SP without erasing the data on GLOBAL RANGE *ONLY*
+.IP "\-\-yesIreallywanttoERASEALLmydatausingthePSID <PSID> <device>"
+revert the device using the PSID. 
+.B *ERASING* *ALL* the data
+.IP "\-\-printDefaultPassword <device>"
+print MSID
+
+.SS TCG Opal devices only
 .IP "\-\-setAdmin1Pwd <Admin1password> <newAdmin1password> <device>"
 Change the Admin1 password
-.IP "\-\-setPassword <oldpassword, "" for MSID> <userid> <newpassword> <device>"
-Change the Enterprise password for userid, "EraseMaster" or "BandMaster<n>", 0 <= n <= 1023
-.IP "\-\-setLockingRange <0...n> <RW|RO|LK> <Admin1password> <device>"
-Set the status of a Locking Range, 0 = GLobal 1..n  = LRn
-.IP "\-\-enableLockingRange <0...n> <Admin1password> <device>"
-Enable a Locking Range, 0 = GLobal 1..n  = LRn
-.IP "\-\-disableLockingRange <0...n> <Admin1password> <device>"
-Disable a Locking Range, 0 = GLobal 1..n  = LRn
+.IP "\-\-activateLockingSP <SIDpassword> <device>"
+Activate the LockingSP. Admin1 password in LockingSP will be set to SID password.
 .IP "\-\-setMBREnable <on|off> <Admin1password> <device>"
 Enable|Disable MBR shadowing
 .IP "\-\-setMBRDone <on|off> <Admin1password> <device>"
 set|unset MBRDone
 .IP "\-\-loadPBAimage <Admin1password> <file> <device>"
 Write <file> to MBR Shadow area
-.IP "\-\-revertTPer <SIDpassword> <device>"
-set the device back to factory defaults.
-.B This **ERASES ALL DATA**
-.IP "\-\-revertNoErase <Admin1password> <device>"
-deactivate the Locking SP without erasing the data on GLOBAL RANGE *ONLY*
-.IP "\-\---yesIreallywanttoERASEALLmydatausingthePSID <PSID> <device>"
-revert the device using the PSID. 
-.B *ERASING* *ALL* the data
-.IP "\-\-printDefaultPassword <device>"
-print MSID
+.IP "\-\-readMBR <Admin1Password> <offset> <count> <device>"
+Print MBR data starting at offset for count bytes.
+.IP "\-\-loadDataStore <Admin1password> <table> <offset> <count> <file> <device>"
+Load data from a file into the Datastore table.  count is maxiumum bytes to write, 0 for whole file. 
+table selects the DataStore table, 1 if no additional tables.
+.IP "\-\-readDataStore <Admin1password> <table> <offset> <count> <device>"
+Print DataStore data starting at offset for count bytes.  table selects the DataStore table, 1 if no additional tables.
+.IP "\-\-assign <Admin1Password> <namespace> <rangeStart> <rangeLength> <device>"
+Assign a locking range for a namespace (CNL feature).
+.IP "\-\-deassign <Admin1password> <1...n> <keep> <device>"
+Deassign a Locking Range (CNL feature). 1...n - LRn, keep = T or F.
+.IP "\-\-printTables <SP> <password> <level> <device>"
+Get and print all of the accessible table values and ACL for a Security Protocol.  SP is Admin or Locking.  
+Use Admin1 password or "" for MSID.  level 0 is tables only, 1 for details.
+
+.SS TCG Opal devices in Single User Mode only
+.IP "\-\-setup_SUM <0...n> <lrstart> <lrlength> <password> <newpassword> <device>"
+Initial setup for the device in TCG Opal Single User Mode.  Selects Global range (0) or a single range (1..n).  
+lrstart and lrlength are ignored got global range. password in the ISD password, User<n> password will be set to newpassword.
+.IP "\-\-activateLockingSP_SUM <0...n> <SIDpassword> <device>"
+Activate the LockingSP in Single User Mode on Global range (0) or a single range (1..n).  
+Admin1 password in LockingSP will be set to SID password.
+.IP "\-\-setPassword_SUM <password> <user> <newpassword> <device>"
+Change the password of a TCG Opal User authority. user = User0, User1, ...
+.IP "\-\-eraseLockingRange_SUM <0...n> <password> <device>"
+Erase a Locking Range, 0 = GLobal 1..n = LRn, password is for the User<n> that owns the Locking Range.
+.IP "\-\-setLockingRange_SUM <0...n> <RW|RO|LK> <password> <device>"
+Set the locking status of a Locking Range, 0 = GLobal 1..n = LRn.  password is for the User<n> that owns the Locking Range.
+.IP "\-\-setupLockingRange <0...n> <RangeStart> <RangeLength> <password> <device>"
+Setup a new Locking Range, 0 = GLobal 1..n = LRn.  password is for the User<n> that owns the Locking Range.
+
+.SS TCG Enterprise devices only 
+.IP "\-\-setBandsEnabled <password> <device>"
+Set Enabled for all Locking Ranges (Enterprise only), password = "" for MSID.
+.IP "\-\-setBandEnabled <0...n> <password> <device>"
+Set Enabled for Locking Range[n] (Enterprise only), password = "" for MSID.
+.IP "\-\-eraseLockingRange <0...n> <password> <device>"
+Erase a Locking Range, 0 = GLobal 1..n = LRn
 
 .SH EXAMPLES
 .EX
