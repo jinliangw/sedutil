@@ -255,7 +255,7 @@ uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
                     LR[6] = 0x03;  // non global ranges are 00000802000300nn
                     LR[8] = i & 0xff;
                 }
-		if ((lastRC = getTable(LR, _OPAL_TOKEN::RANGESTART, _OPAL_TOKEN::WRITELOCKED)) != 0) {
+		if ((lastRC = getTable(LR, _OPAL_TOKEN::RANGESTART, _OPAL_TOKEN::ACTIVEKEY)) != 0) {
 			delete session;
 			return lastRC;
 		}
@@ -2780,6 +2780,34 @@ uint8_t DtaDevOpal::nextTableRow(OPAL_UID sp, std::string& pw, vector<uint8_t>& 
 	return 0;
 }
 
+// Get and entire table row
+uint8_t DtaDevOpal::getTable(vector<uint8_t> table)
+{
+    LOG(D1) << "Entering DtaDevOpal::getTable";
+    uint8_t lastRC;
+    DtaCommand *get = new DtaCommand();
+    if (NULL == get) {
+        LOG(E) << "Unable to create command object ";
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+    get->reset(table, OPAL_METHOD::GET);
+    get->addToken(OPAL_TOKEN::STARTLIST);
+        get->addToken(OPAL_TOKEN::STARTLIST);
+            get->addToken(OPAL_TOKEN::STARTNAME);
+                get->addToken(OPAL_TOKEN::STARTCOLUMN);
+                get->addToken((uint64_t)0);
+            get->addToken(OPAL_TOKEN::ENDNAME);
+        get->addToken(OPAL_TOKEN::ENDLIST);
+    get->addToken(OPAL_TOKEN::ENDLIST);
+    get->complete();
+    if ((lastRC = session->sendCommand(get, response)) != 0) {
+        delete get;
+        return lastRC;
+    }
+    delete get;
+    return 0;
+}
+
 uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 								const tableDesc_t* TableDesc,
 								OPAL_UID sp,
@@ -2814,7 +2842,7 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 			delete session;
 		} else {
 			if (level > 0) cout << "Session opened with password authentication.\n";
-			if ((lastRC = getTable(uidtok, 0, TableDesc->columnCount - 1)) != 0) {
+			if ((lastRC = getTable(uidtok)) != 0) {
 				delete session;
 			}
 			authenticated++;
@@ -2833,7 +2861,7 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 			if (level > 1) cout << "Unable to start anybody session.\n";
 		} else {
 			if (level > 0) cout << "Session opened with Anybody authorization.\n";
-			lastRC = getTable(uidtok, 0, 0);
+			lastRC = getTable(uidtok);
 			if (lastRC == 0) {
 				anybody++;
 			}

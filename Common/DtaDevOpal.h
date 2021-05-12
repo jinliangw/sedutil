@@ -323,6 +323,7 @@ protected:
 	uint8_t verifyPassword(OPAL_UID sp, OPAL_UID auth, std::string& pw);
 	uint8_t nextTable(vector<uint8_t>& table);
 	uint8_t nextTableRow(OPAL_UID sp, std::string& pw, vector<uint8_t>& uid);
+    uint8_t getTable(vector<uint8_t> table);
 	uint8_t getTableRow(const vector<uint8_t>& uid, const tableDesc_t* tableDesc,
 						OPAL_UID sp, OPAL_UID auth, std::string& password,
 						rowMap_t& rowMap, uint8_t level);
