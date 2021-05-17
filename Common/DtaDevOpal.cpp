@@ -260,12 +260,26 @@ uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
 			return lastRC;
 		}
 
+        std::string resets;
+        if ((response.getTokenCount() > 30) && (response.getUint8(27) == 9)) {
+            resets.append("LockOnReset =");
+            // the response included the reset list, parse it
+            for (uint32_t t = 29; t < response.getTokenCount(); t++) {
+                if (response.tokenIs(t) == OPAL_TOKEN::ENDLIST) {
+                    break;
+                }
+                char buf[4];
+                sprintf(buf, " %xh", response.getUint32(t));
+                resets.append(buf);
+            }
+        }
+
 		LOG(I) << "LR" << i << " Begin " << response.getUint64(4) <<
 			" for " << response.getUint64(8);
 		LOG(I)	<< "            RLKEna =" << (response.getUint8(12) ? " Y " : " N ") <<
 			" WLKEna =" << (response.getUint8(16) ? " Y " : " N ") <<
 			" RLocked =" << (response.getUint8(20) ? " Y " : " N ") <<
-			" WLocked =" << (response.getUint8(24) ? " Y " : " N ");
+			" WLocked =" << (response.getUint8(24) ? " Y " : " N ") << resets;
 
 		if (disk_info.CNL && (i != 0)) {
 			if ((lastRC = getTable(LR, OPAL_TOKEN::NAMESPACEID, OPAL_TOKEN::NAMESPACEGLOBAL)) != 0) {
@@ -2386,7 +2400,7 @@ const tableDesc_t AccessControlTableDesc =
 const tableDesc_t ACETableDesc =
 {
     "ACE",
-    "An <empty List> value in the 'columns' column indicates the entry applies to all comlumns.",
+    "An <empty List> value in the 'columns' column indicates the entry applies to all columns.",
     { 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00 },
     { 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01 },
     1,
@@ -2884,7 +2898,7 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 			uint32_t column = response.getUint32(++i);
 			const char* columnName = TableDesc->columns.find(column)->second.c_str();
 			// if the column number is followed by a start list token, then
-			// the colun contains a list of values.
+			// the column contains a list of values.
 			if (response.tokenIs(++i) == OPAL_TOKEN::STARTLIST) {
 				while (response.tokenIs(++i) != OPAL_TOKEN::ENDLIST) {
 					// skip end name tokens
@@ -2949,6 +2963,14 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 			rowMap[column] = valueStr;
 		}
 	}
+
+    // If the first column us UID and we did not get a value returned for that
+    // column, then add the row UID in that place with a 'H' instead of 'h'.
+    if ((TableDesc->columns.find(0)->second.compare(0, 3, "UID") == 0) && 
+        (rowMap[0].compare("N/A") == 0)) {
+        printUID(uid, rowMap[0]);
+        rowMap[0].push_back('H');
+    }
 
 	delete session;
 	LOG(D1) << "Exiting getTableRow()";
