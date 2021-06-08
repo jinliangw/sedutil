@@ -2761,7 +2761,8 @@ uint8_t DtaDevOpal::nextTable(vector<uint8_t>& table)
 	return lastRC;
 }
 
-uint8_t DtaDevOpal::nextTableRow(OPAL_UID sp, std::string& pw, vector<uint8_t>& tableUID)
+uint8_t DtaDevOpal::nextTableRow(OPAL_UID sp, OPAL_UID auth, std::string& pw,
+                                 std::vector<uint8_t>& tableUID)
 {
 	LOG(D1) << "Entering DtaDevOpal::()";
 	uint8_t lastRC;
@@ -2773,8 +2774,7 @@ uint8_t DtaDevOpal::nextTableRow(OPAL_UID sp, std::string& pw, vector<uint8_t>& 
 	}
 
 	if (pw.length() != 0) {
-		if ((lastRC = session->start(sp, (char*)pw.c_str(),
-									 OPAL_UID::OPAL_ADMINSP_UID)) != 0) {
+		if ((lastRC = session->start(sp, (char*)pw.c_str(), auth)) != 0) {
 			LOG(E) << "Unable to start Admin session " << dev;
 		}
 	}
@@ -3255,7 +3255,7 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
 	printf("\nTable Table\n");
 
 	vector<uint8_t> table{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 };
-	uint8_t rc = nextTableRow(sp, pw, table);
+	uint8_t rc = nextTableRow(sp, auth, pw, table);
 	if (rc) {
 		printf("Unable to read table rows.\n");
 		return rc;
@@ -3287,7 +3287,7 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
 	std::vector<std::vector<uint8_t>> methodsList;
 
 	std::vector<uint8_t> methodTable = { 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00 };
-	rc = nextTableRow(sp, pw, methodTable);
+	rc = nextTableRow(sp, auth, pw, methodTable);
 	if (rc) {
 		printf("Unable to read MethodID table rows.\n");
 	} else {
@@ -3353,7 +3353,7 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
  		} else {
             std::vector<std::vector<uint8_t>> rowUIDs;
 
-    		uint8_t rc = nextTableRow(sp, pw, table);
+    		uint8_t rc = nextTableRow(sp, auth, pw, table);
     		if (rc) {
     			printf("Unable to read table rows list, use the default.\n");
     			std::vector<uint8_t> oneRow(tableDescPtr->defaultRow, tableDescPtr->defaultRow + 8);
