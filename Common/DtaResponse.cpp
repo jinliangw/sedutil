@@ -247,6 +247,20 @@ uint32_t DtaResponse::getTokenCount()
     return (uint32_t) response.size();
 }
 
+int DtaResponse::isByteSequence(uint32_t tokenNum)
+{
+    int retCode = 0;
+    uint8_t token = response[tokenNum][0];
+    if (!(token & 0x40)) {          // short atom
+        retCode = token & 0x20;
+    } else if (!(token & 0x20)) {   // medium atom
+        retCode = token & 0x10;
+    } else if (!(token & 0x10)) {   // long atom
+        retCode = token & 0x02;
+    }
+    return retCode;
+}
+
 DtaResponse::~DtaResponse()
 {
     LOG(D1) << "Destroying DtaResponse";

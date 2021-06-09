@@ -69,6 +69,8 @@ public:
     * @param bytearray pointer to array for return data
     * @return number of bytes put in the bytearray */
     int getBytes(uint32_t tokenNum, uint8_t bytearray[]);
+    /** return non-zero if token is a byte sequence, otherwise 0. */
+    int isByteSequence(uint32_t tokenNum);
 
     OPALHeader h; /**< TCG Header fields of the response */
 

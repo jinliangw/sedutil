@@ -2352,6 +2352,28 @@ const tableDesc_t SPTemplateTableDesc =
     }
 };
 
+const tableDesc_t ColumnTableDesc =
+{
+    "Column",
+    "",
+    { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,              // skip
+    9,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "Type" },
+        { 4, "IsUnique" },
+        { 5, "ColumnNumber" },
+        { 6, "Transactional" },
+        { 7, "Next" },
+        { 8, "AttributeFlags" }
+    }
+};
+
 const tableDesc_t MethodIDTableDesc =
 {
     "MethodID",
@@ -2467,6 +2489,25 @@ const tableDesc_t C_PINTableDesc =
         { 7, "Persistence" }
     }
 };
+
+const tableDesc_t C_HMAC_384TableDesc =
+{
+    "C_HMAC_384",
+    "",
+    { 0x00, 0x00, 0x00, 0x1b, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x1b, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    5,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "Key" },
+        { 4, "Hash" }
+    }
+};
+
 const tableDesc_t SecretProtectTableDesc =
 {
     "SecretProtect",
@@ -2481,6 +2522,25 @@ const tableDesc_t SecretProtectTableDesc =
         { 1, "Table" },
         { 2, "ColumnNumber" },
         { 3, "ProtectMechanisms" }
+    }
+};
+
+const tableDesc_t C_TLS_PSKTableDesc =
+{
+    "C_TLS_PSK",
+    "Defined in Core Specification Secure Messaging addendum.",
+    { 0x00, 0x00, 0x00, 0x1e, 0x00, 0x00, 0x00, 0x00 },
+    { 0x00, 0x00, 0x00, 0x1e, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    6,
+    {
+        { 0, "UID" },
+        { 1, "Name" },
+        { 2, "CommonName" },
+        { 3, "Enabled" },
+        { 4, "PSK" },
+        { 5, "CipherSuite" }
     }
 };
 
@@ -2688,12 +2748,15 @@ const tableDesc_t* tableDescriptors[] =
 	&TableTableDesc,
 	&SPInfoTableDesc,
 	&SPTemplateTableDesc,
+    &ColumnTableDesc,
 	&MethodIDTableDesc,
 	&AccessControlTableDesc,
 	&ACETableDesc,
 	&AuthorityTableDesc,
 	&C_PINTableDesc,
+    &C_HMAC_384TableDesc,
 	&SecretProtectTableDesc,
+    &C_TLS_PSKTableDesc,
 	&TPerInfoTableDesc,
 	&TemplateTableDesc,
 	&SPTableDesc,
@@ -2939,14 +3002,12 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 				}
 			}
 			else {
-				uint32_t valueLength = response.getLength(i);
-
-				if (valueLength <= 4) {
+                if (response.isByteSequence(i) == 0) {
 					if (level > 0) {
-						printf("  Column: %2d, Name: '%s', Value: %xh\n",
-						       column, columnName, response.getUint32(i));
+						printf("  Column: %2d, Name: '%s', Value: %lxh\n",
+						       column, columnName, response.getUint64(i));
 					}
-					sprintf(valueStr, "%xh", response.getUint32(i));
+					sprintf(valueStr, "%lxh", response.getUint64(i));
 				} else {
 					uint8_t buffer[64];
 					char    str[140];
