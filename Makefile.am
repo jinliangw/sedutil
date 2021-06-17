@@ -9,6 +9,10 @@ SEDUTIL_COMMON_CODE = \
 	Common/DtaDevGeneric.cpp Common/DtaDevGeneric.h \
 	Common/DtaDevOpal1.cpp Common/DtaDevOpal1.h \
 	Common/DtaDevOpal2.cpp Common/DtaDevOpal2.h \
+	Common/DtaDevOpalite.cpp Common/DtaDevOpalite.h \
+	Common/DtaDevPyrite1.cpp Common/DtaDevPyrite1.h \
+	Common/DtaDevPyrite2.cpp Common/DtaDevPyrite2.h \
+	Common/DtaDevRuby1.cpp Common/DtaDevRuby1.h \
 	Common/DtaDevOpal.cpp Common/DtaDevOpal.h \
 	Common/DtaDiskType.cpp Common/DtaDiskType.h \
 	Common/DtaHashPwd.cpp Common/DtaHashPwd.h \
@@ -17,8 +21,8 @@ SEDUTIL_COMMON_CODE = \
 	Common/DtaSession.cpp Common/DtaSession.h \
 	Common/DtaStructures.h Common/log.h Common/DtaLexicon.h Common/DtaConstants.h Common/DtaEndianFixup.h \
 	Common/pbkdf2/blockwise.c Common/pbkdf2/blockwise.h Common/pbkdf2/chash.c Common/pbkdf2/chash.h Common/pbkdf2/handy.h \
-	Common/pbkdf2/hmac.c Common/pbkdf2/hmac.h Common/pbkdf2/pbkdf2.c Common/pbkdf2/pbkdf2.h Common/pbkdf2/sha1.c \
-	Common/pbkdf2/sha1.h Common/pbkdf2/tassert.h Common/pbkdf2/bitops.h
+	Common/pbkdf2/hmac.c Common/pbkdf2/hmac.h Common/pbkdf2/pbkdf2.c Common/pbkdf2/pbkdf2.h Common/pbkdf2/sha512.c \
+	Common/pbkdf2/sha2.h Common/pbkdf2/tassert.h Common/pbkdf2/bitops.h
 sbin_PROGRAMS = sedutil-cli linuxpba
 sedutil_cli_SOURCES = linux/Version.h Common/sedutil.cpp Common/DtaOptions.cpp Common/DtaOptions.h \
 	\

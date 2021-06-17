@@ -1,15 +1,15 @@
 .\" Manpage for sedutil-cli.
 .TH SEDUTIL\-CLI 8 "12 May 2021" "1.16" "sedutil-cli man page"
 .SH NAME
-sedutil-cli \- util to manage TCG self encrypting drives.
+sedutil-cli \- util to manage TCG Storage self encrypting drives
 
 .SH SYNOPSIS
 sedutil\-cli <\-v> <\-n> <action> <options> <device>
 
 .SH DESCRIPTION
 sedutil-cli is a utility to manage self encrypting drives that conform
-to the Trusted Computing Group (TCG) OPAL 1.0, TCG OPAL 2.0, or TCG 
-Enterprise SSC specification.
+to the Trusted Computing Group (TCG) Enterprise, Opal, Opalite and
+Pyrite SSC specifications.
 
 For SATA drives in Linux, libata.allow_tpm must be set to 1. Either via adding
 libata.allow_tpm=1 to the kernel flags at boot time or changing the
@@ -60,9 +60,14 @@ set the device back to factory defaults.
 .B This **ERASES ALL DATA**
 .IP "\-\-revertNoErase <Admin1password> <device>"
 deactivate the Locking SP without erasing the data on GLOBAL RANGE *ONLY*
+.IP "\-\-PSIDrevert <PSID> <device>"
 .IP "\-\-yesIreallywanttoERASEALLmydatausingthePSID <PSID> <device>"
 revert the device using the PSID. 
 .B *ERASING* *ALL* the data
+.IP "\-\-PSIDrevertAdminSP <PSID> <device>"
+Alike to PSIDrevert, but on Enterprise calls AdminSP->Revert instead of
+ThisSP->RevertSP.  There are no PSID or Revert standards for Enterprise
+and different devices support different methods.
 .IP "\-\-printDefaultPassword <device>"
 print MSID
 
@@ -124,7 +129,7 @@ sedutil-cli --scan
 sedutil-cli --query /dev/sdc
 .EE
 .EX
-sedutil-cli --yesIreallywanttoERASEALLmydatausingthePSID <PSIDALLCAPSNODASHED> /dev/sdc
+sedutil-cli --yesIreallywanttoERASEALLmydatausingthePSID <PSIDNODASHED> /dev/sdc
 .EE
 .EX
 sedutil-cli --initialSetup <newSIDpassword> /dev/sdc

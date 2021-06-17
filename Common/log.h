@@ -94,7 +94,7 @@ TLogLevel& Log<T>::Level() {
 
 template <typename T>
 std::string Log<T>::ToString(TLogLevel level) {
-    static const char* const buffer[] = {"ERR ", "WARN", "INFO", "DBG ", "DBG1", "DBG2", "DBG3", "DBG4"};
+    static const char* const buffer[] = {"OFF", "ERR ", "WARN", "INFO", "DBG ", "DBG1", "DBG2", "DBG3", "DBG4"};
     return buffer[level];
 }
 

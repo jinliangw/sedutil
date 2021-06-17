@@ -22,7 +22,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 /** MIN length of com packets per Opal requirements */
 #define MIN_BUFFER_LENGTH 2048
 /** Length of input the IO buffers reported via Properties exchange */
-#define PROP_BUFFER_LENGTH 2048
+#define PROP_BUFFER_LENGTH 16384
 /** Alignment of the IO buffers.
 * generic align on 1k boundary probably not needed
 * but when things weren't working this was one of the

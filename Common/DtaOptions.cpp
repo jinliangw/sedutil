@@ -25,13 +25,13 @@ void usage()
 {
     printf("sedutil v%s Copyright 2014-2017 Bright Plaza Inc. <drivetrust@drivetrust.com>\n", GIT_VERSION);
     printf("a utility to manage self encrypting drives that conform\n");
-    printf("to the Trusted Computing Group OPAL 2.0 SSC specification\n");
-    printf("General Usage:                     (see readme for extended commandset)\n");
+    printf("to the TCG Enterprise, Opal, Opalite and Pyrite SSC specs\n");
+    printf("General Usage:                  (see readme for extended commandset)\n");
     printf("sedutil-cli <-v> <-n> <action> <options> <device>\n");
-    printf("-v (optional)                       increase verbosity, one to eight v's\n");
-    printf("-n (optional)                       no password hashing. Passwords will be sent in clear text!\n");
-    printf("-l (optional)                       log style output to stderr only\n");
-    printf("actions \n");
+    printf("-v (optional)                   increase verbosity, one to four v's\n");
+    printf("-n (optional)                   no password hashing. Passwords will be sent in clear text!\n");
+    printf("-l (optional)                   log style output to stderr only\n");
+    printf("actions:\n");
     printf("--scan \n");
     printf("                                Scans the devices on the system \n");
     printf("                                identifying Opal compliant devices \n");
@@ -69,8 +69,9 @@ void usage()
 	printf("--setAdmin1Pwd <Admin1password> <newAdmin1password> <device> \n");
 	printf("                                Change the Admin1 password in the LockingSP\n");
 	printf("--setPassword <oldpassword, \"\" for MSID> <userid> <newpassword> <device> \n");
-	printf("                                Change the Enterprise password for userid\n");
-	printf("                                \"EraseMaster\" or \"BandMaster<n>\", 0 <= n <= 1023\n");
+	printf("                                Change password for userid:\n");
+	printf("                                Enteprise: \"EraseMaster\" or \"BandMaster<n>\"\n");
+	printf("                                Opal: \"Admin<n>\" or \"User<n>\"\n");
 	printf("--setLockingRange <0...n> <RW|RO|LK> <Admin1password> <device> \n");
 	printf("                                Set the status of a Locking Range\n");
 	printf("                                0 = GLobal 1..n  = LRn \n");
@@ -109,8 +110,13 @@ void usage()
 	printf("                                deactivate the Locking SP \n");
 	printf("                                without erasing the data \n");
 	printf("                                on GLOBAL RANGE *ONLY* \n");
-    printf("--yesIreallywanttoERASEALLmydatausingthePSID <PSID> <device>\n");
-    printf("                                revert the device using the PSID *ERASING* *ALL* the data \n");
+	printf("--PSIDrevert <PSID> <device>\n");
+	printf("--yesIreallywanttoERASEALLmydatausingthePSID <PSID> <device>\n");
+	printf("                                revert the device using the PSID *ERASING*\n");
+	printf("                                *ALL* the data\n");
+	printf("--PSIDrevertAdminSP <PSID> <device>\n");
+	printf("                                Alike to PSIDrevert, but on Enterprise calls\n");
+	printf("                                AdminSP->Revert instead of ThisSP->RevertSP\n");
     printf("--printDefaultPassword <device>\n");
     printf("                                print MSID \n");
     printf("--printTables <SP> <password> <level> <device>\n");
@@ -122,7 +128,7 @@ void usage()
     printf("Examples \n");
     printf("sedutil-cli --scan \n");
 	printf("sedutil-cli --query %s \n", DEVICEEXAMPLE);
-	printf("sedutil-cli --yesIreallywanttoERASEALLmydatausingthePSID <PSIDALLCAPSNODASHED> %s \n", DEVICEEXAMPLE);
+	printf("sedutil-cli --yesIreallywanttoERASEALLmydatausingthePSID <PSIDNODASHED> %s \n", DEVICEEXAMPLE);
 	printf("sedutil-cli --initialSetup <newSIDpassword> %s \n", DEVICEEXAMPLE);
     return;
 }
@@ -149,6 +155,7 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			loggingLevel += (uint16_t)(strlen(argv[i]) - 1);
 			if (loggingLevel > 8) loggingLevel = 8;
 			CLog::Level() = CLog::FromInt(loggingLevel);
+			RCLog::Level() = RCLog::FromInt(loggingLevel);
 			LOG(D) << "Log level set to " << CLog::ToString(CLog::FromInt(loggingLevel));
 			LOG(D) << "sedutil version : " << GIT_VERSION;
 		}
