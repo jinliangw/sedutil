@@ -1,6 +1,9 @@
 ![alt tag](https://avatars0.githubusercontent.com/u/13870012?v=3&s=200)
 
-Intel and AMD Ryzen: This SEDutil fork includes support for intel and AMD Ryzen systems with SHA-512 password authentication
+This fork of sedutil was developed for CNEXlabs to add support for several features
+that have been added to TCG Opal since support for the mainline sedutil was discontinued.
+
+This SEDutil fork includes support for intel and AMD Ryzen systems with SHA-512 password authentication
 
 Note: This version of SEDutil is not compatible with SHA-1 versions of SEDutil
 
@@ -37,11 +40,10 @@ or changing the contents of /sys/module/libata/parameters/allow_tpm from a "0" t
 
 Orginal source code is available on GitHub at https://github.com/Drive-Trust-Alliance/sedutil 
 
-Linux and Windows executables and Linux PBA bootloader images for this version of SEDutil are available at https://github.com/ChubbyAnt/sedutil/releases
 
-# About SEDutil for AMD Ryzen
+# About SEDutil for CNEXlabs
 
-DTA sedutil: For AMD Ryzen Systems
+DTA sedutil: For CNEXlabs
 
 The sedutil project provides a CLI tool (`sedutil-cli`) capable of setting up and managing self encrypting drives (SEDs) that comply with the TCG OPAL 2.00 standard, Opalite, Pyrite, and Ruby. This project also provides a pre-boot authentication image (`linuxpba`) which can be loaded onto an encrypted disk's shadow MBR. This pre-boot authentication image allows the user enter their password and unlock SED drives during the boot process. **Using this tool can make data on the drive inaccessible!**
 
@@ -53,22 +55,19 @@ To configure a drive, load a compatible [RECOVERY](https://github.com/ChubbyAnt/
 https://github.com/Drive-Trust-Alliance/sedutil/wiki/Encrypting-your-drive  
 
 
-## Origin
-
-This version of sedutil is based off the original [@dta](https://github.com/Drive-Trust-Alliance/sedutil/) implementation incorporating some modifications by [@ladar](https://github.com/ladar/sedutil), [@ckamm](https://github.com/ckamm/sedutil/) and [@CyrilVanErsche](https://github.com/CyrilVanErsche/sedutil/). This fork adds support for the PBA bootloader on AMD Ryzen and AMD Ryzen mobile systems.
-
-
 ## Notable Differences
 
 Unique to this repo are the following modifications:
 
 * SHA512 password hashing vs SHA1 on original SEDutil
 * Compatibile with AMD Ryzen and AMD Ryzen mobile systems
+* Addition of reassign and deassign commands from CNL
+* Addition of printTables command to dump all of the tables
 
 
 ## Build Process
 
-Building is supported on Ubuntu 18.04.3 (LTS) x64. Other versions will probably not compile correctly!
+Building is supported on Ubuntu 18.04.5 (LTS) x64. Other versions will probably not compile correctly!
 
 To compile your own version of `sedutil` you will need the standard development tools, an internet connection, and ~10 GB of disk space. 
 
@@ -242,7 +241,7 @@ Verify that the PBA unlocks your drive, it should say "is OPAL Unlocked" If it d
 
 The SID and Admin1 passwords do not have to match but it makes things easier.  
 ```
-edutil-cli --setsidpassword debug yourrealpassword /dev/nvme0
+sedutil-cli --setsidpassword debug yourrealpassword /dev/nvme0
 sedutil-cli --setadmin1pwd debug yourrealpassword /dev/nvme0
 ```
 
