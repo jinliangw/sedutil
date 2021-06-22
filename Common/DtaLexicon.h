@@ -60,6 +60,7 @@ static const uint8_t OPALUID[][8]{
 		{ 0x00, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x01 }, /**< OPAL Locking Info */
 		{ 0x00, 0x00, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00 }, /**< Enterprise Locking Info */
 		{ 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00 }, /**< Access Control Table */
+        { 0x00, 0x00, 0x02, 0x01, 0x00, 0x03, 0x00, 0x01 }, /**< TPer Info Table */
         //C_PIN_TABLE object ID's
         { 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x84, 0x02}, /**< C_PIN_MSID */
         { 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x01}, /**< C_PIN_SID */
@@ -104,6 +105,7 @@ typedef enum _OPAL_UID {
 	OPAL_LOCKING_INFO_TABLE,
 	ENTERPRISE_LOCKING_INFO_TABLE,
 	ACCESS_CONTROL_TABLE,
+    TPER_INFO_TABLE,
     //C_PIN_TABLE object ID's
     OPAL_C_PIN_MSID,
     OPAL_C_PIN_SID,
@@ -193,7 +195,9 @@ typedef enum _OPAL_TOKEN {
     MBRENABLE = 0x01,
     MBRDONE = 0x02,
 	// properties
-	HOSTPROPERTIES =0x00,
+	HOSTPROPERTIES = 0x00,
+    // tper info table
+    TPERRESETENABLE = 0x08,
     // response tokenis() returned values
     DTA_TOKENID_BYTESTRING = 0xe0,
     DTA_TOKENID_SINT = 0xe1,

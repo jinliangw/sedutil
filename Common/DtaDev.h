@@ -329,6 +329,19 @@ public:
 	/** Print the tables supported by the TPER
 	 */
 	virtual uint8_t printTables(char* sp, char* password, uint8_t level) = 0;
+
+    /** Enables TPER_RESET in the device as defined in TCG Opal specification
+     */
+    virtual uint8_t enableTperReset(char* password) = 0;
+
+    /** Issues TPER_RESET to the device as defined in TCG Opal specification
+     */
+    uint8_t tperReset();
+
+    /** Issues STACK_RESET to the device for the ComID used by sedutil
+     */
+    uint8_t stackReset();
+
 	/*
 	* virtual functions required to be implemented
 	* because they are called by DtaSession.cpp

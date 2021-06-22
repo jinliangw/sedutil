@@ -105,6 +105,9 @@ typedef enum _sedutiloption {
     printDefaultPassword,
 	rawCmd,
 	printTables,
+    enableTperReset,
+    tperReset,
+    stackReset
 
 } sedutiloption;
 /** verify the number of arguments passed */
@@ -134,7 +137,7 @@ if((x+baseOptions) != argc) { \
 i++;
 
 #define TESTARG_RANGE(structfield, minValue, maxValue, errorStr) \
-    opts->structfield = atoi(argv[i + 1]); \
+    opts->structfield = static_cast<uint8_t>(atoi(argv[i + 1])); \
     if ((opts->structfield < minValue) || (opts->structfield > maxValue)) \
     TESTFAIL(errorStr)
 

@@ -35,6 +35,8 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+static uint8_t buffer[512 + IO_BUFFER_ALIGNMENT];
+
 /** Device Class (Base) represents a single disk device.
  *  This is the functionality that is common to all OS's and SSC's
  */
@@ -135,6 +137,63 @@ DTA_DEVICE_TYPE DtaDev::getDevType()
 	{
 		return disk_info.devType;
 	}
+
+uint8_t DtaDev::tperReset()
+{
+	void* bufferPtr = buffer + IO_BUFFER_ALIGNMENT;
+	bufferPtr = (void *)((uintptr_t)bufferPtr & (uintptr_t)~(IO_BUFFER_ALIGNMENT - 1));
+	memset(bufferPtr, 0, sizeof(StackResetRequest_t));
+
+    LOG(I) << "Sending TPER_RESET";
+
+	uint8_t lastRC;
+    if ((lastRC = sendCmd(IF_SEND, 0x02, 0x0004, bufferPtr, sizeof(StackResetRequest_t))) != 0) {
+        LOG(D) << "Send TPER_RESET command request to device failed " << (uint16_t)lastRC;
+    }
+    return lastRC;
+}
+
+uint8_t DtaDev::stackReset()
+{
+	void* bufferPtr = buffer + IO_BUFFER_ALIGNMENT;
+	bufferPtr = (void *)((uintptr_t)bufferPtr & (uintptr_t)~(IO_BUFFER_ALIGNMENT - 1));
+	memset(bufferPtr, 0, sizeof(StackResetRequest_t));
+
+    uint16_t comId = comID();
+    StackResetRequest_t* reqPtr = static_cast<StackResetRequest_t*>(bufferPtr);
+    reqPtr->comID = SWAP16(comId);
+    reqPtr->requestCode   = SWAP32(STACK_RESET_REQUEST_CODE);
+
+    LOG(I) << "Sending STACK_RESET for comID " << std::hex << comId;
+
+	uint8_t lastRC;
+    if ((lastRC = sendCmd(IF_SEND, 0x02, comId, bufferPtr, sizeof(StackResetRequest_t))) != 0) {
+        LOG(D) << "Send STACK_RESET command request to device failed " << (uint16_t)lastRC;
+        DtaHexDump(bufferPtr, sizeof(StackResetRequest_t));
+        return lastRC;
+    }
+    if ((lastRC = sendCmd(IF_RECV, 0x02, comId, bufferPtr, MIN_BUFFER_LENGTH)) != 0) {
+        LOG(D) << "Send STACK_RESET response request to device failed " << (uint16_t)lastRC;
+        return lastRC;
+    }
+    StackResetResponse_t* respPtr = static_cast<StackResetResponse_t*>(bufferPtr);
+    uint32_t retComID = SWAP16(respPtr->comID);
+    uint16_t retLength = SWAP16(respPtr->length);
+    uint32_t retStatus = SWAP32(respPtr->status);
+
+    if ((retComID != comId) || (retLength < 4 )) {
+        LOG(W) << "Invalid response";
+        DtaHexDump(bufferPtr, sizeof(StackResetResponse_t));
+        return 1;
+    }
+    if (retStatus != 0) {
+        LOG(W) << "STACK_RESET Failed, status = " << retStatus;
+        return retStatus;
+    }
+    LOG(I) << "STACK_RESET successful";
+    return 0;
+}
+
 void DtaDev::discovery0()
 {
     LOG(D1) << "Entering DtaDev::discovery0()";

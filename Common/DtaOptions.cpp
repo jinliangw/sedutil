@@ -27,12 +27,12 @@ void usage()
     printf("a utility to manage self encrypting drives that conform\n");
     printf("to the TCG Enterprise, Opal, Opalite and Pyrite SSC specs\n");
     printf("General Usage:                  (see readme for extended commandset)\n");
-    printf("sedutil-cli <-v> <-n> <action> <options> <device>\n");
+    printf("sedutil-cli [-vnl] <action> [options] <device>\n");
     printf("-v (optional)                   increase verbosity, one to four v's\n");
     printf("-n (optional)                   no password hashing. Passwords will be sent in clear text!\n");
     printf("-l (optional)                   log style output to stderr only\n");
     printf("actions:\n");
-    printf("--scan \n");
+    printf("--scan\n");
     printf("                                Scans the devices on the system \n");
     printf("                                identifying Opal compliant devices \n");
     printf("--query <device>\n");
@@ -124,6 +124,12 @@ void usage()
     printf("                                SP is Admin or Locking\n");
     printf("                                use \"\" as password for MSID.\n");
     printf("                                level 0 is tables only, 1 for details.\n");
+    printf("--enableTperReset <SIDpassword> <device>\n");
+    printf("                                Enable TPer Reset\n");
+    printf("--tperReset <device>\n");
+    printf("                                Send TPER_RESET to device\n");
+    printf("--stackReset <device>\n");
+    printf("                                Send a STACK_RESET for the base ComID\n");
     printf("\n");
     printf("Examples \n");
     printf("sedutil-cli --scan \n");
@@ -364,6 +370,9 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 		BEGIN_OPTION(objDump, 5) i += 4; OPTION_IS(device) END_OPTION
         BEGIN_OPTION(printDefaultPassword, 1) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(rawCmd, 7) i += 6; OPTION_IS(device) END_OPTION
+        BEGIN_OPTION(enableTperReset, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
+        BEGIN_OPTION(tperReset, 1) OPTION_IS(device) END_OPTION
+        BEGIN_OPTION(stackReset, 1) OPTION_IS(device) END_OPTION
 		else {
             LOG(E) << "Invalid command line argument " << argv[i];
 			return DTAERROR_INVALID_COMMAND;

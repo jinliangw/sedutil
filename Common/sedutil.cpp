@@ -306,6 +306,15 @@ int main(int argc, char * argv[])
 		LOG(D) << "Performing printTables";
 		return d->printTables(argv[opts.userid], argv[opts.password], opts.level);
 		break;
+    case sedutiloption::enableTperReset:
+        LOG(D) << "Enabling TPER_RESET";
+        return d->enableTperReset(argv[opts.password]);
+    case sedutiloption::tperReset:
+        LOG(D) << "Performing TPER_RESET";
+        return d->tperReset();
+    case sedutiloption::stackReset:
+        LOG(D) << "Performing STACK_RESET";
+        return d->stackReset();
     default:
         LOG(E) << "Unable to determine what you want to do ";
         usage();

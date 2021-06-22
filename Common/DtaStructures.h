@@ -40,6 +40,27 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #define FC_DATAREM    0x0404	/* Supported Data Removal Mechanism */
 #define FC_NSGEOMETRY 0x0405	/* Namespace Geometry Reporting */
 
+/** STACK_RESET Request
+ */
+typedef struct _StackResetRequest {
+    uint16_t comID;
+    uint16_t extendedComID;
+    uint32_t requestCode;
+} StackResetRequest_t;
+
+#define STACK_RESET_REQUEST_CODE 0x00000002
+
+/** STACK_RESET Response
+ */
+typedef struct _StackResetResponse {
+    uint16_t comID;
+    uint16_t extendedComID;
+    uint32_t requestCode;
+    uint16_t reserved;
+    uint16_t length;
+    uint32_t status;
+} StackResetResponse_t;
+
 /** The Discovery 0 Header. As defined in
 * Opal SSC Documentation
 */

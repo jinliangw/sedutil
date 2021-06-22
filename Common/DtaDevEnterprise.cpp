@@ -1528,6 +1528,12 @@ uint8_t DtaDevEnterprise::readDataStore(char* password, uint8_t table, uint32_t 
     return 0xff;
 }
 
+uint8_t DtaDevEnterprise::enableTperReset(char* password)
+{
+    cout << "TCG Enterprise SSC does not include the enableTperReset function.\n";
+    return 0xff;
+}
+
 void DtaDevEnterprise::puke()
 {
 

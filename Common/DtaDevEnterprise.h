@@ -213,6 +213,7 @@ public:
 	uint8_t loadDataStore(char* password, uint8_t table, uint32_t offset, uint32_t count,
 	                      const char* filename);
 	uint8_t readDataStore(char* password, uint8_t table, uint32_t offset, uint32_t count);
+    uint8_t enableTperReset(char* password);
 
 protected:
 	uint8_t getDefaultPassword();
