@@ -806,7 +806,7 @@ uint8_t DtaDevOpal::eraseLockingRange(uint8_t lockingrange, char * password)
 	LOG(D1) << "Exiting DtaDevOpal::eraseLockingRange()";
 	return 0;
 }
-uint8_t DtaDevOpal::getAuth4User(char * userid, uint8_t uidorcpin, std::vector<uint8_t> &userData)
+uint8_t DtaDevOpal::getAuth4User(const char* userid, uint8_t uidorcpin, std::vector<uint8_t> &userData)
 {
 	LOG(D1) << "Entering DtaDevOpal::getAuth4User()";
 	userData.clear();
@@ -844,25 +844,31 @@ uint8_t DtaDevOpal::getAuth4User(char * userid, uint8_t uidorcpin, std::vector<u
 	LOG(D1) << "Exiting DtaDevOpal::getAuth4User()";
 	return 0;
 }
-uint8_t DtaDevOpal::setPassword(char * password, char * userid, char * newpassword)
+uint8_t DtaDevOpal::setPassword(const char* authority, char * password, char * userid, char * newpassword)
 {
 	LOG(D1) << "Entering DtaDevOpal::setPassword" ;
 	uint8_t lastRC;
-	std::vector<uint8_t> userCPIN, hash;
+	std::vector<uint8_t> userCPIN, hash, authorityUID;
+
+	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
+	if ((lastRC = getAuth4User(userid, 10, userCPIN)) != 0) {
+		LOG(E) << "Unable to find user " << userid << " in Authority Table";
+		return lastRC;
+	}
+
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}
-	if ((lastRC = getAuth4User(userid, 10, userCPIN)) != 0) {
-		LOG(E) << "Unable to find user " << userid << " in Authority Table";
-		delete session;
-		return lastRC;
-	}
+
 	DtaHashPwd(hash, newpassword, this);
 	if ((lastRC = setTable(userCPIN, OPAL_TOKEN::PIN, hash)) != 0) {
 		LOG(E) << "Unable to set user " << userid << " new password ";
@@ -1207,18 +1213,25 @@ uint8_t DtaDevOpal::setLockingSPvalue(OPAL_UID table_uid, OPAL_TOKEN name,
 	return 0;
 }
 
-uint8_t DtaDevOpal::enableUser(char * password, char * userid, OPAL_TOKEN status)
+uint8_t DtaDevOpal::enableUser(const char* authority, char* password, char* userid, OPAL_TOKEN status)
 {
 	LOG(D1) << "Entering DtaDevOpal::enableUser";
 	uint8_t lastRC;
 	vector<uint8_t> userUID;
+    vector<uint8_t> authorityUID;
+
+	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
 
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}
@@ -1237,6 +1250,7 @@ uint8_t DtaDevOpal::enableUser(char * password, char * userid, OPAL_TOKEN status
 	LOG(D1) << "Exiting DtaDevOpal::enableUser()";
 	return 0;
 }
+
 uint8_t DtaDevOpal::revertTPer(char * password, uint8_t PSID, uint8_t AdminSP)
 {
 	LOG(D1) << "Entering DtaDevOpal::revertTPer() " << AdminSP;
@@ -1848,7 +1862,8 @@ uint8_t DtaDevOpal::getDefaultPassword()
 		delete session;
 		return lastRC;
 	}
-	vector<uint8_t> table;
+
+    vector<uint8_t> table;
 	table. push_back(OPAL_SHORT_ATOM::BYTESTRING8);
 	for (int i = 0; i < 8; i++) {
 		table.push_back(OPALUID[OPAL_UID::OPAL_C_PIN_MSID][i]);

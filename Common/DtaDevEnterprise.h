@@ -108,7 +108,7 @@ public:
         /** get the UID or CPIN ID of a user from their character name*/
 	uint8_t getAuth4User(char * userid, uint8_t column, std::vector<uint8_t> &userData);
         /** Enable a Bandmaster Not functional */
-	uint8_t enableUser(char * password, char * userid, OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);
+	uint8_t enableUser(const char* authority, char* password, char* userid, OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);
          /** Primitive to set the MBRDone flag.
          * @param state 0 or 1
          * @param Admin1Password Locking SP authority with access to flag
@@ -121,11 +121,12 @@ public:
 	uint8_t setMBREnable(uint8_t state, char * Admin1Password);
 
          /** Set the password of a locking SP user.
+         * @param authority ignored in Enterprise
          * @param password  current password
          * @param userid the userid whose password is to be changed
          * @param newpassword  value password is to be changed to
          */
-	uint8_t setPassword(char * password, char * userid, char * newpassword);
+	uint8_t setPassword(const char* authority, char * password, char * userid, char * newpassword);
 	/** dummy code not implemented in the enterprise SSC*/
 	uint8_t setNewPassword_SUM(char * password, char * userid, char * newpassword);
 	uint8_t setLockingRange(uint8_t lockingrange, uint8_t lockingstate,

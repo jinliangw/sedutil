@@ -67,7 +67,7 @@ uint8NOCODE(configureLockingRange,uint8_t lockingrange,
 	uint8_t enabled, char * password)
 uint8NOCODE(revertLockingSP,char * password, uint8_t keep)
 uint8NOCODE(setup_SUM, uint8_t lockingrange, uint64_t start, uint64_t length, char *Admin1Password, char * password)
-uint8NOCODE(setPassword,char * password, char * userid, char * newpassword)
+uint8NOCODE(setPassword, const char* authority, char * password, char * userid, char * newpassword)
 uint8NOCODE(setNewPassword_SUM,char * password, char * userid, char * newpassword)
 uint8NOCODE(setMBREnable,uint8_t mbrstate, char * Admin1Password)
 uint8NOCODE(setMBRDone,uint8_t mbrstate, char * Admin1Password)
@@ -82,7 +82,7 @@ uint8NOCODE(setupLockingRange_SUM, uint8_t lockingrange, uint64_t start,
 	uint64_t length, char * password)
 uint8NOCODE(rekeyLockingRange, uint8_t lockingrange, char * password)
 uint8NOCODE(setBandsEnabled, int16_t lockingrange, char * password)
-uint8NOCODE(enableUser,char * password, char * userid, OPAL_TOKEN status)
+uint8NOCODE(enableUser, const char* authority, char * password, char * userid, OPAL_TOKEN status)
 uint8NOCODE(revertTPer,char * password, uint8_t PSID, uint8_t AdminSP)
 uint8NOCODE(eraseLockingRange,uint8_t lockingrange, char * password)
 uint8NOCODE(printDefaultPassword);

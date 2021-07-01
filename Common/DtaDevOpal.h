@@ -141,12 +141,13 @@ public:
           *  @param column UID or CPIN to be returned
           *  @param userData The UIS or CPIN of the USER
           */
-	uint8_t getAuth4User(char * userid, uint8_t column, std::vector<uint8_t> &userData);
-        /**  Enable a user in the Locking SP
-         * @param password the password of the Locking SP administrative authority
+	uint8_t getAuth4User(const char* userid, uint8_t column, std::vector<uint8_t> &userData);
+		/**  Enable a user in the Locking SP
+		 * @param authority authority to use for the session
+         * @param password the password of the Locking SP authority
          * @param userid Character name of the user to be enabled
          */
-	uint8_t enableUser(char * password, char * userid, OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);
+	uint8_t enableUser(const char* authority, char* password, char* userid, OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);
         /** Primitive to set the MBRDone flag.
          * @param state 0 or 1
          * @param Admin1Password Locking SP authority with access to flag
@@ -163,7 +164,7 @@ public:
          * @param userid the userid whose password is to be changed
          * @param newpassword  value password is to be changed to
          */
-	uint8_t setPassword(char * password, char * userid, char * newpassword);
+	uint8_t setPassword(const char* authority, char * password, char * userid, char * newpassword);
 	/** Set the password of a locking SP user in Single User Mode.
          * @param password  current user password
          * @param userid the userid whose password is to be changed

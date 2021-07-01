@@ -108,6 +108,8 @@ int main(int argc, char * argv[])
 		d->no_hash_passwords = opts.no_hash_passwords;
 
 		d->output_format = opts.output_format;
+        d->timeout = opts.timeout;
+        d->testTimeout = opts.testTimeout;
 	}
 
     switch (opts.action) {
@@ -125,8 +127,8 @@ int main(int argc, char * argv[])
 		break;
 	case sedutiloption::setAdmin1Pwd:
         LOG(D) << "Performing setAdmin1Pwd ";
-        return d->setPassword(argv[opts.password], (char *) "Admin1",
-                            argv[opts.newpassword]);
+        return d->setPassword("Admin1", argv[opts.password], (char *) "Admin1",
+                              argv[opts.newpassword]);
 		break;
 	case sedutiloption::loadPBAimage:
         LOG(D) << "Loading PBA image " << argv[opts.pbafile] << " to " << opts.device;
@@ -210,7 +212,8 @@ int main(int argc, char * argv[])
 		break;
 	case sedutiloption::enableuser:
         LOG(D) << "Performing enable user for user " << argv[opts.userid];
-        return d->enableUser(argv[opts.password], argv[opts.userid]);
+        return d->enableUser(opts.authority[0] ? opts.authority : "Admin1",
+                             argv[opts.password], argv[opts.userid]);
         break;
 	case sedutiloption::activateLockingSP:
 		LOG(D) << "Activating the LockingSP on" << argv[opts.device];
@@ -257,8 +260,8 @@ int main(int argc, char * argv[])
         break;
 	case sedutiloption::setPassword:
         LOG(D) << "Performing setPassword for user " << argv[opts.userid];
-        return d->setPassword(argv[opts.password], argv[opts.userid],
-                              argv[opts.newpassword]);
+        return d->setPassword(opts.authority[0] ? opts.authority : "Admin1",
+                              argv[opts.password], argv[opts.userid], argv[opts.newpassword]);
         break;
 	case sedutiloption::setPassword_SUM:
 		LOG(D) << "Performing setPassword in SUM mode for user " << argv[opts.userid];

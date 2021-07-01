@@ -148,12 +148,13 @@ public:
 	 */
 	virtual uint8_t setSIDPassword(char * oldpassword, char * newpassword,
 		uint8_t hasholdpwd = 1, uint8_t hashnewpwd = 1) = 0;
-	/** Set the password of a locking SP user.
+    /** Set the password of a locking SP user.
+     * @param authority authority to use for the session
 	 * @param password  current password
 	 * @param userid the userid whose password is to be changed
 	 * @param newpassword  value password is to be changed to
 	 */
-	virtual uint8_t setPassword(char * password, char * userid, char * newpassword) = 0;
+	virtual uint8_t setPassword(const char* authority, char * password, char * userid, char * newpassword) = 0;
 	/** Set the password of a locking SP user in Single User Mode.
          * @param password  current user password
          * @param userid the userid whose password is to be changed
@@ -249,11 +250,12 @@ public:
 	 * @param Admin1Password Locking SP authority with access to flag
 	 */
 	virtual uint8_t setMBREnable(uint8_t state, char * Admin1Password) = 0;
-	/** enable a locking sp user.
-	 * @param password password of locking sp administrative authority
+    /** enable a locking sp user.
+     * @param authority authority to use for the session
+	 * @param password password of locking sp authority
 	 * @param userid  the user to be enabled
 	 */
-	virtual uint8_t enableUser(char * password, char * userid, OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE) = 0;
+	virtual uint8_t enableUser(const char* authority, char* password, char* userid, OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE) = 0;
 	/** Enable locking on the device
 	 * @param password password of the admin sp SID authority
 	 */
@@ -354,8 +356,12 @@ public:
 	virtual uint8_t exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol = 0x01) = 0;
 	/** return the communications ID to be used for sessions to this device */
 	virtual uint16_t comID() = 0;
+
 	bool no_hash_passwords; /** disables hashing of passwords */
 	sedutiloutput output_format; /** standard, readable, JSON */
+    uint32_t timeout = 0;   /** Session timeout, 0 is no timeout */
+    bool testTimeout = false;
+
 protected:
 	const char * dev;   /**< character string representing the device in the OS lexicon */
 	uint8_t isOpen = FALSE;  /**< The device has been opened */
