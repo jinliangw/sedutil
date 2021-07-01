@@ -29,6 +29,9 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include "DtaHashPwd.h"
 #include "DtaStructures.h"
 
+#include <thread>
+#include <chrono>
+
 using namespace std;
 
 DtaSession::DtaSession(DtaDev * device)
@@ -139,13 +142,19 @@ again:
 		cmd->addToken(60000);
 		cmd->addToken(OPAL_TOKEN::ENDNAME);
 	}
+    else if (d->timeout) {
+		cmd->addToken(OPAL_TOKEN::STARTNAME);
+		cmd->addToken(OPAL_TINY_ATOM::UINT_05);
+		cmd->addToken(d->timeout);
+		cmd->addToken(OPAL_TOKEN::ENDNAME);
+    }
 
     cmd->addToken(OPAL_TOKEN::ENDLIST); // ]  (Close Bracket)
     cmd->complete();
 	if ((lastRC = sendCommand(cmd, response)) != 0) {
 		delete cmd;
 		if (settimeout) {
-			LOG(D2) << "Session start with timeout failed rc = " << (int)lastRC;
+			LOG(D2) << "Session start with SessionTimeout parameter failed rc = " << (int)lastRC;
 			settimeout = 0;
 			goto again;
 		}
@@ -160,8 +169,17 @@ again:
 	if ((NULL != HostChallenge) && (d->isEprise())) {
 		return(authenticate(SignAuthority, HostChallenge));
 	}
+
+    if (d->testTimeout) {
+        // configure to test timeout.  Wait here for timeout + 2 seconds.
+        int64_t waitTime = d->timeout + 2000;
+        LOG(W) << "Testing timeout, waiting " << waitTime << " milliseconds after opening the session";
+        std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
+    }
+
     return 0;
 }
+
 uint8_t
 DtaSession::authenticate(vector<uint8_t> Authority, char * Challenge)
 {

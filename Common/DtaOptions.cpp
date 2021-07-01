@@ -31,6 +31,10 @@ void usage()
     printf("-v (optional)                   increase verbosity, one to four v's\n");
     printf("-n (optional)                   no password hashing. Passwords will be sent in clear text!\n");
     printf("-l (optional)                   log style output to stderr only\n");
+    printf("-a=authortity (optional)        specify am authority instead of the default for the action\n");
+    printf("                                Authorities are Admin[1..n], User[1..n]");
+    printf("                                This option is not supported for all actions.\n");
+    printf("-t=timeout (optional)           specify a session timeout value to be sent on all Start Sessions\n");
     printf("actions:\n");
     printf("--scan\n");
     printf("                                Scans the devices on the system \n");
@@ -72,6 +76,10 @@ void usage()
 	printf("                                Change password for userid:\n");
 	printf("                                Enteprise: \"EraseMaster\" or \"BandMaster<n>\"\n");
 	printf("                                Opal: \"Admin<n>\" or \"User<n>\"\n");
+    printf("                                default authority is Admin1, over-ride with -a option\n");
+    printf("--enableUser <password> <user> <device>\n");
+    printf("                                enable a user, user = Admin[2...n] or User[2...n]\n");
+    printf("                                default authority is Admin1, over-ride with -a option\n");
 	printf("--setLockingRange <0...n> <RW|RO|LK> <Admin1password> <device> \n");
 	printf("                                Set the status of a Locking Range\n");
 	printf("                                0 = GLobal 1..n  = LRn \n");
@@ -175,9 +183,22 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			opts->output_format = sedutilNormal;
 			outputFormat = sedutilNormal;
 		}
-		else if (!(('-' == argv[i][0]) && ('-' == argv[i][1])) &&
-			(0 == opts->action))
-		{
+        else if (!strncmp("-a=", argv[i], 3)) {
+            ++baseOptions;
+            strncpy(opts->authority, &argv[i][3], sizeof(opts->authority));
+            LOG(D) << "Default authority over-ride, using " << opts->authority;
+        }
+        else if (!strcmp("-tt", argv[i])) {
+            ++baseOptions;
+            opts->testTimeout = 1;
+            LOG(D) << "Configured to test timeout";
+        }
+        else if (!strncmp("-t=", argv[i], 3)) {
+            ++baseOptions;
+            opts->timeout = atoi(&argv[i][3]);
+            LOG(D) << "session timeout set to  " << opts->timeout;
+        }
+        else if (!(('-' == argv[i][0]) && ('-' == argv[i][1])) && (0 == opts->action)) {
 			LOG(E) << "Argument " << (uint16_t) i << " (" << argv[i] << ") should be a command";
 			return DTAERROR_INVALID_COMMAND;
 		}
@@ -223,7 +244,7 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 		BEGIN_OPTION(PSIDrevertAdminSP, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(yesIreallywanttoERASEALLmydatausingthePSID, 2) OPTION_IS(password)
 			OPTION_IS(device) END_OPTION
-		BEGIN_OPTION(enableuser, 2) OPTION_IS(password) OPTION_IS(userid)
+		BEGIN_OPTION(enableuser, 3) OPTION_IS(password) OPTION_IS(userid)
 			OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(activateLockingSP, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(activateLockingSP_SUM, 3)

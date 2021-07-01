@@ -377,7 +377,7 @@ uint8_t DtaDevEnterprise::revertLockingSP(char * password, uint8_t keep)
 	LOG(D1) << "Exiting DtaDevEnterprise::revertLockingSP()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::setPassword(char * password, char * userid, char * newpassword)
+uint8_t DtaDevEnterprise::setPassword(const char* authority, char * password, char * userid, char * newpassword)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setPassword" ;
 	uint8_t lastRC;
@@ -848,7 +848,7 @@ uint8_t DtaDevEnterprise::setLockingRange_SUM(uint8_t lockingrange, uint8_t lock
         LOG(D1) << "Exiting DtaDevEnterprise::setLockingRange_SUM()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::enableUser(char * password, char * userid, OPAL_TOKEN status)
+uint8_t DtaDevEnterprise::enableUser(const char* authority, char * password, char * userid, OPAL_TOKEN status)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::enableUser";
 	LOG(E) << "enableUser not implemented";

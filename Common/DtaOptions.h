@@ -44,8 +44,11 @@ typedef struct _DTA_OPTIONS {
 	uint8_t level;			/** output level, for print operations */
 	uint8_t offset;			/** offset in table */
 	uint8_t count;			/** Count of bytes in table */
+    uint8_t testTimeout;
 
-	bool no_hash_passwords; /** global parameter, disables hashing of passwords */
+	bool    no_hash_passwords; /** global parameter, disables hashing of passwords */
+    char    authority[16];  /** authority over-ride */
+    uint32_t timeout;       /** session timeout option */
 	sedutiloutput output_format;
 } DTA_OPTIONS;
 /** Print a usage message */
