@@ -65,7 +65,7 @@ DtaResponse::init(void * buffer)
     }
 }
 
-OPAL_TOKEN DtaResponse::tokenIs(uint32_t tokenNum)
+OPAL_TOKEN DtaResponse::tokenIs(const uint32_t tokenNum) const
 {
     LOG(D1) << "Entering  DtaResponse::tokenIs";
     if (!(response[tokenNum][0] & 0x80)) { //tiny atom
@@ -102,12 +102,12 @@ OPAL_TOKEN DtaResponse::tokenIs(uint32_t tokenNum)
         return (OPAL_TOKEN) response[tokenNum][0];
 }
 
-uint32_t DtaResponse::getLength(uint32_t tokenNum)
+uint32_t DtaResponse::getLength(const uint32_t tokenNum) const
 {
-    return (uint32_t) response[tokenNum].size();
+    return (uint32_t)response[tokenNum].size();
 }
 
-uint64_t DtaResponse::getUint64(uint32_t tokenNum)
+uint64_t DtaResponse::getUint64(const uint32_t tokenNum) const
 {
     LOG(D1) << "Entering  DtaResponse::getUint64";
     if (!(response[tokenNum][0] & 0x80)) { //tiny atom
@@ -150,40 +150,40 @@ uint64_t DtaResponse::getUint64(uint32_t tokenNum)
     }
 }
 
-uint32_t DtaResponse::getUint32(uint32_t tokenNum)
+uint32_t DtaResponse::getUint32(const uint32_t tokenNum) const
 {
     LOG(D1) << "Entering  DtaResponse::getUint32";
     uint64_t i = getUint64(tokenNum);
     if (i > 0xffffffff) { LOG(E) << "UINT32 truncated "; }
-    return (uint32_t) i;
+    return (uint32_t)i;
 
 }
 
-uint16_t DtaResponse::getUint16(uint32_t tokenNum)
+uint16_t DtaResponse::getUint16(const uint32_t tokenNum) const
 {
     LOG(D1) << "Entering  DtaResponse::getUint16";
     uint64_t i = getUint64(tokenNum);
     if (i > 0xffff) { LOG(E) << "UINT16 truncated "; }
-    return (uint16_t) i;
+    return (uint16_t)i;
 }
 
-uint8_t DtaResponse::getUint8(uint32_t tokenNum)
+uint8_t DtaResponse::getUint8(const uint32_t tokenNum) const
 {
 	LOG(D1) << "Entering  DtaResponse::getUint8";
     uint64_t i = getUint64(tokenNum);
     if (i > 0xff) { LOG(E) << "UINT8 truncated "; }
-    return (uint8_t) i;
+    return (uint8_t)i;
 }
 //int64_t DtaResponse::getSint(uint32_t tokenNum) {
 //	LOG(E) << "DtaResponse::getSint() is not implemented";
 //}
 
-std::vector<uint8_t> DtaResponse::getRawToken(uint32_t tokenNum)
+std::vector<uint8_t> DtaResponse::getRawToken(const uint32_t tokenNum) const
 {
     return response[tokenNum];
 }
 
-std::string DtaResponse::getString(uint32_t tokenNum)
+std::string DtaResponse::getString(const uint32_t tokenNum) const
 {
     LOG(D1) << "Entering  DtaResponse::getString";
     std::string s;
@@ -212,7 +212,7 @@ std::string DtaResponse::getString(uint32_t tokenNum)
     return s;
 }
 
-int DtaResponse::getBytes(uint32_t tokenNum, uint8_t bytearray[])
+int DtaResponse::getBytes(const uint32_t tokenNum, uint8_t bytearray[]) const
 {
     LOG(D1) << "Entering  DtaResponse::getBytes";
     int overhead = 0;
@@ -241,17 +241,19 @@ int DtaResponse::getBytes(uint32_t tokenNum, uint8_t bytearray[])
     return size - overhead;
 }
 
-uint32_t DtaResponse::getTokenCount()
+uint32_t DtaResponse::getTokenCount() const
 {
     LOG(D1) << "Entering  DtaResponse::getTokenCount()";
-    return (uint32_t) response.size();
+    return (uint32_t)response.size();
 }
 
-int DtaResponse::isByteSequence(uint32_t tokenNum)
+int DtaResponse::isByteSequence(const uint32_t tokenNum) const
 {
     int retCode = 0;
     uint8_t token = response[tokenNum][0];
-    if (!(token & 0x40)) {          // short atom
+    if (!(token & 0x80)) {          // tiny atom
+        retCode = 0;
+    } else if (!(token & 0x40)) {   // short atom
         retCode = token & 0x20;
     } else if (!(token & 0x20)) {   // medium atom
         retCode = token & 0x10;

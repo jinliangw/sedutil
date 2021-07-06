@@ -51,7 +51,7 @@ void DtaDevOpal::init(const char * devref)
 	if((lastRC = properties()) != 0) { LOG(E) << "Properties exchange failed";}
 }
 
-uint8_t DtaDevOpal::initialSetup(char * password)
+uint8_t DtaDevOpal::initialSetup(const char* password)
 {
 	LOG(D1) << "Entering initialSetup()";
 	uint8_t lastRC;
@@ -80,7 +80,8 @@ uint8_t DtaDevOpal::initialSetup(char * password)
 	return 0;
 }
 
-uint8_t DtaDevOpal::setup_SUM(uint8_t lockingrange, uint64_t start, uint64_t length, char *Admin1Password, char * password)
+uint8_t DtaDevOpal::setup_SUM(const uint8_t lockingrange, const uint64_t start, const uint64_t length,
+                              const char* Admin1Password, const char* password)
 {
 	LOG(D1) << "Entering setup_SUM()";
 	uint8_t lastRC;
@@ -152,7 +153,9 @@ uint8_t DtaDevOpal::setup_SUM(uint8_t lockingrange, uint64_t start, uint64_t len
 	LOG(D1) << "Exiting setup_SUM()";
 	return 0;
 }
-DtaDevOpal::lrStatus_t DtaDevOpal::getLockingRange_status(uint8_t lockingrange, char * password)
+
+DtaDevOpal::lrStatus_t DtaDevOpal::getLockingRange_status(const uint8_t lockingrange, 
+                                                          const char* password)
 {
 	uint8_t lastRC;
 	lrStatus_t lrStatus;
@@ -205,7 +208,8 @@ DtaDevOpal::lrStatus_t DtaDevOpal::getLockingRange_status(uint8_t lockingrange, 
 	LOG(D1) << "Exiting DtaDevOpal:getLockingRange_status()";
 	return lrStatus;
 }
-uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
+
+uint8_t DtaDevOpal::listLockingRanges(const char* password, const int16_t rangeid)
 {
         int firstRange = (int)rangeid;
         int lastRange = (int)rangeid;
@@ -296,8 +300,9 @@ uint8_t DtaDevOpal::listLockingRanges(char * password, int16_t rangeid)
 	LOG(D1) << "Exiting DtaDevOpal:listLockingRanges()";
 	return 0;
 }
-uint8_t DtaDevOpal::setupLockingRange(uint8_t lockingrange, uint64_t start,
-	uint64_t length, char * password)
+
+uint8_t DtaDevOpal::setupLockingRange(const uint8_t lockingrange, const uint64_t start,
+                                      const uint64_t length, const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal:setupLockingRange()";
@@ -378,8 +383,9 @@ uint8_t DtaDevOpal::setupLockingRange(uint8_t lockingrange, uint64_t start,
 	LOG(D1) << "Exiting DtaDevOpal:setupLockingRange()";
 	return 0;
 }
-uint8_t DtaDevOpal::setupLockingRange_SUM(uint8_t lockingrange, uint64_t start,
-	uint64_t length, char * password)
+
+uint8_t DtaDevOpal::setupLockingRange_SUM(const uint8_t lockingrange, const uint64_t start,
+                                          const uint64_t length, const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal:setupLockingRange_SUM()";
@@ -467,7 +473,9 @@ uint8_t DtaDevOpal::setupLockingRange_SUM(uint8_t lockingrange, uint64_t start,
 	LOG(D1) << "Exiting DtaDevOpal:setupLockingRange_SUM()";
 	return 0;
 }
-uint8_t DtaDevOpal::configureLockingRange(uint8_t lockingrange, uint8_t enabled, char * password)
+
+uint8_t DtaDevOpal::configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
+                                          const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal::configureLockingRange()";
@@ -529,7 +537,8 @@ uint8_t DtaDevOpal::configureLockingRange(uint8_t lockingrange, uint8_t enabled,
 	LOG(D1) << "Exiting DtaDevOpal::configureLockingRange()";
 	return 0;
 }
-uint8_t DtaDevOpal::rekeyLockingRange(uint8_t lockingrange, char * password)
+
+uint8_t DtaDevOpal::rekeyLockingRange(const uint8_t lockingrange, const char* password)
 {
 	LOG(D1) << "Entering DtaDevOpal::rekeyLockingRange()";
 	uint8_t lastRC;
@@ -578,7 +587,10 @@ uint8_t DtaDevOpal::rekeyLockingRange(uint8_t lockingrange, char * password)
 	LOG(D1) << "Exiting DtaDevOpal::rekeyLockingRange()";
 	return 0;
 }
-uint8_t DtaDevOpal::rekeyLockingRange_SUM(vector<uint8_t> LR, vector<uint8_t>  UID, char * password)
+
+uint8_t DtaDevOpal::rekeyLockingRange_SUM(const std::vector<uint8_t>& LR,
+                                          const std::vector<uint8_t>& UID,
+                                          const char* password)
 {
 	LOG(D1) << "Entering DtaDevOpal::rekeyLockingRange_SUM()";
 	uint8_t lastRC;
@@ -620,8 +632,8 @@ uint8_t DtaDevOpal::rekeyLockingRange_SUM(vector<uint8_t> LR, vector<uint8_t>  U
 	return 0;
 }
 
-uint8_t DtaDevOpal::assign(char* password, uint32_t ns,
-                           uint64_t start, uint64_t length)
+uint8_t DtaDevOpal::assign(const char* password, const uint32_t ns,
+                           const uint64_t start, const uint64_t length)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal::assign()";
@@ -687,7 +699,7 @@ uint8_t DtaDevOpal::assign(char* password, uint32_t ns,
 	return 0;
 }
 
-uint8_t DtaDevOpal::deassign(char* password, uint8_t lockingrange, bool keep)
+uint8_t DtaDevOpal::deassign(const char* password, const uint8_t lockingrange, const bool keep)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal::deassign()";
@@ -740,7 +752,7 @@ uint8_t DtaDevOpal::deassign(char* password, uint8_t lockingrange, bool keep)
 	return 0;
 }
 
-uint8_t DtaDevOpal::setBandsEnabled(int16_t lockingrange, char * password)
+uint8_t DtaDevOpal::setBandsEnabled(const int16_t lockingrange, const char* password)
 {
 	if (password == NULL) { LOG(D4) << "Password is NULL"; } // unreferenced formal paramater
 	LOG(D1) << "Entering DtaDevOpal::setBandsEnabled()" << lockingrange << " " << dev;
@@ -748,7 +760,7 @@ uint8_t DtaDevOpal::setBandsEnabled(int16_t lockingrange, char * password)
 	LOG(D1) << "Exiting DtaDevOpal::setBandsEnabled()";
 	return 0;
 }
-uint8_t DtaDevOpal::revertLockingSP(char * password, uint8_t keep)
+uint8_t DtaDevOpal::revertLockingSP(const char* password, const uint8_t keep)
 {
 	LOG(D1) << "Entering DtaDevOpal::revertLockingSP() keep = " << (uint16_t) keep;
 	uint8_t lastRC;
@@ -798,7 +810,8 @@ uint8_t DtaDevOpal::revertLockingSP(char * password, uint8_t keep)
 	LOG(D1) << "Exiting DtaDevOpal::revertLockingSP()";
 	return 0;
 }
-uint8_t DtaDevOpal::eraseLockingRange(uint8_t lockingrange, char * password)
+
+uint8_t DtaDevOpal::eraseLockingRange(const uint8_t lockingrange, const char* password)
 {
 	LOG(D1) << "Entering DtaDevOpal::eraseLockingRange()" << lockingrange << " " << dev;
 	if (password == NULL) { LOG(D4) << "Referencing formal parameters " << lockingrange; }
@@ -806,7 +819,9 @@ uint8_t DtaDevOpal::eraseLockingRange(uint8_t lockingrange, char * password)
 	LOG(D1) << "Exiting DtaDevOpal::eraseLockingRange()";
 	return 0;
 }
-uint8_t DtaDevOpal::getAuth4User(const char* userid, uint8_t uidorcpin, std::vector<uint8_t> &userData)
+
+uint8_t DtaDevOpal::getAuth4User(const char* userid, const uint8_t uidorcpin, 
+                                 std::vector<uint8_t>& userData) const
 {
 	LOG(D1) << "Entering DtaDevOpal::getAuth4User()";
 	userData.clear();
@@ -844,7 +859,9 @@ uint8_t DtaDevOpal::getAuth4User(const char* userid, uint8_t uidorcpin, std::vec
 	LOG(D1) << "Exiting DtaDevOpal::getAuth4User()";
 	return 0;
 }
-uint8_t DtaDevOpal::setPassword(const char* authority, char * password, char * userid, char * newpassword)
+
+uint8_t DtaDevOpal::setPassword(const char* authority, const char* password, const char* userid,
+                                const char* newpassword)
 {
 	LOG(D1) << "Entering DtaDevOpal::setPassword" ;
 	uint8_t lastRC;
@@ -880,7 +897,9 @@ uint8_t DtaDevOpal::setPassword(const char* authority, char * password, char * u
 	LOG(D1) << "Exiting DtaDevOpal::setPassword()";
 	return 0;
 }
-uint8_t DtaDevOpal::setNewPassword_SUM(char * password, char * userid, char * newpassword)
+
+uint8_t DtaDevOpal::setNewPassword_SUM(const char* password, const char* userid,
+                                       const char* newpassword)
 {
 	LOG(D1) << "Entering DtaDevOpal::setNewPassword_SUM";
 	uint8_t lastRC;
@@ -934,7 +953,8 @@ uint8_t DtaDevOpal::setNewPassword_SUM(char * password, char * userid, char * ne
 	LOG(D1) << "Exiting DtaDevOpal::setNewPassword_SUM()";
 	return 0;
 }
-uint8_t DtaDevOpal::setMBREnable(uint8_t mbrstate,	char * Admin1Password)
+
+uint8_t DtaDevOpal::setMBREnable(const uint8_t mbrstate, const char* Admin1Password)
 {
 	LOG(D1) << "Entering DtaDevOpal::setMBREnable";
 	uint8_t lastRC;
@@ -966,7 +986,8 @@ uint8_t DtaDevOpal::setMBREnable(uint8_t mbrstate,	char * Admin1Password)
 	LOG(D1) << "Exiting DtaDevOpal::setMBREnable";
 	return 0;
 }
-uint8_t DtaDevOpal::setMBRDone(uint8_t mbrstate, char * Admin1Password)
+
+uint8_t DtaDevOpal::setMBRDone(const uint8_t mbrstate, const char* Admin1Password)
 {
 	LOG(D1) << "Entering DtaDevOpal::setMBRDone";
 	uint8_t lastRC;
@@ -993,8 +1014,9 @@ uint8_t DtaDevOpal::setMBRDone(uint8_t mbrstate, char * Admin1Password)
 	LOG(D1) << "Exiting DtaDevOpal::setMBRDone";
 	return 0;
 }
-uint8_t DtaDevOpal::setLockingRange(uint8_t lockingrange, uint8_t lockingstate,
-	char * Admin1Password)
+
+uint8_t DtaDevOpal::setLockingRange(const uint8_t lockingrange, const uint8_t lockingstate,
+                                    const char* Admin1Password)
 {
 	uint8_t lastRC;
 	uint8_t archiveuser = 0;
@@ -1080,8 +1102,9 @@ uint8_t DtaDevOpal::setLockingRange(uint8_t lockingrange, uint8_t lockingstate,
 	LOG(D1) << "Exiting DtaDevOpal::setLockingRange";
 	return 0;
 }
-uint8_t DtaDevOpal::setLockingRange_SUM(uint8_t lockingrange, uint8_t lockingstate,
-	char * password)
+
+uint8_t DtaDevOpal::setLockingRange_SUM(const uint8_t lockingrange, const uint8_t lockingstate,
+                                        const char* password)
 {
 	uint8_t lastRC;
 	OPAL_TOKEN readlocked, writelocked;
@@ -1180,8 +1203,9 @@ uint8_t DtaDevOpal::setLockingRange_SUM(uint8_t lockingrange, uint8_t lockingsta
 	LOG(D1) << "Exiting DtaDevOpal::setLockingRange_SUM";
 	return 0;
 }
-uint8_t DtaDevOpal::setLockingSPvalue(OPAL_UID table_uid, OPAL_TOKEN name,
-	OPAL_TOKEN value,char * password, char * msg)
+
+uint8_t DtaDevOpal::setLockingSPvalue(const OPAL_UID table_uid, const OPAL_TOKEN name,
+                                      const OPAL_TOKEN value, const char* password, const char* msg)
 {
 	LOG(D1) << "Entering DtaDevOpal::setLockingSPvalue";
 	uint8_t lastRC;
@@ -1213,7 +1237,8 @@ uint8_t DtaDevOpal::setLockingSPvalue(OPAL_UID table_uid, OPAL_TOKEN name,
 	return 0;
 }
 
-uint8_t DtaDevOpal::enableUser(const char* authority, char* password, char* userid, OPAL_TOKEN status)
+uint8_t DtaDevOpal::enableUser(const char* authority, const char* password, const char* userid,
+                               const OPAL_TOKEN status)
 {
 	LOG(D1) << "Entering DtaDevOpal::enableUser";
 	uint8_t lastRC;
@@ -1251,7 +1276,7 @@ uint8_t DtaDevOpal::enableUser(const char* authority, char* password, char* user
 	return 0;
 }
 
-uint8_t DtaDevOpal::revertTPer(char * password, uint8_t PSID, uint8_t AdminSP)
+uint8_t DtaDevOpal::revertTPer(const char* password, const uint8_t PSID, const uint8_t AdminSP)
 {
 	LOG(D1) << "Entering DtaDevOpal::revertTPer() " << AdminSP;
 	uint8_t lastRC;
@@ -1293,7 +1318,7 @@ uint8_t DtaDevOpal::revertTPer(char * password, uint8_t PSID, uint8_t AdminSP)
 	return 0;
 }
 
-uint8_t DtaDevOpal::loadPBA(char * password, char * filename) {
+uint8_t DtaDevOpal::loadPBA(const char* password, const char* filename) {
 	LOG(D1) << "Entering DtaDevOpal::loadPBAimage()" << filename << " " << dev;
 	uint8_t lastRC;
 	uint32_t blockSize;
@@ -1377,7 +1402,7 @@ uint8_t DtaDevOpal::loadPBA(char * password, char * filename) {
 	return 0;
 }
 
-uint8_t DtaDevOpal::readMBR(char* password, uint32_t offset, uint32_t count)
+uint8_t DtaDevOpal::readMBR(const char* password, const uint32_t offset, const uint32_t count)
 {
     uint8_t buffer[PROP_BUFFER_LENGTH];
     uint8_t  lastRC = 0;
@@ -1428,8 +1453,8 @@ uint8_t DtaDevOpal::readMBR(char* password, uint32_t offset, uint32_t count)
     return lastRC;
 }
 
-uint8_t DtaDevOpal::loadDataStore(char* password, uint8_t table, uint32_t offset,
-                                  uint32_t count, const char* filename)
+uint8_t DtaDevOpal::loadDataStore(const char* password, const uint8_t table, const uint32_t offset,
+                                  const uint32_t count, const char* filename)
 {
     LOG(D1) << "Entering DtaDevOpal::loadDataStore()" << filename << " " << dev;
 
@@ -1446,6 +1471,7 @@ uint8_t DtaDevOpal::loadDataStore(char* password, uint8_t table, uint32_t offset
 
     uint8_t lastRC;
     uint32_t filepos = 0;
+    uint32_t byteCount = count;
 
     uint32_t blockSize = MIN(PROP_BUFFER_LENGTH, tperMaxPacket);
     if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
@@ -1464,8 +1490,8 @@ uint8_t DtaDevOpal::loadDataStore(char* password, uint8_t table, uint32_t offset
     uint32_t eofpos = (uint32_t)fileStream.tellg();
     fileStream.seekg(0, fileStream.beg);
 
-    if (count == 0) {
-        count = eofpos;
+    if (byteCount == 0) {
+        byteCount = eofpos;
     }
 
     DtaCommand *cmd = new DtaCommand();
@@ -1489,11 +1515,11 @@ uint8_t DtaDevOpal::loadDataStore(char* password, uint8_t table, uint32_t offset
     LOG(I) << "Writing DataStore to " << dev;
 
     uint32_t bytesWritten = 0;
-    while (bytesWritten < count) {
+    while (bytesWritten < byteCount) {
         buffer.clear();
         // last chunk handling
-        if (blockSize > (count - bytesWritten)) {
-            blockSize = count - bytesWritten;
+        if (blockSize > (byteCount - bytesWritten)) {
+            blockSize = byteCount - bytesWritten;
         }
         buffer.resize(blockSize);
         // Fill the buffer with data from the file.  If the file is smaller than the blockSize
@@ -1541,8 +1567,8 @@ uint8_t DtaDevOpal::loadDataStore(char* password, uint8_t table, uint32_t offset
             return lastRC;
         }
         bytesWritten += blockSize;
-        cout << bytesWritten << " of " << count << " "
-             << (uint16_t)(((float)bytesWritten/(float)count) * 100) << "% blk="
+        cout << bytesWritten << " of " << byteCount << " "
+             << (uint16_t)(((float)bytesWritten/(float)byteCount) * 100) << "% blk="
              << blockSize << " \r";
     }
     cout << "\n";
@@ -1554,8 +1580,8 @@ uint8_t DtaDevOpal::loadDataStore(char* password, uint8_t table, uint32_t offset
     return 0;
 }
 
-uint8_t DtaDevOpal::readDataStore(char* password, uint8_t table, uint32_t offset,
-                                  uint32_t count)
+uint8_t DtaDevOpal::readDataStore(const char* password, const uint8_t table, const uint32_t offset,
+                                  const uint32_t count)
 {
     uint8_t buffer[PROP_BUFFER_LENGTH];
     uint8_t  lastRC = 0;
@@ -1610,7 +1636,7 @@ uint8_t DtaDevOpal::readDataStore(char* password, uint8_t table, uint32_t offset
     return lastRC;
 }
 
-uint8_t DtaDevOpal::getByteTable(std::vector<uint8_t>& tableUID, const uint32_t row,
+uint8_t DtaDevOpal::getByteTable(const std::vector<uint8_t>& tableUID, const uint32_t row,
                                  const uint32_t count, uint8_t* buffer)
 {
 	LOG(D1) << "Entering DtaDevOpal::getByteTable";
@@ -1645,7 +1671,7 @@ uint8_t DtaDevOpal::getByteTable(std::vector<uint8_t>& tableUID, const uint32_t 
 	return 0;
 }
 
-uint8_t DtaDevOpal::activateLockingSP(char * password)
+uint8_t DtaDevOpal::activateLockingSP(const char* password)
 {
 	LOG(D1) << "Entering DtaDevOpal::activateLockingSP()";
 	uint8_t lastRC;
@@ -1700,7 +1726,7 @@ uint8_t DtaDevOpal::activateLockingSP(char * password)
 	return 0;
 }
 
-uint8_t DtaDevOpal::activateLockingSP_SUM(uint8_t lockingrange, char * password)
+uint8_t DtaDevOpal::activateLockingSP_SUM(const uint8_t lockingrange, const char* password)
 {
 	LOG(D1) << "Entering DtaDevOpal::activateLockingSP_SUM()";
 	uint8_t lastRC;
@@ -1784,7 +1810,7 @@ uint8_t DtaDevOpal::activateLockingSP_SUM(uint8_t lockingrange, char * password)
 	return 0;
 }
 
-uint8_t DtaDevOpal::eraseLockingRange_SUM(uint8_t lockingrange, char * password)
+uint8_t DtaDevOpal::eraseLockingRange_SUM(const uint8_t lockingrange, const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal::eraseLockingRange_SUM";
@@ -1831,7 +1857,7 @@ uint8_t DtaDevOpal::eraseLockingRange_SUM(uint8_t lockingrange, char * password)
 	return 0;
 }
 
-uint8_t DtaDevOpal::takeOwnership(char * newpassword)
+uint8_t DtaDevOpal::takeOwnership(const char* newpassword)
 {
 	LOG(D1) << "Entering DtaDevOpal::takeOwnership()";
 	uint8_t lastRC;
@@ -1883,12 +1909,12 @@ uint8_t DtaDevOpal::printDefaultPassword()
 		LOG(E) << "unable to read MSID password";
 		return rc;
 	}
-	string defaultPassword = response.getString(4);
-    fprintf(stdout, "MSID: %s\n", (char *)defaultPassword.c_str());
+	const std::string defaultPassword = response.getString(4);
+    fprintf(stdout, "MSID: %s\n", defaultPassword.c_str());
     return 0;
 }
-uint8_t DtaDevOpal::setSIDPassword(char * oldpassword, char * newpassword,
-	uint8_t hasholdpwd, uint8_t hashnewpwd)
+uint8_t DtaDevOpal::setSIDPassword(const char* oldpassword, const char* newpassword,
+                                   const uint8_t hasholdpwd, const uint8_t hashnewpwd)
 {
 	vector<uint8_t> hash, table;
 	LOG(D1) << "Entering DtaDevOpal::setSIDPassword()";
@@ -1931,7 +1957,7 @@ uint8_t DtaDevOpal::setSIDPassword(char * oldpassword, char * newpassword,
 	return 0;
 }
 
-uint8_t DtaDevOpal::enableTperReset(char* password)
+uint8_t DtaDevOpal::enableTperReset(const char* password)
 {
 	LOG(D1) << "Entering DtaDevOpal::enableTperReset";
 	uint8_t lastRC;
@@ -1961,16 +1987,16 @@ uint8_t DtaDevOpal::enableTperReset(char* password)
 	return 0;
 }
 
-uint8_t DtaDevOpal::setTable(vector<uint8_t> table, OPAL_TOKEN name,
-	OPAL_TOKEN value)
+uint8_t DtaDevOpal::setTable(const std::vector<uint8_t>& table, const OPAL_TOKEN name,
+                             const OPAL_TOKEN value)
 {
 	vector <uint8_t> token;
 	token.push_back((uint8_t) value);
 	return(setTable(table, name, token));
 }
 
-uint8_t DtaDevOpal::setTable(vector<uint8_t> table, OPAL_TOKEN name,
-	vector<uint8_t> value)
+uint8_t DtaDevOpal::setTable(const std::vector<uint8_t>& table, const OPAL_TOKEN name,
+                             const std::vector<uint8_t>& value)
 {
 	LOG(D1) << "Entering DtaDevOpal::setTable";
 	uint8_t lastRC;
@@ -2002,8 +2028,9 @@ uint8_t DtaDevOpal::setTable(vector<uint8_t> table, OPAL_TOKEN name,
 	LOG(D1) << "Leaving DtaDevOpal::setTable";
 	return 0;
 }
-uint8_t DtaDevOpal::getTable(vector<uint8_t> table, uint16_t startcol,
-	uint16_t endcol)
+
+uint8_t DtaDevOpal::getTable(const std::vector<uint8_t>& table, const uint16_t startcol,
+                             const uint16_t endcol)
 {
 	LOG(D1) << "Entering DtaDevOpal::getTable";
 	uint8_t lastRC;
@@ -2034,37 +2061,41 @@ uint8_t DtaDevOpal::getTable(vector<uint8_t> table, uint16_t startcol,
 	delete get;
 	return 0;
 }
-uint8_t DtaDevOpal::exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol)
+
+uint8_t DtaDevOpal::exec(const DtaCommand* cmd, DtaResponse& resp, const uint8_t protocol)
 {
-	uint8_t lastRC;
+    uint8_t lastRC;
     OPALHeader * hdr = (OPALHeader *) cmd->getCmdBuffer();
+
     LOG(D3) << endl << "Dumping command buffer";
     IFLOG(D) DtaAnnotatedDump(IF_SEND, cmd->getCmdBuffer(), cmd->outputBufferSize());
     IFLOG(D3) DtaHexDump(cmd->getCmdBuffer(), SWAP32(hdr->cp.length) + sizeof (OPALComPacket));
+
     if((lastRC = sendCmd(IF_SEND, protocol, comID(), cmd->getCmdBuffer(), cmd->outputBufferSize())) != 0) {
-		LOG(E) << "Command failed on send, status code = " << (uint16_t) lastRC;
+        LOG(E) << "Command failed on send, status code = " << (uint16_t) lastRC;
         return lastRC;
     }
-    hdr = (OPALHeader *) cmd->getRespBuffer();
+
+    hdr = (OPALHeader *)cmd->getRespBuffer();
     uint32_t receiveLength = (PROP_BUFFER_LENGTH < tperMaxPacket) ? PROP_BUFFER_LENGTH : tperMaxPacket;
     do {
         osmsSleep(25);
         memset(cmd->getRespBuffer(), 0, receiveLength);
         lastRC = sendCmd(IF_RECV, protocol, comID(), cmd->getRespBuffer(), receiveLength);
 
-    }
-    while ((0 != hdr->cp.outstandingData) && (0 == hdr->cp.minTransfer));
+    } while ((0 != hdr->cp.outstandingData) && (0 == hdr->cp.minTransfer));
+
     LOG(D3) << std::endl << "Dumping reply buffer";
     IFLOG(D) DtaAnnotatedDump(IF_RECV, cmd->getRespBuffer(), SWAP32(hdr->cp.length) + sizeof (OPALComPacket));
     IFLOG(D3) DtaHexDump(cmd->getRespBuffer(), SWAP32(hdr->cp.length) + sizeof(OPALComPacket));
-	if (0 != lastRC) {
+
+    if (0 != lastRC) {
         LOG(E) << "Command failed on recv, status code = " << (uint16_t)lastRC;
         return lastRC;
     }
     resp.init(cmd->getRespBuffer());
     return 0;
 }
-
 
 uint8_t DtaDevOpal::properties()
 {
@@ -2161,8 +2192,8 @@ void DtaDevOpal::puke()
 	}
 }
 
-uint8_t DtaDevOpal::objDump(char *sp, char * auth, char *pass,
-	char * objID)
+uint8_t DtaDevOpal::objDump(const char* sp, const char* auth, const char* pass,
+                            const char* objID)
 {
 
 	LOG(D1) << "Entering DtaDevOpal::objDump";
@@ -2227,8 +2258,10 @@ uint8_t DtaDevOpal::objDump(char *sp, char * auth, char *pass,
 	LOG(D1) << "Exiting DtaDevOpal::objDump";
 	return 0;
 }
-uint8_t DtaDevOpal::rawCmd(char *sp, char * hexauth, char *pass,
-	char *hexinvokingUID, char *hexmethod, char *hexparms) {
+
+uint8_t DtaDevOpal::rawCmd(const char* sp, const char* hexauth, const char* pass,
+                           const char* hexinvokingUID, const char* hexmethod, const char* hexparms)
+{
 	LOG(D1) << "Entering DtaDevOpal::rawCmd";
 	LOG(D1) << sp << " " << hexauth << " " << pass << " ";
 	LOG(D1) << hexinvokingUID << " " << hexmethod << " " << hexparms;
@@ -2818,7 +2851,7 @@ int anybody;
 int authenticated;
 int failed;
 
-uint8_t DtaDevOpal::verifyPassword(OPAL_UID sp, OPAL_UID authority, std::string& pw)
+uint8_t DtaDevOpal::verifyPassword(const OPAL_UID sp, const OPAL_UID authority, const std::string& pw)
 {
 	LOG(D1) << "Entering DtaDevOpal::verifyPassword()";
 
@@ -2831,12 +2864,12 @@ uint8_t DtaDevOpal::verifyPassword(OPAL_UID sp, OPAL_UID authority, std::string&
 	}
 
 	if (pw.length() != 0) {
-		if ((lastRC = session->start(sp, (char*)pw.c_str(), authority)) != 0) {
+		if ((lastRC = session->start(sp, pw.c_str(), authority)) != 0) {
 			LOG(E) << "Unable to start session" << dev;
 		} else {
             std::vector<uint8_t> auth(OPALUID[authority], OPALUID[authority] + 8);
             auth.insert(auth.begin(), OPAL_SHORT_ATOM::BYTESTRING8);
-            lastRC = session->authenticate(auth, (char*)pw.c_str());
+            lastRC = session->authenticate(auth, pw.c_str());
         }
 	}
 
@@ -2845,7 +2878,7 @@ uint8_t DtaDevOpal::verifyPassword(OPAL_UID sp, OPAL_UID authority, std::string&
 	return lastRC;
 }
 
-uint8_t DtaDevOpal::nextTable(vector<uint8_t>& table)
+uint8_t DtaDevOpal::nextTable(const std::vector<uint8_t>& table)
 {
 	LOG(D1) << "Entering DtaDevOpal::nextTable";
 	uint8_t lastRC;
@@ -2868,8 +2901,8 @@ uint8_t DtaDevOpal::nextTable(vector<uint8_t>& table)
 	return lastRC;
 }
 
-uint8_t DtaDevOpal::nextTableRow(OPAL_UID sp, OPAL_UID auth, std::string& pw,
-                                 std::vector<uint8_t>& tableUID)
+uint8_t DtaDevOpal::nextTableRow(const OPAL_UID sp, const OPAL_UID auth, const std::string& pw,
+                                 const std::vector<uint8_t>& tableUID)
 {
 	LOG(D1) << "Entering DtaDevOpal::()";
 	uint8_t lastRC;
@@ -2902,7 +2935,7 @@ uint8_t DtaDevOpal::nextTableRow(OPAL_UID sp, OPAL_UID auth, std::string& pw,
 }
 
 // Get and entire table row
-uint8_t DtaDevOpal::getTable(vector<uint8_t> table)
+uint8_t DtaDevOpal::getTable(const std::vector<uint8_t>& table)
 {
     LOG(D1) << "Entering DtaDevOpal::getTable";
     uint8_t lastRC;
@@ -2931,11 +2964,11 @@ uint8_t DtaDevOpal::getTable(vector<uint8_t> table)
 
 uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 								const tableDesc_t* TableDesc,
-								OPAL_UID sp,
-								OPAL_UID auth,
-								std::string& password,
+								const OPAL_UID sp,
+								const OPAL_UID auth,
+								const std::string& password,
 								rowMap_t& rowMap,
-								uint8_t level)
+								const uint8_t level)
 {
 	LOG(D1) << "Entering DtaDevOpal::getTableRow()";\
 
@@ -3000,10 +3033,13 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 		if (tokenType == OPAL_TOKEN::STARTNAME) {
 			char valueStr[100] = "<empty list>";
 			char* valuePtr = valueStr;
+            const char* columnName = "Unknown";
 
 			// the first entry after a start name in the column number
 			uint32_t column = response.getUint32(++i);
-			const char* columnName = TableDesc->columns.find(column)->second.c_str();
+            if (column < TableDesc->columnCount) {
+                columnName = TableDesc->columns.find(column)->second.c_str();
+            }
 			// if the column number is followed by a start list token, then
 			// the column contains a list of values.
 			if (response.tokenIs(++i) == OPAL_TOKEN::STARTLIST) {
@@ -3069,7 +3105,7 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 		}
 	}
 
-    // If the first column us UID and we did not get a value returned for that
+    // If the first column is UID and we did not get a value returned for that
     // column, then add the row UID in that place with a 'H' instead of 'h'.
     if ((TableDesc->columns.find(0)->second.compare(0, 3, "UID") == 0) && 
         (rowMap[0].compare("N/A") == 0)) {
@@ -3113,12 +3149,12 @@ uint8_t DtaDevOpal::getACLCmd(const std::vector<uint8_t>& object,
 	return 0;
 }
 
-uint8_t DtaDevOpal::getACL(OPAL_UID sp, OPAL_UID auth,
-						   std::string& password,
+uint8_t DtaDevOpal::getACL(const OPAL_UID sp, const OPAL_UID auth,
+						   const std::string& password,
 						   const std::vector<uint8_t>& object,
 						   const std::vector<uint8_t>& method,
 						   std::string& str,
-						   uint8_t level)
+						   const uint8_t level)
 {
 	uint8_t lastRC;
 
@@ -3210,8 +3246,11 @@ uint8_t DtaDevOpal::getACL(OPAL_UID sp, OPAL_UID auth,
 
 uint8_t DtaDevOpal::getACLRow(const std::vector<uint8_t>& object,
 				              const std::vector<std::vector<uint8_t>>& methods,
-				              OPAL_UID sp, OPAL_UID auth, std::string& password,
-				              tableRows_t& output, uint8_t level)
+				              const OPAL_UID sp,
+                              const OPAL_UID auth,
+                              const std::string& password,
+				              tableRows_t& output, 
+                              const uint8_t level)
 {
 	LOG(D1) << "Entering DtaDevOpal::getACLRow()";
 
@@ -3275,7 +3314,7 @@ void DtaDevOpal::printUID(const uint8_t* uid)
 	}
 }
 
-void DtaDevOpal::printBytes(const uint8_t* uid, int length, char* str)
+void DtaDevOpal::printBytes(const uint8_t* uid, const int length, char* str)
 {
 	int index = 0;
 
@@ -3300,7 +3339,7 @@ void DtaDevOpal::printBytes(const uint8_t* uid, int length, char* str)
 	str[index]   = '\0';
 }
 
-uint8_t DtaDevOpal::printTables(char* sp, char* password, uint8_t level)
+uint8_t DtaDevOpal::printTables(const char* sp, const char* password, const uint8_t level)
 {
 	printf("DtaDevOpal::printTables() called, security provider = %s, password = '%s', level = %d\n",
 			sp, password, level);
@@ -3343,18 +3382,20 @@ uint8_t DtaDevOpal::printTables(char* sp, char* password, uint8_t level)
 	return 0;
 }
 
-uint8_t DtaDevOpal::printTablesForSP(const char* spStr, OPAL_UID sp,
-									 OPAL_UID auth, std::string& pw,
-									 uint8_t level)
+uint8_t DtaDevOpal::printTablesForSP(const char* spStr, const OPAL_UID sp,
+									 const OPAL_UID auth, const std::string& password,
+									 const uint8_t level)
 {
 	printf("***** %s Security Provider ******\n", spStr);
 
+    std::string pw;
 
-	if (verifyPassword(sp, auth, pw) != 0) {
+	if (verifyPassword(sp, auth, password) != 0) {
 		printf("Password verification failed, using Anyone authority.\n");
-		pw.clear();
+        pw.clear();
 	} else {
 		printf("Password verified.\n");
+        pw = password;
 	}
 
 	printf("\nTable Table\n");

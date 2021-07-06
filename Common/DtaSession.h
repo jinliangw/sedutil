@@ -39,36 +39,36 @@ public:
     ~DtaSession();
     /** start an anonymous session 
      * @param SP the Security Provider to start the session with */
-    uint8_t start(OPAL_UID SP);    
+    uint8_t start(const OPAL_UID SP);
     /** Start an authenticated session with any user(1-8) or admint (OPAL only) 
      * @param SP the securitly provider to start the session with
      * @param HostChallenge the password to start the session
      * @param SignAuthority the Signing authority (in a simple session this is the user)
      *  */    
 #ifdef MULTISTART
-	uint8_t unistart(OPAL_UID SP, char * HostChallenge, vector<uint8_t> SignAuthority);
+	uint8_t unistart(const OPAL_UID SP, const char* HostChallenge, const vector<uint8_t>& SignAuthority);
 #endif
 	/** Start an authenticated session (OPAL only)
 	* @param SP the securitly provider to start the session with
 	* @param HostChallenge the password to start the session
 	* @param SignAuthority the Signing authority (in a simple session this is the user)
 	*/
-    uint8_t start(OPAL_UID SP, char * HostChallenge, OPAL_UID SignAuthority);
+    uint8_t start(const OPAL_UID SP, const char* HostChallenge, const OPAL_UID SignAuthority);
     /** Start an authenticated session (OPAL only) 
      * @param SP the securitly provider to start the session with
      * @param HostChallenge the password to start the session
      * @param SignAuthority the Signing authority (in a simple session this is the user)
      *  */
-    uint8_t start(OPAL_UID SP, char * HostChallenge, vector<uint8_t> SignAuthority);
+    uint8_t start(const OPAL_UID SP, const char* HostChallenge, const vector<uint8_t>& SignAuthority);
     /** Authenticate an already started session 
      * @param Authority the authority to authenticate
      * @param Challenge the password
      */
-    uint8_t authenticate(vector<uint8_t> Authority, char * Challenge);
+    uint8_t authenticate(const std::vector<uint8_t>& Authority, const char* Challenge);
     /** assign the security protocol to be used in the sessiion
      * @param value the security protocol number 
      */
-    void setProtocol(uint8_t value);
+    void setProtocol(const uint8_t value);
     /** The password is not to be hashed.
      *  This is used when the factory default password or the PSID password is
      * used to authenticate a session 
@@ -80,7 +80,7 @@ public:
      */
     void expectAbort();
 	/** return the authorization the session has started under */
-	uint8_t authuser();
+	uint8_t authuser() const;
     /** send a command to the device in this session 
      * @param cmd  The DtaCommand object 
      * @param response The MesdResponse object 
@@ -92,7 +92,7 @@ private:
     /** return a string explaining the method status 
      * @param status the method status code returned 
      */
-    char * methodStatus(uint8_t status);
+    const char* methodStatus(const uint8_t status) const;
     DtaDev * d;   /**< Pointer to device this session is with */
     uint32_t bufferpos = 0;   /**< psooition in the response buffer the parser is at */
     uint32_t TSN = 0;   /**< TPer session number */

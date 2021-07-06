@@ -50,93 +50,93 @@ DtaDev::~DtaDev()
 {
 }
 
-uint8_t DtaDev::isRuby1()
+uint8_t DtaDev::isRuby1() const
 {
 	LOG(D1) << "Entering DtaDev::isRuby1 " << (uint16_t) disk_info.Ruby10;
 	return disk_info.Ruby10;
 }
-uint8_t DtaDev::isPyrite2()
+uint8_t DtaDev::isPyrite2() const
 {
 	LOG(D1) << "Entering DtaDev::isPyrite2 " << (uint16_t) disk_info.Pyrite20;
 	return disk_info.Pyrite20;
 }
-uint8_t DtaDev::isPyrite1()
+uint8_t DtaDev::isPyrite1() const
 {
 	LOG(D1) << "Entering DtaDev::isPyrite1 " << (uint16_t) disk_info.Pyrite10;
 	return disk_info.Pyrite10;
 }
-uint8_t DtaDev::isOpalite()
+uint8_t DtaDev::isOpalite() const
 {
 	LOG(D1) << "Entering DtaDev::isOpalite " << (uint16_t) disk_info.Opalite;
 	return disk_info.Opalite;
 }
-uint8_t DtaDev::isOpal2()
+uint8_t DtaDev::isOpal2() const
 {
 	LOG(D1) << "Entering DtaDev::isOpal2 " << (uint16_t) disk_info.OPAL20;
 	return disk_info.OPAL20;
 }
-uint8_t DtaDev::isOpal1()
+uint8_t DtaDev::isOpal1() const
 {
 	LOG(D1) << "Entering DtaDev::isOpal1() " << (uint16_t)disk_info.OPAL10;
     return disk_info.OPAL10;
 }
-uint8_t DtaDev::isEprise()
+uint8_t DtaDev::isEprise() const
 {
     LOG(D1) << "Entering DtaDev::isEprise " << (uint16_t) disk_info.Enterprise;
     return disk_info.Enterprise;
 }
 
-uint8_t DtaDev::isAnySSC()
+uint8_t DtaDev::isAnySSC() const
 {
 	LOG(D1) << "Entering DtaDev::isAnySSC " << (uint16_t)disk_info.ANY_OPAL_SSC;
 	return disk_info.ANY_OPAL_SSC;
 }
-uint8_t DtaDev::isPresent()
+uint8_t DtaDev::isPresent() const
 {
 	LOG(D1) << "Entering DtaDev::isPresent() " << (uint16_t) isOpen;
     return isOpen;
 }
-uint8_t DtaDev::MBREnabled()
+uint8_t DtaDev::MBREnabled() const
 {
 	LOG(D1) << "Entering DtaDev::MBRENabled" << (uint16_t)disk_info.Locking_MBREnabled;
 	return disk_info.Locking_MBREnabled;
 }
-uint8_t DtaDev::MBRDone()
+uint8_t DtaDev::MBRDone() const
 {
 	LOG(D1) << "Entering DtaDev::MBRDone" << (uint16_t)disk_info.Locking_MBRDone;
 	return disk_info.Locking_MBRDone;
 }
-uint8_t DtaDev::MBRAbsent()
+uint8_t DtaDev::MBRAbsent() const
 {
 	LOG(D1) << "Entering DtaDev::MBRAbsent" << (uint16_t)disk_info.Locking_MBRAbsent;
 	return disk_info.Locking_MBRAbsent;
 }
-uint8_t DtaDev::Locked()
+uint8_t DtaDev::Locked() const
 {
 	LOG(D1) << "Entering DtaDev::Locked" << (uint16_t)disk_info.Locking_locked;
 	return disk_info.Locking_locked;
 }
-uint8_t DtaDev::LockingEnabled()
+uint8_t DtaDev::LockingEnabled() const
 {
 	LOG(D1) << "Entering DtaDev::LockingEnabled" << (uint16_t)disk_info.Locking_lockingEnabled;
 	return disk_info.Locking_lockingEnabled;
 }
-char *DtaDev::getFirmwareRev()
+const char* DtaDev::getFirmwareRev() const
 {
-	return (char *)&disk_info.firmwareRev;
+	return (const char*)disk_info.firmwareRev;
 }
-char *DtaDev::getModelNum()
+const char* DtaDev::getModelNum() const
 {
-	return (char *)&disk_info.modelNum;
+	return (const char*)disk_info.modelNum;
 }
-char *DtaDev::getSerialNum()
+const char* DtaDev::getSerialNum() const
 {
-	return (char *)&disk_info.serialNum;
+	return (const char*)disk_info.serialNum;
 }
-DTA_DEVICE_TYPE DtaDev::getDevType()
-	{
-		return disk_info.devType;
-	}
+DTA_DEVICE_TYPE DtaDev::getDevType() const
+{
+    return disk_info.devType;
+}
 
 uint8_t DtaDev::tperReset()
 {

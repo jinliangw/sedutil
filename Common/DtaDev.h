@@ -47,41 +47,41 @@ public:
 	/** Default destructor, does nothing*/
 	virtual ~DtaDev();
 	/** Does the device conform to the Ruby 1.0 SSC */
-	uint8_t isRuby1();
+	uint8_t isRuby1() const;
 	/** Does the device conform to the Pyrite 2.0 SSC */
-	uint8_t isPyrite2();
+	uint8_t isPyrite2() const;
 	/** Does the device conform to the Pyrite 1.0 SSC */
-	uint8_t isPyrite1();
+	uint8_t isPyrite1() const;
 	/** Does the device conform to the Opalite SSC */
-	uint8_t isOpalite();
+	uint8_t isOpalite() const;
 	/** Does the device conform to the OPAL 2.0 SSC */
-	uint8_t isOpal2();
+	uint8_t isOpal2() const;
 	/** Does the device conform to the OPAL 1.0 SSC */
-	uint8_t isOpal1();
+	uint8_t isOpal1() const;
 	/** Does the device conform to the OPAL Enterprise SSC */
-	uint8_t isEprise();
+	uint8_t isEprise() const;
 	/** Does the device conform to ANY TCG storage SSC */
-	uint8_t isAnySSC();
+	uint8_t isAnySSC() const;
 	/** Is the MBREnabled flag set */
-	uint8_t MBREnabled();
+	uint8_t MBREnabled() const;
 	/** Is the MBRDone flag set */
-	uint8_t MBRDone();
+	uint8_t MBRDone() const;
 	/** Is the MBRAbsent flag set */
-	uint8_t MBRAbsent();
+	uint8_t MBRAbsent() const;
 	/** Is the Locked flag set */
-	uint8_t Locked();
+	uint8_t Locked() const;
 	/** Is the Locking SP enabled */
-	uint8_t LockingEnabled();
+	uint8_t LockingEnabled() const;
 	/** Is there an OS disk represented by this object */
-	uint8_t isPresent();
+	uint8_t isPresent() const;
 	/** Returns the Firmware revision reported by the identify command */
-	char *getFirmwareRev();
+	const char* getFirmwareRev() const;
 	/** Returns the Model Number reported by the Identify command */
-	char *getModelNum();
+	const char* getModelNum() const;
 	/** Returns the Serial Number reported by the Identify command */
-	char *getSerialNum();
+	const char* getSerialNum() const;
 	/* What type of disk attachment is used */
-	DTA_DEVICE_TYPE getDevType();
+	DTA_DEVICE_TYPE getDevType() const;
 	/** displays the information returned by the Discovery 0 reply */
 	virtual void puke();
 
@@ -130,7 +130,7 @@ public:
 	 * Specific to the SSC that the device supports
 	 * @param password the password that is to be assigned to the SSC master entities
 	 */
-	virtual uint8_t initialSetup(char * password) = 0;
+	virtual uint8_t initialSetup(const char* password) = 0;
 	/** User command to prepare the drive for Single User Mode and rekey a SUM locking range.
 	 * @param lockingrange locking range number to enable
 	 * @param start LBA to start locking range
@@ -138,7 +138,8 @@ public:
 	 * @param Admin1Password admin1 password for TPer
 	 * @param password User password to set for locking range
 	 */
-	virtual uint8_t setup_SUM(uint8_t lockingrange, uint64_t start, uint64_t length, char *Admin1Password, char * password) = 0;
+	virtual uint8_t setup_SUM(const uint8_t lockingrange, const uint64_t start, const uint64_t length,
+                              const char* Admin1Password, const char* password) = 0;
 	/** Set the SID password.
 	 * Requires special handling because password is not always hashed.
 	 * @param oldpassword  current SID password
@@ -146,32 +147,34 @@ public:
 	 * @param hasholdpwd  is the old password to be hashed before being added to the bytestream
 	 * @param hashnewpwd  is the new password to be hashed before being added to the bytestream
 	 */
-	virtual uint8_t setSIDPassword(char * oldpassword, char * newpassword,
-		uint8_t hasholdpwd = 1, uint8_t hashnewpwd = 1) = 0;
+	virtual uint8_t setSIDPassword(const char* oldpassword, const char* newpassword,
+                                   const uint8_t hasholdpwd = 1, const uint8_t hashnewpwd = 1) = 0;
     /** Set the password of a locking SP user.
      * @param authority authority to use for the session
 	 * @param password  current password
 	 * @param userid the userid whose password is to be changed
 	 * @param newpassword  value password is to be changed to
 	 */
-	virtual uint8_t setPassword(const char* authority, char * password, char * userid, char * newpassword) = 0;
+	virtual uint8_t setPassword(const char* authority, const char* password, const char* userid,
+                                const char* newpassword) = 0;
 	/** Set the password of a locking SP user in Single User Mode.
          * @param password  current user password
          * @param userid the userid whose password is to be changed
          * @param newpassword  value password is to be changed to
          */
-	virtual uint8_t setNewPassword_SUM(char * password, char * userid, char * newpassword) = 0;
+	virtual uint8_t setNewPassword_SUM(const char* password, const char* userid, 
+                                       const char* newpassword) = 0;
 	/** Loads a disk image file to the shadow MBR table.
 	 * @param password the password for the administrative authority with access to the table
 	 * @param filename the filename of the disk image
 	 */
-	virtual uint8_t loadPBA(char * password, char * filename) = 0;
+	virtual uint8_t loadPBA(const char* password, const char* filename) = 0;
 	/** Prints the contents of the MBR as read from the table
 	 * @param password the password for the LockingSP Admin1 authority
 	 * @param offset offset from row 0 to begin the Get operartion
 	 * @param count number of bytes to get and print
 	 */
-	virtual uint8_t readMBR(char* password, uint32_t offset, uint32_t count) = 0;
+	virtual uint8_t readMBR(const char* password, const uint32_t offset, const uint32_t count) = 0;
 	/** Loads data from a disk file to the DataStore table.
      * @param password the password for the administrative authority with access to
      *                 the table
@@ -179,36 +182,36 @@ public:
 	 * @param count number of bytes to set.
 	 * @param filename the filename of the disk image
 	 */
-	virtual uint8_t loadDataStore(char* password, uint8_t table, uint32_t offset,
-                                  uint32_t count, const char* filename) = 0;
+	virtual uint8_t loadDataStore(const char* password, const uint8_t table, const uint32_t offset,
+                                  const uint32_t count, const char* filename) = 0;
 	/** Prints the contents of the DataStore as read from the table
 	 * @param password the password for the LockingSP Admin1 authority
 	 * @param offset offset from row 0 to begin the Get operartion
 	 * @param count number of bytes to get and print
 	 */
-	virtual uint8_t readDataStore(char* password, uint8_t table, uint32_t offset,
-	                              uint32_t count) = 0;
+	virtual uint8_t readDataStore(const char* password, const uint8_t table, const uint32_t offset,
+	                              const uint32_t count) = 0;
 	/** Change the locking state of a locking range
 	 * @param lockingrange The number of the locking range (0 = global)
 	 * @param lockingstate  the locking state to set
 	 * @param Admin1Password password of administrative authority for locking range
 	 */
-	virtual uint8_t setLockingRange(uint8_t lockingrange, uint8_t lockingstate,
-		char * Admin1Password) = 0;
+	virtual uint8_t setLockingRange(const uint8_t lockingrange, const uint8_t lockingstate,
+                                    const char * Admin1Password) = 0;
 	/** Change the locking state of a locking range in Single User Mode
          * @param lockingrange The number of the locking range (0 = global)
          * @param lockingstate  the locking state to set
          * @param password password of user authority for the locking range
          */
-	virtual uint8_t setLockingRange_SUM(uint8_t lockingrange, uint8_t lockingstate,
-		char * password) = 0;
+	virtual uint8_t setLockingRange_SUM(const uint8_t lockingrange, const uint8_t lockingstate,
+                                        const char* password) = 0;
 	/** Change the active state of a locking range
 	 * @param lockingrange The number of the locking range (0 = global)
 	 * @param enabled  enable (true) or disable (false) the lockingrange
 	 * @param password Password of administrative authority for locking range
 	 */
-	virtual uint8_t configureLockingRange(uint8_t lockingrange, uint8_t enabled,
-		char * password) = 0;
+	virtual uint8_t configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
+                                          const char* password) = 0;
 	/** Setup a locking range.  Initialize a locking range, set it's start
 	 *  LBA and length, initialize it as unlocked with locking disabled.
 	 *  @paran lockingrange The Locking Range to be setup
@@ -216,8 +219,8 @@ public:
 	 *  @param length Number of blocks
 	 *  @param password Password of administrator
 	 */
-	virtual uint8_t setupLockingRange(uint8_t lockingrange, uint64_t start,
-		uint64_t length, char * password) = 0;
+	virtual uint8_t setupLockingRange(const uint8_t lockingrange, const uint64_t start,
+                                      const uint64_t length, const char* password) = 0;
 	/** Setup a locking range in Single User Mode.  Initialize a locking range,
 	 *  set it's start LBA and length, initialize it as unlocked with locking enabled.
          *  @paran lockingrange The Locking Range to be setup
@@ -225,72 +228,74 @@ public:
          *  @param length Number of blocks
          *  @param password Password of administrator
          */
-	virtual uint8_t setupLockingRange_SUM(uint8_t lockingrange, uint64_t start,
-		uint64_t length, char * password) = 0;
+	virtual uint8_t setupLockingRange_SUM(const uint8_t lockingrange, const uint64_t start,
+                                          const uint64_t length, const char* password) = 0;
 	/** List status of locking ranges.
 	*  @param password Password of administrator
 	*/
-	virtual uint8_t listLockingRanges(char * password, int16_t rangeid) = 0;
+	virtual uint8_t listLockingRanges(const char* password, const int16_t rangeid) = 0;
 	/** Generate a new encryption key for a locking range.
 	* @param lockingrange locking range number
 	* @param password password of the locking administrative authority
 	*/
-	virtual uint8_t rekeyLockingRange(uint8_t lockingrange, char * password) = 0;
+	virtual uint8_t rekeyLockingRange(const uint8_t lockingrange, const char* password) = 0;
 	/** Enable bands using MSID.
 	* @param lockingrange locking range number
 	*/
-	virtual uint8_t setBandsEnabled(int16_t rangeid, char * password) = 0;
+	virtual uint8_t setBandsEnabled(const int16_t rangeid, const char* password) = 0;
 	/** Primitive to set the MBRDone flag.
 	 * @param state 0 or 1
 	 * @param Admin1Password Locking SP authority with access to flag
 	 */
-	virtual uint8_t setMBRDone(uint8_t state, char * Admin1Password) = 0;
+	virtual uint8_t setMBRDone(const uint8_t state, const char* Admin1Password) = 0;
 	/** Primitive to set the MBREnable flag.
 	 * @param state 0 or 1
 	 * @param Admin1Password Locking SP authority with access to flag
 	 */
-	virtual uint8_t setMBREnable(uint8_t state, char * Admin1Password) = 0;
+	virtual uint8_t setMBREnable(const uint8_t state, const char* Admin1Password) = 0;
     /** enable a locking sp user.
      * @param authority authority to use for the session
 	 * @param password password of locking sp authority
 	 * @param userid  the user to be enabled
 	 */
-	virtual uint8_t enableUser(const char* authority, char* password, char* userid, OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE) = 0;
+	virtual uint8_t enableUser(const char* authority, const char* password, const char* userid,
+                               const OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE) = 0;
 	/** Enable locking on the device
 	 * @param password password of the admin sp SID authority
 	 */
-	virtual uint8_t activateLockingSP(char * password) = 0;
+	virtual uint8_t activateLockingSP(const char* password) = 0;
 	/** Enable locking on the device in Single User Mode
 	* @param lockingrange the locking range number to activate in SUM
 	* @param password password of the admin sp SID authority
 	*/
-	virtual uint8_t activateLockingSP_SUM(uint8_t lockingrange, char * password) = 0;
+	virtual uint8_t activateLockingSP_SUM(const uint8_t lockingrange, const char* password) = 0;
 	/** Erase a Single User Mode locking range by calling the drive's erase method
 	 * @param lockingrange The Locking Range to erase
 	 * @param password The administrator password for the drive
 	 */
-	virtual uint8_t eraseLockingRange_SUM(uint8_t lockingrange, char * password) = 0;
+	virtual uint8_t eraseLockingRange_SUM(const uint8_t lockingrange, const char* password) = 0;
 	/** Change the SID password from it's MSID default
 	 * @param newpassword  new password for SID and locking SP admins
 	 */
-	virtual uint8_t takeOwnership(char * newpassword) = 0;
+	virtual uint8_t takeOwnership(const char* newpassword) = 0;
 	/** Reset the Locking SP to its factory default condition
 	 * ERASES ALL DATA!
 	 * @param password of Administrative user
 	 * @param keep true false for noerase function NOT WWORKING
 	 */
-	virtual uint8_t revertLockingSP(char * password, uint8_t keep = 0) = 0;
+	virtual uint8_t revertLockingSP(const char* password, const uint8_t keep = 0) = 0;
 	/** Reset the TPER to its factory condition
 	 * ERASES ALL DATA!
 	 * @param password password of authority (SID or PSID)
 	 * @param PSID true or false is the authority the PSID
 	 *   */
-	virtual uint8_t revertTPer(char * password, uint8_t PSID = 0, uint8_t AdminSP = 0 ) = 0;
+	virtual uint8_t revertTPer(const char* password, const uint8_t PSID = 0,
+                               const uint8_t AdminSP = 0) = 0;
 	/** Erase a locking range
 	 * @param lockingrange The number of the locking range (0 = global)
 	 * @param password Password of administrative authority for locking range
 	 */
-	virtual uint8_t eraseLockingRange(uint8_t lockingrange, char * password) = 0;
+	virtual uint8_t eraseLockingRange(const uint8_t lockingrange, const char* password) = 0;
 	/** Assign a locking range to a Namespace
 	 * @param password for Admin1
 	 * @param namespace
@@ -298,22 +303,22 @@ public:
 	 * @param start - N/A if global is true
 	 * @param length - N/A if global is true
 	 */
-	virtual uint8_t assign(char* password, uint32_t ns,
-	                       uint64_t start = 0, uint64_t length = 0) = 0;
+	virtual uint8_t assign(const char* password, const uint32_t ns,
+	                       const uint64_t start = 0, const uint64_t length = 0) = 0;
 	/** Deassign a locking range
 	 * @param password for Admin1
 	 * @param lockingrange The number of the locking range
 	 * @param keep True to keep the global range Key
 	 */
-	virtual uint8_t deassign(char* password, uint8_t lockingrange, bool keep) = 0;
+	virtual uint8_t deassign(const char* password, const uint8_t lockingrange, const bool keep) = 0;
 	/** Dumps an object for diagnostic purposes
 	 * @param sp index into the OPALUID table for the SP the object is in
 	 * @param auth the authority to use for the dump
 	 * @param pass the password for the authority
 	 * @param objID the UID of the object to dump
 	 */
-	virtual uint8_t objDump(char *sp, char * auth, char *pass,
-		char * objID) = 0;
+	virtual uint8_t objDump(const char* sp, const char* auth, const char* pass,
+                            const char* objID) = 0;
 	/** Issue any command to the drive for diagnostic purposes
 	 * @param sp index into the OPALUID table for the SP the object is in
 	 * @param auth the authority to use for the dump
@@ -323,18 +328,18 @@ public:
 	 * @param plist  the parameter list for the command
 	 *
 	 */
-	virtual uint8_t rawCmd(char *sp, char * auth, char *pass,
-		char *invoker, char *method, char *plist) = 0;
+	virtual uint8_t rawCmd(const char* sp, const char* auth, const char* pass,
+                           const char* invoker, const char* method, const char* plist) = 0;
 	/** Read MSID
 	 */
 	virtual uint8_t printDefaultPassword() = 0;
 	/** Print the tables supported by the TPER
 	 */
-	virtual uint8_t printTables(char* sp, char* password, uint8_t level) = 0;
+	virtual uint8_t printTables(const char* sp, const char* password, const uint8_t level) = 0;
 
     /** Enables TPER_RESET in the device as defined in TCG Opal specification
      */
-    virtual uint8_t enableTperReset(char* password) = 0;
+    virtual uint8_t enableTperReset(const char* password) = 0;
 
     /** Issues TPER_RESET to the device as defined in TCG Opal specification
      */
@@ -353,7 +358,7 @@ public:
 	 * @param response the DtaResonse object containing the response
 	 * @param protocol The security protocol number to use for the command
 	 */
-	virtual uint8_t exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol = 0x01) = 0;
+	virtual uint8_t exec(const DtaCommand* cmd, DtaResponse& resp, const uint8_t protocol = 0x01) = 0;
 	/** return the communications ID to be used for sessions to this device */
 	virtual uint16_t comID() = 0;
 

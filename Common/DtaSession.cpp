@@ -42,13 +42,13 @@ DtaSession::DtaSession(DtaDev * device)
 }
 
 uint8_t
-DtaSession::start(OPAL_UID SP)
+DtaSession::start(const OPAL_UID SP)
 {
     return (start(SP, NULL, OPAL_UID::OPAL_UID_HEXFF));
 }
 
 uint8_t 
-DtaSession::start(OPAL_UID SP, char * HostChallenge, OPAL_UID SignAuthority)
+DtaSession::start(const OPAL_UID SP, const char* HostChallenge, const OPAL_UID SignAuthority)
 {
 	LOG(D1) << "Entering DtaSession::startSession ";
 	vector<uint8_t> auth;
@@ -58,12 +58,16 @@ DtaSession::start(OPAL_UID SP, char * HostChallenge, OPAL_UID SignAuthority)
 	}
 	return(start(SP, HostChallenge, auth));
 }
-uint8_t DtaSession::authuser() {
+
+uint8_t DtaSession::authuser() const
+{
 	return sessionauth;
 }
+
 #ifdef MULTISTART
 uint8_t
-DtaSession::start(OPAL_UID SP, char * HostChallenge, vector<uint8_t> SignAuthority)
+DtaSession::start(const OPAL_UID SP, const char* HostChallenge, 
+                  const std::vector<uint8_t>& SignAuthority)
 {
 	vector <uint8_t> auth;
 	if ((lastRC = unistart(SP, HostChallenge, SignAuthority)) == 0) {
@@ -88,15 +92,15 @@ DtaSession::start(OPAL_UID SP, char * HostChallenge, vector<uint8_t> SignAuthori
 				return 0;
 			}
 		}
-
 	}
 	return lastRC;
 }
+
 uint8_t
-DtaSession::unistart(OPAL_UID SP, char * HostChallenge, vector<uint8_t> SignAuthority)
+DtaSession::unistart(const OPAL_UID SP, const char* HostChallenge, const std::vector<uint8_t>& SignAuthority)
 #else
 uint8_t
-DtaSession::start(OPAL_UID SP, char * HostChallenge, vector<uint8_t> SignAuthority)
+DtaSession::start(const OPAL_UID SP, const char* HostChallenge, const std::vector<uint8_t>& SignAuthority)
 #endif
 {
     LOG(D1) << "Entering DtaSession::startSession ";
@@ -181,7 +185,7 @@ again:
 }
 
 uint8_t
-DtaSession::authenticate(vector<uint8_t> Authority, char * Challenge)
+DtaSession::authenticate(const vector<uint8_t>& Authority, const char* Challenge)
 {
 	LOG(D1) << "Entering DtaSession::authenticate ";
 	vector<uint8_t> hash;
@@ -227,6 +231,7 @@ DtaSession::authenticate(vector<uint8_t> Authority, char * Challenge)
 	delete cmd;
 	return 0;
 }
+
 uint8_t
 DtaSession::sendCommand(DtaCommand * cmd, DtaResponse & response)
 {
@@ -277,7 +282,7 @@ DtaSession::sendCommand(DtaCommand * cmd, DtaResponse & response)
 }
 
 void
-DtaSession::setProtocol(uint8_t value)
+DtaSession::setProtocol(const uint8_t value)
 {
     LOG(D1) << "Entering DtaSession::setProtocol";
     SecurityProtocol = value;
@@ -297,49 +302,49 @@ DtaSession::expectAbort()
     willAbort = 1;
 }
 
-char *
-DtaSession::methodStatus(uint8_t status)
+const char*
+DtaSession::methodStatus(const uint8_t status) const
 {
     LOG(D1) << "Entering DtaSession::methodStatus()";
     switch (status) {
     case OPALSTATUSCODE::AUTHORITY_LOCKED_OUT:
-        return (char *) "AUTHORITY_LOCKED_OUT";
+        return "AUTHORITY_LOCKED_OUT";
     case OPALSTATUSCODE::FAIL:
-        return (char *) "FAIL";
+        return "FAIL";
     case OPALSTATUSCODE::INSUFFICIENT_ROWS:
-        return (char *) "INSUFFICIENT_ROWS";
+        return "INSUFFICIENT_ROWS";
     case OPALSTATUSCODE::INSUFFICIENT_SPACE:
-        return (char *) "INSUFFICIENT_SPACE";
+        return "INSUFFICIENT_SPACE";
 	case OPALSTATUSCODE::INVALID_FUNCTION:
-		return (char *) "INVALID_FUNCTION";
+		return "INVALID_FUNCTION";
     case OPALSTATUSCODE::INVALID_PARAMETER:
-        return (char *) "INVALID_PARAMETER";
+        return "INVALID_PARAMETER";
 	case OPALSTATUSCODE::INVALID_REFERENCE:
-		return (char *) "INVALID_REFERENCE";
+		return "INVALID_REFERENCE";
     case OPALSTATUSCODE::NOT_AUTHORIZED:
-        return (char *) "NOT_AUTHORIZED";
+        return "NOT_AUTHORIZED";
     case OPALSTATUSCODE::NO_SESSIONS_AVAILABLE:
-        return (char *) "NO_SESSIONS_AVAILABLE";
+        return "NO_SESSIONS_AVAILABLE";
     case OPALSTATUSCODE::RESPONSE_OVERFLOW:
-        return (char *) "RESPONSE_OVERFLOW";
+        return "RESPONSE_OVERFLOW";
     case OPALSTATUSCODE::SP_BUSY:
-        return (char *) "SP_BUSY";
+        return "SP_BUSY";
     case OPALSTATUSCODE::SP_DISABLED:
-        return (char *) "SP_DISABLED";
+        return "SP_DISABLED";
     case OPALSTATUSCODE::SP_FAILED:
-        return (char *) "SP_FAILED";
+        return "SP_FAILED";
     case OPALSTATUSCODE::SP_FROZEN:
-        return (char *) "SP_FROZEN";
+        return "SP_FROZEN";
     case OPALSTATUSCODE::SUCCESS:
-        return (char *) "SUCCESS";
+        return "SUCCESS";
     case OPALSTATUSCODE::TPER_MALFUNCTION:
-        return (char *) "TPER_MALFUNCTION";
+        return "TPER_MALFUNCTION";
     case OPALSTATUSCODE::TRANSACTION_FAILURE:
-        return (char *) "TRANSACTION_FAILURE";
+        return "TRANSACTION_FAILURE";
     case OPALSTATUSCODE::UNIQUENESS_CONFLICT:
-        return (char *) "UNIQUENESS_CONFLICT";
+        return "UNIQUENESS_CONFLICT";
     default:
-        return (char *) "Unknown status code";
+        return "Unknown status code";
     }
 }
 

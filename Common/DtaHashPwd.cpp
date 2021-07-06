@@ -32,8 +32,8 @@ extern "C" {
 }
 using namespace std;
 
-void DtaHashPassword(vector<uint8_t> &hash, char * password, vector<uint8_t> salt,
-	unsigned int iter, uint8_t hashsize)
+void DtaHashPassword(vector<uint8_t>& hash, const char* password, const vector<uint8_t> salt,
+                     const unsigned int iter, const uint8_t hashsize)
 {
 	LOG(D1) << " Entered DtaHashPassword";
 	// if the hashsize can be > 255 the token overhead logic needs to be fixed
@@ -63,10 +63,9 @@ exit:	// add the token overhead
 	hash.insert(hash.begin(), 0xd0);
 }
 
-void DtaHashPwd(vector<uint8_t> &hash, char * password, DtaDev * d)
+void DtaHashPwd(vector<uint8_t>& hash, const char* password, const DtaDev* d)
 {
     LOG(D1) << " Entered DtaHashPwd";
-    char *serNum;
 
     if (strlen(password) == 0) {
         hash.clear();
@@ -85,7 +84,8 @@ void DtaHashPwd(vector<uint8_t> &hash, char * password, DtaDev * d)
     	LOG(D1) << " Exit DtaHashPwd";
     	return;
     }
-    serNum = d->getSerialNum();
+
+    const char* serNum = d->getSerialNum();
     vector<uint8_t> salt(serNum, serNum + 20);
     //	vector<uint8_t> salt(DEFAULTSALT);
     DtaHashPassword(hash, password, salt);
@@ -127,7 +127,7 @@ int Testsedutil(const PBKDF_TestTuple *testSet, unsigned int testSetSize)
         }
 		printf("Password %s Salt %s Iterations %i Length %i\n", (char *)tuple.Password,
 			(char *) tuple.Salt, tuple.iterations, tuple.hashlen);
-		DtaHashPassword(hash, (char *) tuple.Password, seaSalt, tuple.iterations, tuple.hashlen);
+		DtaHashPassword(hash, (const char*)tuple.Password, seaSalt, tuple.iterations, tuple.hashlen);
 		int fail = (testresult(hash, tuple.hexDerivedKey, tuple.hashlen) == 0);
         pass = pass & fail;
     }

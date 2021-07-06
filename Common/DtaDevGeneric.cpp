@@ -62,45 +62,47 @@ DtaDevGeneric::~DtaDevGeneric()
 void DtaDevGeneric::init(const char * devref)
 {
 }
-uint8NOCODE(initialSetup, char *password)
-uint8NOCODE(configureLockingRange,uint8_t lockingrange,
-	uint8_t enabled, char * password)
-uint8NOCODE(revertLockingSP,char * password, uint8_t keep)
-uint8NOCODE(setup_SUM, uint8_t lockingrange, uint64_t start, uint64_t length, char *Admin1Password, char * password)
-uint8NOCODE(setPassword, const char* authority, char * password, char * userid, char * newpassword)
-uint8NOCODE(setNewPassword_SUM,char * password, char * userid, char * newpassword)
-uint8NOCODE(setMBREnable,uint8_t mbrstate, char * Admin1Password)
-uint8NOCODE(setMBRDone,uint8_t mbrstate, char * Admin1Password)
-uint8NOCODE(setLockingRange,uint8_t lockingrange, uint8_t lockingstate,
-	char * Admin1Password)
-uint8NOCODE(setLockingRange_SUM, uint8_t lockingrange, uint8_t lockingstate,
-	char * password)
-uint8NOCODE(setupLockingRange,uint8_t lockingrange, uint64_t start,
-	uint64_t length, char * password)
-uint8NOCODE(listLockingRanges, char * password, int16_t rangeid)
-uint8NOCODE(setupLockingRange_SUM, uint8_t lockingrange, uint64_t start,
-	uint64_t length, char * password)
-uint8NOCODE(rekeyLockingRange, uint8_t lockingrange, char * password)
-uint8NOCODE(setBandsEnabled, int16_t lockingrange, char * password)
-uint8NOCODE(enableUser, const char* authority, char * password, char * userid, OPAL_TOKEN status)
-uint8NOCODE(revertTPer,char * password, uint8_t PSID, uint8_t AdminSP)
-uint8NOCODE(eraseLockingRange,uint8_t lockingrange, char * password)
+uint8NOCODE(initialSetup, const char* password)
+uint8NOCODE(configureLockingRange, const uint8_t lockingrange,
+            const uint8_t enabled, const char* password)
+uint8NOCODE(revertLockingSP, const char* password, const uint8_t keep)
+uint8NOCODE(setup_SUM, const uint8_t lockingrange, const uint64_t start, const uint64_t length,
+            const char* Admin1Password, const char* password)
+uint8NOCODE(setPassword, const char* authority, const char* password, const char* userid, const char* newpassword)
+uint8NOCODE(setNewPassword_SUM, const char* password, const char* userid, const char* newpassword)
+uint8NOCODE(setMBREnable, const uint8_t mbrstate, const char* Admin1Password)
+uint8NOCODE(setMBRDone, const uint8_t mbrstate, const char* Admin1Password)
+uint8NOCODE(setLockingRange, const uint8_t lockingrange, const uint8_t lockingstate,
+            const char* Admin1Password)
+uint8NOCODE(setLockingRange_SUM, const uint8_t lockingrange, const uint8_t lockingstate,
+            const char* password)
+uint8NOCODE(setupLockingRange, const uint8_t lockingrange, const uint64_t start,
+            const uint64_t length, const char* password)
+uint8NOCODE(listLockingRanges, const char* password, const int16_t rangeid)
+uint8NOCODE(setupLockingRange_SUM, const uint8_t lockingrange, const uint64_t start,
+            const uint64_t length, const char* password)
+uint8NOCODE(rekeyLockingRange, const uint8_t lockingrange, const char* password)
+uint8NOCODE(setBandsEnabled, const int16_t lockingrange, const char* password)
+uint8NOCODE(enableUser, const char* authority, const char* password, const char* userid, const OPAL_TOKEN status)
+uint8NOCODE(revertTPer, const char* password, const uint8_t PSID, const uint8_t AdminSP)
+uint8NOCODE(eraseLockingRange, const uint8_t lockingrange, const char* password)
 uint8NOCODE(printDefaultPassword);
-uint8NOCODE(loadPBA,char * password, char * filename)
-uint8NOCODE(activateLockingSP,char * password)
-uint8NOCODE(activateLockingSP_SUM,uint8_t lockingrange, char * password)
-uint8NOCODE(eraseLockingRange_SUM, uint8_t lockingrange, char * password)
-uint8NOCODE(takeOwnership, char * newpassword)
-uint8NOCODE(setSIDPassword,char * oldpassword, char * newpassword,
-	uint8_t hasholdpwd, uint8_t hashnewpwd)
-uint8NOCODE(printTables, char* sp, char* password, uint8_t level)
-uint8NOCODE(assign, char* password, uint32_t ns, uint64_t start, uint64_t length)
-uint8NOCODE(deassign, char* password, uint8_t lockingrange, bool keep)
-uint8NOCODE(readMBR, char* password, uint32_t offset, uint32_t count)
-uint8NOCODE(loadDataStore, char* password, uint8_t table, uint32_t offset, uint32_t count,
-            const char* filename)
-uint8NOCODE(readDataStore, char* password, uint8_t table, uint32_t offset, uint32_t count)
-uint8NOCODE(enableTperReset, char* password)
+uint8NOCODE(loadPBA, const char* password, const char* filename)
+uint8NOCODE(activateLockingSP, const char* password)
+uint8NOCODE(activateLockingSP_SUM, const uint8_t lockingrange, const char* password)
+uint8NOCODE(eraseLockingRange_SUM, const uint8_t lockingrange, const char* password)
+uint8NOCODE(takeOwnership, const char* newpassword)
+uint8NOCODE(setSIDPassword, const char* oldpassword, const char* newpassword,
+            const uint8_t hasholdpwd, const uint8_t hashnewpwd)
+uint8NOCODE(printTables, const char* sp, const char* password, const uint8_t level)
+uint8NOCODE(assign, const char* password, const uint32_t ns, const uint64_t start,
+            const uint64_t length)
+uint8NOCODE(deassign, const char* password, const uint8_t lockingrange, const bool keep)
+uint8NOCODE(readMBR, const char* password, const uint32_t offset, const uint32_t count)
+uint8NOCODE(loadDataStore, const char* password, const uint8_t table, const uint32_t offset,
+            const uint32_t count, const char* filename)
+uint8NOCODE(readDataStore, const char* password, const uint8_t table, const uint32_t offset, const uint32_t count)
+uint8NOCODE(enableTperReset, const char* password)
 
 uint16_t DtaDevGeneric::comID()
 {
@@ -108,9 +110,10 @@ uint16_t DtaDevGeneric::comID()
 		return 0xff;
 }
 
-uint8NOCODE(exec,DtaCommand * cmd, DtaResponse & resp, uint8_t protocol)
-uint8NOCODE(objDump,char *sp, char * auth, char *pass,char * objID)
-uint8NOCODE(rawCmd,char *sp, char * auth, char *pass,char *invoker, char *method, char *plist)
+uint8NOCODE(exec, const DtaCommand* cmd, DtaResponse& resp, const uint8_t protocol)
+uint8NOCODE(objDump, const char* sp, const char* auth, const char* pass, const char* objID)
+uint8NOCODE(rawCmd, const char* sp, const char* auth, const char* pass, const char* invoker,
+            const char* method, const char* plist)
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

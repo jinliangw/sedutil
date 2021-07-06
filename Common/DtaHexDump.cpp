@@ -20,7 +20,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include "os.h"
 #include <stdio.h>
 #include <ctype.h>
-void DtaHexDump(void * address, int length) {
+void DtaHexDump(const void* address, const int length) {
 	uint8_t display[17];
 	uint8_t * cpos = (uint8_t *)address;
 	uint8_t * epos = cpos + length;

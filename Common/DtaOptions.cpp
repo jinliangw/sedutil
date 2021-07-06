@@ -26,15 +26,17 @@ void usage()
     printf("sedutil v%s Copyright 2014-2017 Bright Plaza Inc. <drivetrust@drivetrust.com>\n", GIT_VERSION);
     printf("a utility to manage self encrypting drives that conform\n");
     printf("to the TCG Enterprise, Opal, Opalite and Pyrite SSC specs\n");
+    printf("\n");
     printf("General Usage:                  (see readme for extended commandset)\n");
     printf("sedutil-cli [-vnl] <action> [options] <device>\n");
     printf("-v (optional)                   increase verbosity, one to four v's\n");
     printf("-n (optional)                   no password hashing. Passwords will be sent in clear text!\n");
     printf("-l (optional)                   log style output to stderr only\n");
-    printf("-a=authortity (optional)        specify am authority instead of the default for the action\n");
-    printf("                                Authorities are Admin[1..n], User[1..n]");
+    printf("-a=authortity (optional)        specify an authority instead of the default for the action\n");
+    printf("                                Authorities are Admin[1..n], User[1..n]\n");
     printf("                                This option is not supported for all actions.\n");
-    printf("-t=timeout (optional)           specify a session timeout value to be sent on all Start Sessions\n");
+    printf("-t=timeout (optional)           specify a session timeout value to be sent with the Start Session\n");
+    printf("\n");
     printf("actions:\n");
     printf("--scan\n");
     printf("                                Scans the devices on the system \n");
@@ -196,7 +198,7 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
         else if (!strncmp("-t=", argv[i], 3)) {
             ++baseOptions;
             opts->timeout = atoi(&argv[i][3]);
-            LOG(D) << "session timeout set to  " << opts->timeout;
+            LOG(D) << "session timeout set to " << opts->timeout;
         }
         else if (!(('-' == argv[i][0]) && ('-' == argv[i][1])) && (0 == opts->action)) {
 			LOG(E) << "Argument " << (uint16_t) i << " (" << argv[i] << ") should be a command";
@@ -266,7 +268,6 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 		BEGIN_OPTION(isValidSED, 1) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(eraseLockingRange, 3)
 			TESTARG_RANGE(lockingrange, 0, 47, "Invalid Locking Range (0-47)")
-			TESTFAIL("Invalid Locking Range (0-15)")
 			OPTION_IS(password)
 			OPTION_IS(device)
 			END_OPTION

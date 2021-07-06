@@ -32,7 +32,7 @@ using namespace std;
  * @param password The password to be hashed
  * @param device the device where the password is to be used
  */
-void DtaHashPwd(vector<uint8_t> &hash, char * password, DtaDev * device);
+void DtaHashPwd(vector<uint8_t>& hash, const char* password, const DtaDev* device);
 /** Hash a passwor using the PBDKF2<SHA2> function 
  *
  * @param hash Field where hash returned
@@ -41,7 +41,7 @@ void DtaHashPwd(vector<uint8_t> &hash, char * password, DtaDev * device);
  * @param iter number of iterations to be preformed 
  * @param hashsize size of hash to be returned
  */
-void DtaHashPassword(vector<uint8_t> &hash, char * password, vector<uint8_t> salt,
-        unsigned int iter = 500000, uint8_t hashsize = 32);
+void DtaHashPassword(vector<uint8_t>& hash, const char* password, const vector<uint8_t> salt,
+                     const unsigned int iter = 500000, const uint8_t hashsize = 32);
 /** Test the hshing function using publicly available test cased and report */
 int TestPBKDF2();

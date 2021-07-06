@@ -40,37 +40,37 @@ public:
     void init(void * buffer);
     /** return the type of token
      * @param tokenNum the 0 based number of the token*/
-    OPAL_TOKEN tokenIs(uint32_t tokenNum);
+    OPAL_TOKEN tokenIs(const uint32_t tokenNum) const;
     /** return the length of a token
     * @param tokenNum the 0 based number of the token*/
-    uint32_t getLength(uint32_t tokenNum);
+    uint32_t getLength(const uint32_t tokenNum) const;
     /** return an unsigned 64bit integer
     * @param tokenNum the 0 based number of the token*/
-    uint64_t getUint64(uint32_t tokenNum);
+    uint64_t getUint64(const uint32_t tokenNum) const;
     /** return an unsigned 32bit integer
     * @param tokenNum the 0 based number of the token*/
-    uint32_t getUint32(uint32_t tokenNum);
+    uint32_t getUint32(const uint32_t tokenNum) const;
     /** return an unsigned 16bit integer
     * @param tokenNum the 0 based number of the token*/
-    uint16_t getUint16(uint32_t tokenNum);
+    uint16_t getUint16(const uint32_t tokenNum) const;
     /** return an unsigned 8bit integer
     * @param tokenNum the 0 based number of the token*/
-    uint8_t getUint8(uint32_t tokenNum);
+    uint8_t getUint8(const uint32_t tokenNum) const;
     /** return the number of tokens in the response */
-    uint32_t getTokenCount();
+    uint32_t getTokenCount() const;
     /** return a string of the token
      * @param tokenNum the 0 based number of the token*/
-    std::string getString(uint32_t tokenNum);
+    std::string getString(const uint32_t tokenNum) const;
     /** return the entire token including TCG token overhead
     * @param tokenNum the 0 based number of the token*/
-    std::vector<uint8_t> getRawToken(uint32_t tokenNum);
+    std::vector<uint8_t> getRawToken(const uint32_t tokenNum) const;
     /** return the token in an array of uint8_t
     * @param tokenNum the 0 based number of the token
     * @param bytearray pointer to array for return data
     * @return number of bytes put in the bytearray */
-    int getBytes(uint32_t tokenNum, uint8_t bytearray[]);
+    int getBytes(const uint32_t tokenNum, uint8_t bytearray[]) const;
     /** return non-zero if token is a byte sequence, otherwise 0. */
-    int isByteSequence(uint32_t tokenNum);
+    int isByteSequence(const uint32_t tokenNum) const;
 
     OPALHeader h; /**< TCG Header fields of the response */
 

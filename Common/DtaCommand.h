@@ -46,31 +46,31 @@ public:
      *   @param InvokingUid  The UID used to call the SSC method
      *   @param method The SSC method to be called
      */
-    DtaCommand(OPAL_UID InvokingUid, OPAL_METHOD method);
+    DtaCommand(const OPAL_UID InvokingUid, const OPAL_METHOD method);
     /** destructor  frees the command and response buffers */
     ~DtaCommand();
     /** Add a Token to the bytstream of type OPAL_TOKEN. */
-    void addToken(OPAL_TOKEN token);
+    void addToken(const OPAL_TOKEN token);
     /** Add a Token to the bytstream of type OPL_SHORT ATOM. */
-    void addToken(OPAL_SHORT_ATOM token);
+    void addToken(const OPAL_SHORT_ATOM token);
     /** Add a Token to the bytstream of type OPL_TINY ATOM. */
-    void addToken(OPAL_TINY_ATOM token);
+    void addToken(const OPAL_TINY_ATOM token);
     /** Add a Token to the bytstream of from the OPALUID array. */
-    void addToken(OPAL_UID token);
+    void addToken(const OPAL_UID token);
     /** Add a Token to the bytstream of type c-string */
     void addToken(const char * bytestring);
     /** Add a Token to the bytstream of type vector<uint8_t>.
      * This token must be a complete token properly encoded
      * with the proper TCG bytestream header information  */
-    void addToken(std::vector<uint8_t> token);
+    void addToken(const std::vector<uint8_t> token);
     /** Add a Token to the bytstream of type uint64. */
-    void addToken(uint64_t number);
+    void addToken(const uint64_t number);
     /** Set the commid to be used in the command. */
-    void setcomID(uint16_t comID);
+    void setcomID(const uint16_t comID) const;
     /** set the Host session number to be used in the command. */
-    void setHSN(uint32_t HSN);
+    void setHSN(const uint32_t HSN) const;
     /** Set the TPer session number to be used for the command. */
-    void setTSN(uint32_t TSN);
+    void setTSN(const uint32_t TSN) const;
     /** Add the required fields to the end of the bytestream. If EOD is true (default) the
      * EOD token and the method status list will be added to the end of the bytestream.
      * Then the bytstram is padded to a 4-byte boundary if required and the length fields
@@ -78,7 +78,7 @@ public:
      *
      *  @param EOD a bool to signal that command requires the EOD and method status fields
      */
-    void complete(uint8_t EOD = 1);
+    void complete(const uint8_t EOD = 1);
     /** Clears the command buffer and resets the the end of buffer pointer
      * @see bufferpos
      */
@@ -89,7 +89,7 @@ public:
      *   @param InvokingUid  The UID used to call the SSC method
      *   @param method The SSC method to be called
      */
-    void reset(OPAL_UID InvokingUid, OPAL_METHOD method);
+    void reset(const OPAL_UID InvokingUid, const OPAL_METHOD method);
     /** Clears the command buffer and resets the the end of buffer pointer
      * also initializes the invoker and method fields.
      * The invoker is passed as a vector<uint8_t> this is used for the case
@@ -98,7 +98,7 @@ public:
      *   @param InvokingUid  The UID used to call the SSC method
      *   @param method The SSC method to be called
      */
-    void reset(OPAL_UID InvokingUid, vector<uint8_t> method);
+    void reset(const OPAL_UID InvokingUid, const std::vector<uint8_t>& method);
     /** Clears the command buffer and resets the the end of buffer pointer
      * also initializes the invoker and method fields.
      * Both the invoker and method are passed as a vector<uint8_t>
@@ -106,7 +106,7 @@ public:
      *   @param InvokingUid  The UID used to call the SSC method
      *   @param method The SSC method to be called
      */
-    void reset(vector<uint8_t> InvokingUid, vector<uint8_t> method);
+    void reset(const std::vector<uint8_t>& InvokingUid, const std::vector<uint8_t>& method);
 	/** Clears the command buffer and resets the the end of buffer pointer
      * also initializes the invoker and method fields.
      * The invoker and method are passed as a vector<uint8_t>.
@@ -115,25 +115,25 @@ public:
      *   @param InvokingUid  The UID used to call the SSC method
      *   @param method The SSC method to be called
      */
-	void reset(vector<uint8_t> InvokingUid, OPAL_METHOD method);
+	void reset(const std::vector<uint8_t>& InvokingUid, const OPAL_METHOD method);
 	/** Changes the invoker field.
      * The invoker is passed as a vector<uint8_t> this is used for the case
      * where the invoker is not an OPAL user, typically a table.
      *
      *   @param Invoker  The UID used to call the SSC method
      */
-    void changeInvokingUid(vector<uint8_t> Invoker);
+    void changeInvokingUid(const vector<uint8_t>& Invoker);
     /** Produce a hexdump of the response.  Typically used in debugging and tracing */
-	void dumpResponse();
+	void dumpResponse() const;
     /** Produce a hexdump of the command.  Typically used in debugging and tracing */
-	void dumpCommand();
+	void dumpCommand() const;
 	/** Return the space used in the command buffer (rounded to 512 bytes) */
-	uint16_t outputBufferSize();
+	uint16_t outputBufferSize() const;
 private:
     /** return a pointer to the command buffer */
-	void * getCmdBuffer();
+	void * getCmdBuffer() const;
     /** return a pointer to the response buffer. */
-	void * getRespBuffer();
+	void * getRespBuffer() const;
 	uint8_t commandbuffer[MAX_BUFFER_LENGTH + IO_BUFFER_ALIGNMENT]; /**< buffer allocation allow for 1k alignment */
 	uint8_t responsebuffer[PROP_BUFFER_LENGTH + IO_BUFFER_ALIGNMENT]; /**< buffer allocation allow for 1k alignment */
 	uint8_t *cmdbuf;  /**< Pointer to the command buffer */

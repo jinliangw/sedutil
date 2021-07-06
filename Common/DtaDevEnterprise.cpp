@@ -89,7 +89,7 @@ static void user2cpin(vector<uint8_t> & dst, vector<uint8_t> & src)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t DtaDevEnterprise::getMaxRanges(char * password, uint16_t *maxRanges)
+uint8_t DtaDevEnterprise::getMaxRanges(const char* password, uint16_t* maxRanges)
 ////////////////////////////////////////////////////////////////////////////////
 {
 	uint8_t lastRC;
@@ -129,7 +129,7 @@ uint8_t DtaDevEnterprise::getMaxRanges(char * password, uint16_t *maxRanges)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t DtaDevEnterprise::getMaxRangesOpal(char * password, uint16_t *maxRanges)
+uint8_t DtaDevEnterprise::getMaxRangesOpal(const char* password, uint16_t *maxRanges)
 ////////////////////////////////////////////////////////////////////////////////
 {
 	uint8_t lastRC;
@@ -171,7 +171,7 @@ DtaDevEnterprise::DtaDevEnterprise(const char * devref)
 DtaDevEnterprise::~DtaDevEnterprise()
 {
 }
-uint8_t DtaDevEnterprise::initialSetup(char * password)
+uint8_t DtaDevEnterprise::initialSetup(const char* password)
 {
 	LOG(D1) << "Entering initialSetup()";
 	uint8_t lastRC;
@@ -196,13 +196,16 @@ uint8_t DtaDevEnterprise::initialSetup(char * password)
 	LOG(D1) << "Exiting initialSetup()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::setup_SUM(uint8_t lockingrange, uint64_t start, uint64_t length, char *Admin1Password, char * password)
+uint8_t DtaDevEnterprise::setup_SUM(const uint8_t lockingrange, const uint64_t start,
+                                    const uint64_t length, const char*Admin1Password,
+                                    const char* password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setup_SUM";
 	LOG(I) << "setup_SUM not supported on DtaDevEnterprise";
 	return 1;
 }
-uint8_t DtaDevEnterprise::configureLockingRange(uint8_t lockingrange, uint8_t enabled, char * password)
+uint8_t DtaDevEnterprise::configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
+                                                const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevEnterprise::configureLockingRange()";
@@ -277,7 +280,7 @@ uint8_t DtaDevEnterprise::configureLockingRange(uint8_t lockingrange, uint8_t en
 	LOG(D1) << "Exiting DtaDevEnterprise::configureLockingRange()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::rekeyLockingRange(uint8_t lockingrange, char * password)
+uint8_t DtaDevEnterprise::rekeyLockingRange(const uint8_t lockingrange, const char* password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::rekeyLockingRange()";
 	uint8_t lastRC;
@@ -335,7 +338,7 @@ uint8_t DtaDevEnterprise::rekeyLockingRange(uint8_t lockingrange, char * passwor
 	LOG(D1) << "Exiting DtaDevEnterprise::rekeyLockingRange()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::revertLockingSP(char * password, uint8_t keep)
+uint8_t DtaDevEnterprise::revertLockingSP(const char* password, const uint8_t keep)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::revertLockingSP()";
 	if(password == NULL) { LOG(D4) << "Referencing formal parameters " << keep; }
@@ -377,12 +380,13 @@ uint8_t DtaDevEnterprise::revertLockingSP(char * password, uint8_t keep)
 	LOG(D1) << "Exiting DtaDevEnterprise::revertLockingSP()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::setPassword(const char* authority, char * password, char * userid, char * newpassword)
+uint8_t DtaDevEnterprise::setPassword(const char* authority, const char* password,
+                                      const char* userid, const char* newpassword)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setPassword" ;
 	uint8_t lastRC;
 	string defaultPassword;
-	char *pwd = password, *newpwd = newpassword;
+	const char *pwd = password, *newpwd = newpassword;
 
 	if (11 > strnlen(userid, 15)) {
 		LOG(E) << "Invalid Userid " << userid;
@@ -455,14 +459,15 @@ uint8_t DtaDevEnterprise::setPassword(const char* authority, char * password, ch
 	LOG(D1) << "Exiting DtaDevEnterprise::setPassword()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::setNewPassword_SUM(char * password, char * userid, char * newpassword)
+uint8_t DtaDevEnterprise::setNewPassword_SUM(const char* password, const char* userid,
+                                             const char* newpassword)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setNewPassword_SUM()";
 	LOG(I) << "setNewPassword_SUM is not in the Enterprise SSC and not supported";
 	LOG(D1) << "Exiting DtaDevEnterprise::setNewPassword_SUM()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::setMBREnable(uint8_t mbrstate,	char * Admin1Password)
+uint8_t DtaDevEnterprise::setMBREnable(const uint8_t mbrstate, const char* Admin1Password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setMBREnable";
 	if (NULL == Admin1Password) { LOG(E) << "This shouldn't happen " << mbrstate; }
@@ -470,7 +475,7 @@ uint8_t DtaDevEnterprise::setMBREnable(uint8_t mbrstate,	char * Admin1Password)
 	LOG(D1) << "Exiting DtaDevEnterprise::setMBREnable";
 	return 0;
 }
-uint8_t DtaDevEnterprise::setMBRDone(uint8_t mbrstate, char * Admin1Password)
+uint8_t DtaDevEnterprise::setMBRDone(const uint8_t mbrstate, const char* Admin1Password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setMBRDone";
 	if (NULL == Admin1Password) { LOG(E) << "This shouldn't happen " << mbrstate; }
@@ -479,7 +484,8 @@ uint8_t DtaDevEnterprise::setMBRDone(uint8_t mbrstate, char * Admin1Password)
 	return 0;
 }
 
-uint8_t DtaDevEnterprise::setupLockingRange(uint8_t lockingrange, uint64_t start, uint64_t length, char * password)
+uint8_t DtaDevEnterprise::setupLockingRange(const uint8_t lockingrange, const uint64_t start,
+                                            const uint64_t length, const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevEnterprise::setupLockingRange";
@@ -575,22 +581,23 @@ uint8_t DtaDevEnterprise::setupLockingRange(uint8_t lockingrange, uint64_t start
 	LOG(D1) << "Exiting DtaDevEnterprise::setupLockingRange";
 	return 0;
 }
-uint8_t DtaDevEnterprise::setupLockingRange_SUM(uint8_t lockingrange, uint64_t start,
-	uint64_t length, char * password) {
+uint8_t DtaDevEnterprise::setupLockingRange_SUM(const uint8_t lockingrange, const uint64_t start,
+                                                const uint64_t length, const char* password)
+{
 	LOG(D1) << "Entering DtaDevEnterprise::setupLockingRange_SUM";
 	if (0 == lockingrange) { LOG(E) << start << length << password; }
 	LOG(D1) << "Exiting DtaDevEnterprise::setupLockingRange_SUM";
 	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t DtaDevEnterprise::listLockingRanges(char * password, int16_t rangeid)
+uint8_t DtaDevEnterprise::listLockingRanges(const char* password, const int16_t rangeid)
 ////////////////////////////////////////////////////////////////////////////////
 {
 	LOG(D1) << "Entering DtaDevEnterprise::listLockingRanges";
 	uint8_t lastRC = 0, failRC = 0;
 	int one_succeeded = 0;
 	string defaultPassword;
-	char *pwd = NULL;
+	const char *pwd = NULL;
 
 	// if (NULL == password) { LOG(E) << "password NULL"; }
 	if ((password == NULL) || (*password == '\0')) {
@@ -748,8 +755,8 @@ uint8_t DtaDevEnterprise::listLockingRanges(char * password, int16_t rangeid)
 	return lastRC;
 }
 
-uint8_t DtaDevEnterprise::setLockingRange(uint8_t lockingrange, uint8_t lockingstate,
-	char * password)
+uint8_t DtaDevEnterprise::setLockingRange(const uint8_t lockingrange, const uint8_t lockingstate,
+                                          const char* password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setLockingRange";
 	uint8_t lastRC;
@@ -841,14 +848,15 @@ uint8_t DtaDevEnterprise::setLockingRange(uint8_t lockingrange, uint8_t lockings
 	LOG(D1) << "Exiting DtaDevEnterprise::setLockingRange";
 	return 0;
 }
-uint8_t DtaDevEnterprise::setLockingRange_SUM(uint8_t lockingrange, uint8_t lockingstate,
-	char * password) {
+uint8_t DtaDevEnterprise::setLockingRange_SUM(const uint8_t lockingrange, const uint8_t lockingstate,
+                                              const char* password) {
 		LOG(D1) << "Entering DtaDevEnterprise::setLockingRange_SUM()";
         LOG(E) << "setLockingRange_SUM not implemented";
         LOG(D1) << "Exiting DtaDevEnterprise::setLockingRange_SUM()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::enableUser(const char* authority, char * password, char * userid, OPAL_TOKEN status)
+uint8_t DtaDevEnterprise::enableUser(const char* authority, const char* password, 
+                                     const char* userid, const OPAL_TOKEN status)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::enableUser";
 	LOG(E) << "enableUser not implemented";
@@ -856,7 +864,8 @@ uint8_t DtaDevEnterprise::enableUser(const char* authority, char * password, cha
 	LOG(D1) << "Exiting DtaDevEnterprise::enableUser()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::revertTPer(char * password, uint8_t PSID, uint8_t AdminSP)
+uint8_t DtaDevEnterprise::revertTPer(const char* password, const uint8_t PSID,
+                                     const uint8_t AdminSP)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::revertTPer()";
 	if (password == NULL) { LOG(D4) << "Referencing formal parameters " << PSID; }
@@ -901,11 +910,11 @@ uint8_t DtaDevEnterprise::revertTPer(char * password, uint8_t PSID, uint8_t Admi
 	LOG(D1) << "Exiting DtaDevEnterprise::revertTPer()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::eraseLockingRange(uint8_t lockingrange, char * password)
+uint8_t DtaDevEnterprise::eraseLockingRange(const uint8_t lockingrange, const char* password)
 {
 	uint8_t lastRC;
 	string defaultPassword;
-	char *pwd = NULL;
+	const char *pwd = NULL;
 	LOG(D1) << "Entering DtaDevEnterprise::eraseLockingRange";
 
     // look up MaxRanges
@@ -982,7 +991,7 @@ uint8_t DtaDevEnterprise::eraseLockingRange(uint8_t lockingrange, char * passwor
 	LOG(D1) << "Exiting DtaDevEnterprise::eraseLockingRange";
 	return 0;
 }
-uint8_t DtaDevEnterprise::loadPBA(char * password, char * filename) {
+uint8_t DtaDevEnterprise::loadPBA(const char* password, const char* filename) {
 	LOG(D1) << "Entering DtaDevEnterprise::loadPBAimage()" << filename << " " << dev;
 	if (password == NULL) { LOG(D4) << "Referencing formal parameters " << filename; }
 	LOG(I) << "loadPBA is not implemented.  It is not a mandatory part of  ";
@@ -990,7 +999,7 @@ uint8_t DtaDevEnterprise::loadPBA(char * password, char * filename) {
 	LOG(D1) << "Exiting DtaDevEnterprise::loadPBAimage()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::activateLockingSP(char * password)
+uint8_t DtaDevEnterprise::activateLockingSP(const char* password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::activateLockingSP()";
 	if (password == NULL) { LOG(D4) << "Referencing formal parameters "; }
@@ -998,7 +1007,7 @@ uint8_t DtaDevEnterprise::activateLockingSP(char * password)
 	LOG(D1) << "Exiting DtaDevEnterprise::activatLockingSP()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::activateLockingSP_SUM(uint8_t lockingrange, char * password)
+uint8_t DtaDevEnterprise::activateLockingSP_SUM(const uint8_t lockingrange, const char* password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::activateLockingSP_SUM()";
 	if (password == NULL) { LOG(D4) << "Referencing formal parameters "; }
@@ -1006,7 +1015,7 @@ uint8_t DtaDevEnterprise::activateLockingSP_SUM(uint8_t lockingrange, char * pas
 	LOG(D1) << "Exiting DtaDevEnterprise::activateLockingSP_SUM()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::eraseLockingRange_SUM(uint8_t lockingrange, char * password)
+uint8_t DtaDevEnterprise::eraseLockingRange_SUM(const uint8_t lockingrange, const char* password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::eraseLockingRange_SUM()";
 	if (password == NULL) { LOG(D4) << "Referencing formal parameters "; }
@@ -1014,7 +1023,7 @@ uint8_t DtaDevEnterprise::eraseLockingRange_SUM(uint8_t lockingrange, char * pas
 	LOG(D1) << "Exiting DtaDevEnterprise::eraseLockingRange_SUM()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::takeOwnership(char * newpassword)
+uint8_t DtaDevEnterprise::takeOwnership(const char* newpassword)
 {
 	string defaultPassword;
 	uint8_t lastRC;
@@ -1025,7 +1034,7 @@ uint8_t DtaDevEnterprise::takeOwnership(char * newpassword)
 		return lastRC;
 	}
 	defaultPassword = response.getString(5);
-	if ((lastRC = setSIDPassword((char *)defaultPassword.c_str(), newpassword, 0)) != 0) {
+	if ((lastRC = setSIDPassword(defaultPassword.c_str(), newpassword, 0)) != 0) {
 		LOG(E) << "takeOwnership failed unable to set new SID password";
 		return lastRC;
 	}
@@ -1038,7 +1047,7 @@ uint8_t DtaDevEnterprise::takeOwnership(char * newpassword)
 	return 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t DtaDevEnterprise::setBandsEnabled(int16_t lockingrange, char * password)
+uint8_t DtaDevEnterprise::setBandsEnabled(const int16_t lockingrange, const char* password)
 ////////////////////////////////////////////////////////////////////////////////
 {
     uint8_t lastRC = 0;
@@ -1149,7 +1158,7 @@ uint8_t DtaDevEnterprise::setBandsEnabled(int16_t lockingrange, char * password)
     return lastRC;
 }
 
-uint8_t DtaDevEnterprise::initLSPUsers(char * defaultPassword, char * newPassword)
+uint8_t DtaDevEnterprise::initLSPUsers(const char* defaultPassword, const char* newPassword)
 {
     vector<uint8_t> user, usercpin, hash, erasemaster, table;
 	uint8_t lastRC;
@@ -1261,18 +1270,20 @@ uint8_t DtaDevEnterprise::printDefaultPassword()
     fprintf(stdout, "MSID: %s\n", (char *)defaultPassword.c_str());
     return 0;
 }
-uint8_t DtaDevEnterprise::printTables(char* sp, char* password, uint8_t level)
+uint8_t DtaDevEnterprise::printTables(const char* sp, const char* password, const uint8_t level)
 {
     cout << "printTables feature not supported for TCG enterprise devices";
     return 0xff;
 }
-uint8_t DtaDevEnterprise::setSIDPassword(char * oldpassword, char * newpassword,
-	uint8_t hasholdpwd, uint8_t hashnewpwd)
+uint8_t DtaDevEnterprise::setSIDPassword(const char* oldpassword, const char* newpassword,
+                                         const uint8_t hasholdpwd, const uint8_t hashnewpwd)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setSIDPassword()";
 	uint8_t lastRC;
 	string defaultPassword;
-	char *pwd = oldpassword, *newpwd = newpassword;
+	const char *pwd = oldpassword, *newpwd = newpassword;
+    bool hashold = hasholdpwd;
+    bool hashnew = hashnewpwd;
 
 	std::vector<uint8_t> user;
 	set8(user, OPALUID[OPAL_SID_UID]);
@@ -1288,13 +1299,13 @@ uint8_t DtaDevEnterprise::setSIDPassword(char * oldpassword, char * newpassword,
 		}
 		defaultPassword = response.getString(5);
 		if ((oldpassword == NULL) || (*oldpassword == '\0')) {
-			pwd = (char *)defaultPassword.c_str();
-			hasholdpwd = 0;
+			pwd = defaultPassword.c_str();
+			hashold = false;
 		}
 
 		if ((newpassword == NULL) || (*newpassword == '\0')) {
-			newpwd = (char *)defaultPassword.c_str();
-			hashnewpwd = 0;
+			newpwd = defaultPassword.c_str();
+			hashnew = false;
 		}
 	}
 
@@ -1303,7 +1314,7 @@ uint8_t DtaDevEnterprise::setSIDPassword(char * oldpassword, char * newpassword,
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if (!hasholdpwd)
+	if (!hashold)
 		session->dontHashPwd();
 	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, pwd, user)) != 0) {
 		delete session;
@@ -1311,7 +1322,7 @@ uint8_t DtaDevEnterprise::setSIDPassword(char * oldpassword, char * newpassword,
 	}
 
 	std::vector<uint8_t> hash;
-	if (hashnewpwd) {
+	if (hashnew) {
 		DtaHashPwd(hash, newpwd, this);
 	} else {
 		hash.push_back(0xd0);
@@ -1330,15 +1341,15 @@ uint8_t DtaDevEnterprise::setSIDPassword(char * oldpassword, char * newpassword,
 	LOG(D1) << "Exiting DtaDevEnterprise::setSIDPassword()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::setTable(vector<uint8_t> table, const char *name,
-	OPAL_TOKEN value)
+uint8_t DtaDevEnterprise::setTable(const std::vector<uint8_t>& table, const char* name,
+                                   const OPAL_TOKEN value)
 {
-	vector <uint8_t> token;
-	token.push_back((uint8_t) value);
-	return(setTable(table, name, token));
+	vector<uint8_t> token;
+	token.push_back((uint8_t)value);
+	return (setTable(table, name, token));
 }
-uint8_t DtaDevEnterprise::setTable(vector<uint8_t> table, const char *name,
-	vector<uint8_t> value)
+uint8_t DtaDevEnterprise::setTable(const std::vector<uint8_t>& table, const char* name,
+                                   const std::vector<uint8_t>& value)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setTable";
 	uint8_t lastRC;
@@ -1371,8 +1382,8 @@ uint8_t DtaDevEnterprise::setTable(vector<uint8_t> table, const char *name,
 	LOG(D1) << "Leaving DtaDevEnterprise::setTable";
 	return 0;
 }
-uint8_t DtaDevEnterprise::getTable(vector<uint8_t> table, const char * startcol,
-	const char * endcol)
+uint8_t DtaDevEnterprise::getTable(const std::vector<uint8_t>& table, const char* startcol,
+                                   const char* endcol)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::getTable";
 	uint8_t lastRC;
@@ -1408,7 +1419,7 @@ uint16_t DtaDevEnterprise::comID()
     LOG(D1) << "Entering DtaDevEnterprise::comID()";
     return disk_info.Enterprise_basecomID;
 }
-uint8_t DtaDevEnterprise::exec(DtaCommand * cmd, DtaResponse & resp, uint8_t protocol)
+uint8_t DtaDevEnterprise::exec(const DtaCommand* cmd, DtaResponse& resp, const uint8_t protocol)
 {
     uint8_t rc = 0;
     OPALHeader * hdr = (OPALHeader *) cmd->getCmdBuffer();
@@ -1496,39 +1507,39 @@ uint8_t DtaDevEnterprise::properties()
 	return 0;
 }
 
-uint8_t DtaDevEnterprise::assign(char* password, uint32_t ns,
-                                 uint64_t start, uint64_t length)
+uint8_t DtaDevEnterprise::assign(const char* password, const uint32_t ns,
+                                 const uint64_t start, const uint64_t length)
 {
     cout << "TCG Enterprise SSC does not include the assign method.\n";
     return 0xff;
 }
-uint8_t DtaDevEnterprise::deassign(char* password, uint8_t lockingrange, bool keep)
+uint8_t DtaDevEnterprise::deassign(const char* password, const uint8_t lockingrange, const bool keep)
 {
     cout << "TCG Enterprise SSC does not include the deassign method.\n";
     return 0xff;
 }
 
-uint8_t DtaDevEnterprise::readMBR(char* password, uint32_t offset, uint32_t count)
+uint8_t DtaDevEnterprise::readMBR(const char* password, const uint32_t offset, const uint32_t count)
 {
     cout << "TCG Enterprise SSC does not include the readMBR function.\n";
     return 0xff;
 }
 
-uint8_t DtaDevEnterprise::loadDataStore(char* password, uint8_t table, uint32_t offset,
-                                        uint32_t count, const char* filename)
+uint8_t DtaDevEnterprise::loadDataStore(const char* password, const uint8_t table, const uint32_t offset,
+                                        const uint32_t count, const char* filename)
 {
     cout << "TCG Enterprise SSC does not include the loadDataStore function.\n";
     return 0xff;
 }
 
-uint8_t DtaDevEnterprise::readDataStore(char* password, uint8_t table, uint32_t offset,
-                                        uint32_t count)
+uint8_t DtaDevEnterprise::readDataStore(const char* password, const uint8_t table, 
+                                        const uint32_t offset, const uint32_t count)
 {
     cout << "TCG Enterprise SSC does not include the readDataStore function.\n";
     return 0xff;
 }
 
-uint8_t DtaDevEnterprise::enableTperReset(char* password)
+uint8_t DtaDevEnterprise::enableTperReset(const char* password)
 {
     cout << "TCG Enterprise SSC does not include the enableTperReset function.\n";
     return 0xff;
@@ -1568,8 +1579,9 @@ void DtaDevEnterprise::puke()
 			cout << std::endl;
 	}
 }
-uint8_t DtaDevEnterprise::rawCmd(char *sp, char *hexauth, char *pass,
-	char *hexinvokingUID, char *hexmethod,char *hexparms)
+uint8_t DtaDevEnterprise::rawCmd(const char* sp, const char* hexauth, const char* pass,
+                                 const char* hexinvokingUID, const char* hexmethod,
+                                 const char* hexparms)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::rawCmd";
 	LOG(D1) << sp << " " << hexauth << " " << pass << " " ;
@@ -1655,8 +1667,8 @@ uint8_t DtaDevEnterprise::rawCmd(char *sp, char *hexauth, char *pass,
 	LOG(D1) << "Exiting DtaDevEnterprise::rawCmd";
 	return 0;
 }
-uint8_t DtaDevEnterprise::objDump(char *sp, char * auth, char *pass,
-	char * objID)
+uint8_t DtaDevEnterprise::objDump(const char* sp, const char* auth, const char* pass,
+                                  const char* objID)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::objDump";
 	LOG(D1) << sp << " " << auth << " " << pass << " " << objID;
