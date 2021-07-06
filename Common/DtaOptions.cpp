@@ -133,7 +133,7 @@ void usage()
     printf("                                get and print table values for a SP\n");
     printf("                                SP is Admin or Locking\n");
     printf("                                use \"\" as password for MSID.\n");
-    printf("                                level 0 is tables only, 1 for details.\n");
+    printf("                                level 0 = tables, 1 = tables & ACL, 2 = details, 3 = debug\n");
     printf("--enableTperReset <SIDpassword> <device>\n");
     printf("                                Enable TPer Reset\n");
     printf("--tperReset <device>\n");
@@ -261,7 +261,8 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
             TESTARG(0, level, 0)
             TESTARG(1, level, 1)
             TESTARG(2, level, 2)
-            TESTFAIL("Invalid level (0-2)")
+            TESTARG(3, level, 3)
+            TESTFAIL("Invalid level (0-3)")
             OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(query, 1) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(scan, 0)  END_OPTION
