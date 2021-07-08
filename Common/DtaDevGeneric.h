@@ -242,5 +242,5 @@ public:
                            const uint32_t count, const char* filename);
      uint8_t readDataStore(const char* password, const uint8_t table, const uint32_t offset,
                            const uint32_t count);
-     uint8_t enableTperReset(const char* password);
+     uint8_t enableTperReset(const char* password, const uint8_t options);
 };

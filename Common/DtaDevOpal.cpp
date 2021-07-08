@@ -1020,8 +1020,11 @@ uint8_t DtaDevOpal::setLockingRange(const uint8_t lockingrange, const uint8_t lo
 {
 	uint8_t lastRC;
 	uint8_t archiveuser = 0;
-	OPAL_TOKEN readlocked, writelocked;
-	const char *msg;
+	OPAL_TOKEN readlocked  = OPAL_TOKEN::EMPTYATOM;
+    OPAL_TOKEN writelocked = OPAL_TOKEN::EMPTYATOM;
+    const char *msg;
+    std::vector<uint8_t> lockOnReset;
+
 
 	LOG(D1) << "Entering DtaDevOpal::setLockingRange";
 	switch (lockingstate) {
@@ -1042,6 +1045,17 @@ uint8_t DtaDevOpal::setLockingRange(const uint8_t lockingrange, const uint8_t lo
 		readlocked = writelocked = OPAL_TOKEN::OPAL_TRUE;
 		msg = "LK";
 		break;
+    case OPAL_LOCKINGSTATE::ENABLERESET:
+        // This only works because the 2 values we use fit in a tiny token.
+        lockOnReset.push_back(OPAL_TOKEN::POWER_CYCLE);
+        lockOnReset.push_back(OPAL_TOKEN::PROGRAMMATIC);
+        msg = "+R";
+        break;
+    case OPAL_LOCKINGSTATE::DISABLERESET:
+        // This only works because the value we use fits in a tiny token.
+        lockOnReset.push_back(OPAL_TOKEN::POWER_CYCLE);
+        msg = "-R";
+        break;
 	default:
 		LOG(E) << "Invalid locking state for setLockingRange";
 		return DTAERROR_INVALID_PARAMETER;
@@ -1076,17 +1090,27 @@ uint8_t DtaDevOpal::setLockingRange(const uint8_t lockingrange, const uint8_t lo
 	set->addToken(OPAL_TOKEN::STARTNAME);
 	set->addToken(OPAL_TOKEN::VALUES);
 	set->addToken(OPAL_TOKEN::STARTLIST);
-	set->addToken(OPAL_TOKEN::STARTNAME);
-	set->addToken(OPAL_TOKEN::READLOCKED);
-	set->addToken(readlocked);
-	set->addToken(OPAL_TOKEN::ENDNAME);
-	if (!archiveuser) {
+    if (readlocked != OPAL_TOKEN::EMPTYATOM) {
+        set->addToken(OPAL_TOKEN::STARTNAME);
+        set->addToken(OPAL_TOKEN::READLOCKED);
+        set->addToken(readlocked);
+        set->addToken(OPAL_TOKEN::ENDNAME);
+    }
+	if (!archiveuser && (writelocked != OPAL_TOKEN::EMPTYATOM)) {
 		set->addToken(OPAL_TOKEN::STARTNAME);
 		set->addToken(OPAL_TOKEN::WRITELOCKED);
 		set->addToken(writelocked);
 		set->addToken(OPAL_TOKEN::ENDNAME);
 	}
-	set->addToken(OPAL_TOKEN::ENDLIST);
+    if (lockOnReset.size() != 0) {
+		set->addToken(OPAL_TOKEN::STARTNAME);
+        set->addToken(OPAL_TOKEN::LOCKONRESET);
+        set->addToken(OPAL_TOKEN::STARTLIST);
+		set->addToken(lockOnReset);
+        set->addToken(OPAL_TOKEN::ENDLIST);
+		set->addToken(OPAL_TOKEN::ENDNAME);
+    }
+    set->addToken(OPAL_TOKEN::ENDLIST);
 	set->addToken(OPAL_TOKEN::ENDNAME);
 	set->addToken(OPAL_TOKEN::ENDLIST);
 	set->complete();
@@ -1957,10 +1981,12 @@ uint8_t DtaDevOpal::setSIDPassword(const char* oldpassword, const char* newpassw
 	return 0;
 }
 
-uint8_t DtaDevOpal::enableTperReset(const char* password)
+uint8_t DtaDevOpal::enableTperReset(const char* password, const uint8_t options)
 {
 	LOG(D1) << "Entering DtaDevOpal::enableTperReset";
 	uint8_t lastRC;
+    OPAL_TOKEN enable = (options == OPAL_LOCKINGSTATE::DISABLERESET) ? OPAL_TOKEN::OPAL_FALSE
+                                                                     : OPAL_TOKEN::OPAL_TRUE;
 
 	vector<uint8_t> table;
 	table. push_back(OPAL_SHORT_ATOM::BYTESTRING8);
@@ -1972,19 +1998,15 @@ uint8_t DtaDevOpal::enableTperReset(const char* password)
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, OPAL_UID::OPAL_SID_UID)) != 0) {
-		delete session;
-		return lastRC;
-	}
-	if ((lastRC = setTable(table, OPAL_TOKEN::TPERRESETENABLE, OPAL_TOKEN::OPAL_TRUE)) != 0) {
-		LOG(E) << "Unable to update table";
-		delete session;
-		return lastRC;
+	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, OPAL_UID::OPAL_SID_UID)) == 0) {
+        if ((lastRC = setTable(table, OPAL_TOKEN::TPERRESETENABLE, enable)) != 0) {
+            LOG(E) << "Unable to update the TperInfo table";
+        }
 	}
 
 	delete session;
 	LOG(D1) << "Exiting DtaDevOpal::enableTperReset";
-	return 0;
+	return lastRC;
 }
 
 uint8_t DtaDevOpal::setTable(const std::vector<uint8_t>& table, const OPAL_TOKEN name,
@@ -2013,7 +2035,7 @@ uint8_t DtaDevOpal::setTable(const std::vector<uint8_t>& table, const OPAL_TOKEN
 	set->addToken(OPAL_TOKEN::STARTLIST);
 	set->addToken(OPAL_TOKEN::STARTNAME);
 	set->addToken(name);
-	set->addToken(value);
+    set->addToken(value);
 	set->addToken(OPAL_TOKEN::ENDNAME);
 	set->addToken(OPAL_TOKEN::ENDLIST);
 	set->addToken(OPAL_TOKEN::ENDNAME);

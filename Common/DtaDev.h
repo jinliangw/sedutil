@@ -337,9 +337,11 @@ public:
 	 */
 	virtual uint8_t printTables(const char* sp, const char* password, const uint8_t level) = 0;
 
-    /** Enables TPER_RESET in the device as defined in TCG Opal specification
+    /** Enables or disables TPER_RESET in the device as defined in TCG Opal specification
+     * @param password SID password
+     * @param options enable or disable
      */
-    virtual uint8_t enableTperReset(const char* password) = 0;
+    virtual uint8_t enableTperReset(const char* password, const uint8_t options) = 0;
 
     /** Issues TPER_RESET to the device as defined in TCG Opal specification
      */

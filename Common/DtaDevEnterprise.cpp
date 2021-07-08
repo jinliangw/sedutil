@@ -1539,7 +1539,7 @@ uint8_t DtaDevEnterprise::readDataStore(const char* password, const uint8_t tabl
     return 0xff;
 }
 
-uint8_t DtaDevEnterprise::enableTperReset(const char* password)
+uint8_t DtaDevEnterprise::enableTperReset(const char* password, const uint8_t options)
 {
     cout << "TCG Enterprise SSC does not include the enableTperReset function.\n";
     return 0xff;

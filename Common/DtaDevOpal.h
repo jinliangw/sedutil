@@ -102,7 +102,7 @@ public:
          /** set a single column in an object table
          * @param table the UID of the table
          * @param name the column name to be set
-         * @param value data to be stored the the column
+		 * @param value data to be stored the the column
          */
 	uint8_t setTable(const std::vector<uint8_t>& table, const OPAL_TOKEN name,
 					 const std::vector<uint8_t>& value);
@@ -294,7 +294,7 @@ public:
 						  const uint32_t count, const char* filename);
 	uint8_t readDataStore(const char* password, const uint8_t table, const uint32_t offset,
 						  const uint32_t count);
-    uint8_t enableTperReset(const char* password);
+    uint8_t enableTperReset(const char* password, const uint8_t options);
 
 protected:
         /** Primitive to handle the setting of a value in the locking sp.

@@ -102,7 +102,7 @@ uint8NOCODE(readMBR, const char* password, const uint32_t offset, const uint32_t
 uint8NOCODE(loadDataStore, const char* password, const uint8_t table, const uint32_t offset,
             const uint32_t count, const char* filename)
 uint8NOCODE(readDataStore, const char* password, const uint8_t table, const uint32_t offset, const uint32_t count)
-uint8NOCODE(enableTperReset, const char* password)
+uint8NOCODE(enableTperReset, const char* password, const uint8_t options)
 
 uint16_t DtaDevGeneric::comID()
 {

@@ -82,7 +82,7 @@ void usage()
     printf("--enableUser <password> <user> <device>\n");
     printf("                                enable a user, user = Admin[2...n] or User[2...n]\n");
     printf("                                default authority is Admin1, over-ride with -a option\n");
-	printf("--setLockingRange <0...n> <RW|RO|LK> <Admin1password> <device> \n");
+	printf("--setLockingRange <0...n> <RW|RO|LK|+R|-R> <Admin1password> <device> \n");
 	printf("                                Set the status of a Locking Range\n");
 	printf("                                0 = GLobal 1..n  = LRn \n");
 	printf("--enableLockingRange <0...n> <Admin1password> <device> \n");
@@ -134,8 +134,9 @@ void usage()
     printf("                                SP is Admin or Locking\n");
     printf("                                use \"\" as password for MSID.\n");
     printf("                                level 0 = tables, 1 = tables & ACL, 2 = details, 3 = debug\n");
-    printf("--enableTperReset <SIDpassword> <device>\n");
+    printf("--enableTperReset <SIDpassword> <D|E> <device>\n");
     printf("                                Enable TPer Reset\n");
+    printf("                                D = disable, E = enable\n");
     printf("--tperReset <device>\n");
     printf("                                Send TPER_RESET to device\n");
     printf("--stackReset <device>\n");
@@ -305,7 +306,11 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			TESTARG(ro, lockingstate, OPAL_LOCKINGSTATE::READONLY)
 			TESTARG(LK, lockingstate, OPAL_LOCKINGSTATE::LOCKED)
 			TESTARG(lk, lockingstate, OPAL_LOCKINGSTATE::LOCKED)
-			TESTFAIL("Invalid locking state <ro|rw|lk>")
+            TESTARG(+R, lockingstate, OPAL_LOCKINGSTATE::ENABLERESET)
+            TESTARG(+r, lockingstate, OPAL_LOCKINGSTATE::ENABLERESET)
+            TESTARG(-R, lockingstate, OPAL_LOCKINGSTATE::DISABLERESET)
+            TESTARG(-r, lockingstate, OPAL_LOCKINGSTATE::DISABLERESET)
+			TESTFAIL("Invalid locking state <ro|rw|lk|+r|-r>")
 			OPTION_IS(password)
 			OPTION_IS(device)
 			END_OPTION
@@ -393,7 +398,13 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 		BEGIN_OPTION(objDump, 5) i += 4; OPTION_IS(device) END_OPTION
         BEGIN_OPTION(printDefaultPassword, 1) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(rawCmd, 7) i += 6; OPTION_IS(device) END_OPTION
-        BEGIN_OPTION(enableTperReset, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
+        BEGIN_OPTION(enableTperReset, 3)
+            OPTION_IS(password)
+            TESTARG(D, lockingstate, OPAL_LOCKINGSTATE::DISABLERESET)
+            TESTARG(E, lockingstate, OPAL_LOCKINGSTATE::ENABLERESET)
+            TESTFAIL("Invalid option <D|E>")
+            OPTION_IS(device)
+            END_OPTION
         BEGIN_OPTION(tperReset, 1) OPTION_IS(device) END_OPTION
         BEGIN_OPTION(stackReset, 1) OPTION_IS(device) END_OPTION
 		else {

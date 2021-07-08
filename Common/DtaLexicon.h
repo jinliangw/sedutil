@@ -186,9 +186,12 @@ typedef enum _OPAL_TOKEN {
 	WRITELOCKENABLED = 0x06,
 	READLOCKED = 0x07,
 	WRITELOCKED = 0x08,
+    LOCKONRESET = 0x09,
 	ACTIVEKEY = 0x0A,
 	NAMESPACEID = 0x14,
 	NAMESPACEGLOBAL = 0x15,
+    POWER_CYCLE = 0x00,
+    PROGRAMMATIC = 0x03,
 	//locking info table
 	MAXRANGES = 0x04,
     // mbr control
@@ -253,7 +256,10 @@ typedef enum _OPAL_LOCKINGSTATE {
 	LOCKED = 0x03,
 	ARCHIVELOCKED = 0x04,
 	ARCHIVEUNLOCKED = 0x05,
+    ENABLERESET = 0x06,
+    DISABLERESET = 0x07,
 } OPAL_LOCKINGSTATE;
+
 /*
  * Structures to build and decode the Opal SSC messages
  * fields that are NOT really numeric are defined as uint8_t[] to

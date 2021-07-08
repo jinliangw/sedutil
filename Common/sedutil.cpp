@@ -311,7 +311,7 @@ int main(int argc, char * argv[])
 		break;
     case sedutiloption::enableTperReset:
         LOG(D) << "Enabling TPER_RESET";
-        return d->enableTperReset(argv[opts.password]);
+        return d->enableTperReset(argv[opts.password], opts.lockingstate);
     case sedutiloption::tperReset:
         LOG(D) << "Performing TPER_RESET";
         return d->tperReset();
