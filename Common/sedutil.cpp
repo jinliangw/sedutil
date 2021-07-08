@@ -110,6 +110,7 @@ int main(int argc, char * argv[])
 		d->output_format = opts.output_format;
         d->timeout = opts.timeout;
         d->testTimeout = opts.testTimeout;
+        d->testOversizePacket = opts.testOversizePacket;
 	}
 
     switch (opts.action) {

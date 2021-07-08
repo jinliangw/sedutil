@@ -50,7 +50,7 @@ void
 DtaCommand::reset()
 {
     LOG(D1) << "Entering DtaCommand::reset()";
-    memset(cmdbuf, 0, PROP_BUFFER_LENGTH);
+    memset(cmdbuf, 0, MAX_BUFFER_LENGTH);
     memset(respbuf, 0, PROP_BUFFER_LENGTH);
     bufferpos = sizeof(OPALHeader);
 }

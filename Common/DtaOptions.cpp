@@ -196,6 +196,11 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
             opts->testTimeout = 1;
             LOG(D) << "Configured to test timeout";
         }
+        else if (!strcmp("-top", argv[i])) {
+            ++baseOptions;
+            opts->testOversizePacket = 1;
+            LOG(D) << "Configured to test oversize packet";
+        }
         else if (!strncmp("-t=", argv[i], 3)) {
             ++baseOptions;
             opts->timeout = atoi(&argv[i][3]);

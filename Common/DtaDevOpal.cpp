@@ -1348,12 +1348,21 @@ uint8_t DtaDevOpal::loadPBA(const char* password, const char* filename) {
 	uint32_t blockSize;
 	uint32_t filepos = 0;
 	uint32_t eofpos;
-	ifstream pbafile;
-	(PROP_BUFFER_LENGTH > tperMaxPacket) ? blockSize = tperMaxPacket : blockSize = PROP_BUFFER_LENGTH;
-	if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
-	vector <uint8_t> buffer, lengthtoken;
-	blockSize -= sizeof(OPALHeader) + 50;  // packet overhead
+
+    if (testOversizePacket) {
+        blockSize = MIN((MAX_BUFFER_LENGTH - 2048), tperMaxPacket);
+        if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
+        blockSize += 2048;
+    } else {
+        blockSize = MIN(PROP_BUFFER_LENGTH, tperMaxPacket);
+        if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
+    }
+    blockSize -= sizeof(OPALHeader) + 50;  // packet overhead
+
+    std::vector<uint8_t> buffer, lengthtoken;
 	buffer.resize(blockSize);
+
+	ifstream pbafile;
 	pbafile.open(filename, ios::in | ios::binary);
 	if (!pbafile) {
 		LOG(E) << "Unable to open PBA image file " << filename;
@@ -1380,7 +1389,7 @@ uint8_t DtaDevOpal::loadPBA(const char* password, const char* filename) {
 		pbafile.close();
 		return lastRC;
 	}
-	LOG(I) << "Writing PBA to " << dev;
+	LOG(I) << "Writing PBA to " << dev << " using token size of " << blockSize;
 
 	while (!pbafile.eof()) {
 		if (eofpos == filepos) break;
@@ -1496,9 +1505,16 @@ uint8_t DtaDevOpal::loadDataStore(const char* password, const uint8_t table, con
     uint8_t lastRC;
     uint32_t filepos = 0;
     uint32_t byteCount = count;
+    uint32_t blockSize;
 
-    uint32_t blockSize = MIN(PROP_BUFFER_LENGTH, tperMaxPacket);
-    if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
+    if (testOversizePacket) {
+        blockSize = MIN((MAX_BUFFER_LENGTH - 2048), tperMaxPacket);
+        if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
+        blockSize += 2048;
+    } else {
+        blockSize = MIN(PROP_BUFFER_LENGTH, tperMaxPacket);
+        if (blockSize > (tperMaxToken - 4)) blockSize = tperMaxToken - 4;
+    }
     blockSize -= sizeof(OPALHeader) + 50;  // packet overhead
 
     std::vector<uint8_t> buffer, lengthtoken;
@@ -1507,7 +1523,7 @@ uint8_t DtaDevOpal::loadDataStore(const char* password, const uint8_t table, con
     ifstream fileStream;
     fileStream.open(filename, ios::in | ios::binary);
     if (!fileStream) {
-        LOG(E) << "Unable to open PBA image file " << filename;
+        LOG(E) << "Unable to open DataStore file " << filename;
         return DTAERROR_OPEN_ERR;
     }
     fileStream.seekg(0, fileStream.end);
@@ -1536,7 +1552,7 @@ uint8_t DtaDevOpal::loadDataStore(const char* password, const uint8_t table, con
         fileStream.close();
         return lastRC;
     }
-    LOG(I) << "Writing DataStore to " << dev;
+    LOG(I) << "Writing DataStore to " << dev << " using token size of " << blockSize;
 
     uint32_t bytesWritten = 0;
     while (bytesWritten < byteCount) {

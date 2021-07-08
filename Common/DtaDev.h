@@ -368,6 +368,7 @@ public:
 	sedutiloutput output_format; /** standard, readable, JSON */
     uint32_t timeout = 0;   /** Session timeout, 0 is no timeout */
     bool testTimeout = false;
+    bool testOversizePacket = false;
 
 protected:
 	const char * dev;   /**< character string representing the device in the OS lexicon */

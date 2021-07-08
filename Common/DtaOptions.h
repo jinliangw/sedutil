@@ -45,7 +45,7 @@ typedef struct _DTA_OPTIONS {
 	uint8_t offset;			/** offset in table */
 	uint8_t count;			/** Count of bytes in table */
     uint8_t testTimeout;
-    uint8_t testOversize;
+    uint8_t testOversizePacket;
 
 	bool    no_hash_passwords; /** global parameter, disables hashing of passwords */
     char    authority[16];  /** authority over-ride */
