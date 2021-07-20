@@ -88,8 +88,9 @@ uint8NOCODE(revertTPer, const char* password, const uint8_t PSID, const uint8_t 
 uint8NOCODE(eraseLockingRange, const uint8_t lockingrange, const char* password)
 uint8NOCODE(printDefaultPassword);
 uint8NOCODE(loadPBA, const char* password, const char* filename)
-uint8NOCODE(activateLockingSP, const char* password)
-uint8NOCODE(activateLockingSP_SUM, const uint8_t lockingrange, const char* password)
+uint8NOCODE(activateLockingSP, const char* password, const uint32_t dsCount, const uint32_t dsSizes[])
+uint8NOCODE(activateLockingSP_SUM, const uint8_t lockingrange, const char* password, const uint32_t dsCount,
+            const uint32_t dsSizes[])
 uint8NOCODE(eraseLockingRange_SUM, const uint8_t lockingrange, const char* password)
 uint8NOCODE(takeOwnership, const char* newpassword)
 uint8NOCODE(setSIDPassword, const char* oldpassword, const char* newpassword,

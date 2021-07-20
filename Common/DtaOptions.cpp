@@ -191,7 +191,25 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
             strncpy(opts->authority, &argv[i][3], sizeof(opts->authority));
             LOG(D) << "Default authority over-ride, using " << opts->authority;
         }
-        else if (!strcmp("-tt", argv[i])) {
+        else if (!strncmp("-ds=", argv[i], 4)) {
+            ++baseOptions;
+            char* ptr = &argv[i][4];
+            for (opts->datastoreCount = 0; (*ptr != 0) && (opts->datastoreCount < 16);
+                 opts->datastoreCount++) {
+                if ((sscanf(ptr, "%i", &opts->datastoreSizes[opts->datastoreCount])) == 0) {
+                    break;
+                }
+                for (int j = 0; j < 256; j++, ptr++) {
+                    if (*ptr == 0) {
+                        break;
+                    }
+                    if ((*ptr == ',')) {
+                        ++ptr;
+                        break;
+                    }
+                }
+            }
+        } else if (!strcmp("-tt", argv[i])) {
             ++baseOptions;
             opts->testTimeout = 1;
             LOG(D) << "Configured to test timeout";

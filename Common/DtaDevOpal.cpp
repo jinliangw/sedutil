@@ -1711,7 +1711,8 @@ uint8_t DtaDevOpal::getByteTable(const std::vector<uint8_t>& tableUID, const uin
 	return 0;
 }
 
-uint8_t DtaDevOpal::activateLockingSP(const char* password)
+uint8_t DtaDevOpal::activateLockingSP(const char* password, const uint32_t dsCount,
+                                      const uint32_t dsSizes[])
 {
 	LOG(D1) << "Entering DtaDevOpal::activateLockingSP()";
 	uint8_t lastRC;
@@ -1751,7 +1752,22 @@ uint8_t DtaDevOpal::activateLockingSP(const char* password)
 	}
 	cmd->reset(OPAL_UID::OPAL_LOCKINGSP_UID, OPAL_METHOD::ACTIVATE);
 	cmd->addToken(OPAL_TOKEN::STARTLIST);
-	cmd->addToken(OPAL_TOKEN::ENDLIST);
+    // If the user has provided a list of DataStore table sizes. add the list as the parameter
+    // 0x060002 (DataStoreTableSizes).  See TCG Opal Feature Set - Additional Data Store Tables.
+    if (dsCount != 0) {
+        cmd->addToken(OPAL_TOKEN::STARTNAME);
+            cmd->addToken(OPAL_SHORT_ATOM::UINT_3);
+            cmd->addToken(OPAL_TINY_ATOM::UINT_06);
+            cmd->addToken(OPAL_TINY_ATOM::UINT_00);
+            cmd->addToken(OPAL_TINY_ATOM::UINT_02);
+            cmd->addToken(OPAL_TOKEN::STARTLIST);
+                for (uint32_t i = 0; i < dsCount; i++) {
+                    cmd->addToken((uint64_t)dsSizes[i]);
+                }
+            cmd->addToken(OPAL_TOKEN::ENDLIST);
+        cmd->addToken(OPAL_TOKEN::ENDNAME);
+    }
+    cmd->addToken(OPAL_TOKEN::ENDLIST);
 	cmd->complete();
 	if ((lastRC = session->sendCommand(cmd, response)) != 0) {
 		delete cmd;
@@ -1766,7 +1782,8 @@ uint8_t DtaDevOpal::activateLockingSP(const char* password)
 	return 0;
 }
 
-uint8_t DtaDevOpal::activateLockingSP_SUM(const uint8_t lockingrange, const char* password)
+uint8_t DtaDevOpal::activateLockingSP_SUM(const uint8_t lockingrange, const char* password,
+                                          const uint32_t dsCount, const uint32_t dsSizes[])
 {
 	LOG(D1) << "Entering DtaDevOpal::activateLockingSP_SUM()";
 	uint8_t lastRC;
@@ -1833,7 +1850,22 @@ uint8_t DtaDevOpal::activateLockingSP_SUM(const uint8_t lockingrange, const char
 				cmd->addToken(LR);
 			cmd->addToken(OPAL_TOKEN::ENDLIST);
 		cmd->addToken(OPAL_TOKEN::ENDNAME);
-	cmd->addToken(OPAL_TOKEN::ENDLIST);
+        // If the user has provided a list of DataStore table sizes. add the list as the parameter
+        // 0x060003 (DataStoreTableSizes).  See TCG Opal Feature Set - Additional Data Store Tables.
+        if (dsCount != 0) {
+            cmd->addToken(OPAL_TOKEN::STARTNAME);
+                cmd->addToken(OPAL_SHORT_ATOM::UINT_3);
+                cmd->addToken(OPAL_TINY_ATOM::UINT_06);
+                cmd->addToken(OPAL_TINY_ATOM::UINT_00);
+                cmd->addToken(OPAL_TINY_ATOM::UINT_03);
+                cmd->addToken(OPAL_TOKEN::STARTLIST);
+                    for (uint32_t i = 0; i < dsCount; i++) {
+                        cmd->addToken((uint64_t)dsSizes[i]);
+                    }
+                cmd->addToken(OPAL_TOKEN::ENDLIST);
+            cmd->addToken(OPAL_TOKEN::ENDNAME);
+        }
+    cmd->addToken(OPAL_TOKEN::ENDLIST);
 	cmd->complete();
 	if ((lastRC = session->sendCommand(cmd, response)) != 0) {
 		LOG(E) << "session->sendCommand failed with code " << lastRC;

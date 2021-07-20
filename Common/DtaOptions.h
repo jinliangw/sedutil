@@ -50,6 +50,8 @@ typedef struct _DTA_OPTIONS {
 	bool    no_hash_passwords; /** global parameter, disables hashing of passwords */
     char    authority[16];  /** authority over-ride */
     uint32_t timeout;       /** session timeout option */
+    uint32_t datastoreCount;
+    uint32_t datastoreSizes[16];
 	sedutiloutput output_format;
 } DTA_OPTIONS;
 /** Print a usage message */

@@ -263,12 +263,15 @@ public:
 	/** Enable locking on the device
 	 * @param password password of the admin sp SID authority
 	 */
-	virtual uint8_t activateLockingSP(const char* password) = 0;
+	virtual uint8_t activateLockingSP(const char* password, const uint32_t dsCount = 0,
+                                      const uint32_t dsSizes[] = NULL) = 0;
 	/** Enable locking on the device in Single User Mode
 	* @param lockingrange the locking range number to activate in SUM
 	* @param password password of the admin sp SID authority
 	*/
-	virtual uint8_t activateLockingSP_SUM(const uint8_t lockingrange, const char* password) = 0;
+	virtual uint8_t activateLockingSP_SUM(const uint8_t lockingrange, const char* password,
+                                          const uint32_t dsCount = 0,
+                                          const uint32_t dsSizes[] = NULL) = 0;
 	/** Erase a Single User Mode locking range by calling the drive's erase method
 	 * @param lockingrange The Locking Range to erase
 	 * @param password The administrator password for the drive

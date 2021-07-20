@@ -217,12 +217,22 @@ int main(int argc, char * argv[])
                              argv[opts.password], argv[opts.userid]);
         break;
 	case sedutiloption::activateLockingSP:
-		LOG(D) << "Activating the LockingSP on" << argv[opts.device];
+        LOG(D) << "Activating the LockingSP on " << argv[opts.device]
+               << ", datastore tables " << opts.datastoreCount;
+        if (opts.datastoreCount) {
+            return d->activateLockingSP(argv[opts.password], opts.datastoreCount,
+                                        opts.datastoreSizes);
+        }
         return d->activateLockingSP(argv[opts.password]);
         break;
 	case sedutiloption::activateLockingSP_SUM:
-		LOG(D) << "Activating the LockingSP on" << argv[opts.device];
-		return d->activateLockingSP_SUM(opts.lockingrange, argv[opts.password]);
+		LOG(D) << "Activating the LockingSP on" << argv[opts.device]
+               << ", datastore tables " << opts.datastoreCount;
+        if (opts.datastoreCount) {
+            return d->activateLockingSP_SUM(opts.lockingrange, argv[opts.password],
+                                            opts.datastoreCount, opts.datastoreSizes);
+        }
+        return d->activateLockingSP_SUM(opts.lockingrange, argv[opts.password]);
 		break;
 	case sedutiloption::eraseLockingRange_SUM:
 		LOG(D) << "Erasing LockingRange " << opts.lockingrange << " on" << argv[opts.device];

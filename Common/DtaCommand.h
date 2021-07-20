@@ -134,7 +134,7 @@ private:
 	void * getCmdBuffer() const;
     /** return a pointer to the response buffer. */
 	void * getRespBuffer() const;
-    uint8_t commandbuffer[MAX_BUFFER_LENGTH + IO_BUFFER_ALIGNMENT + MIN_BUFFER_LENGTH]; /**< buffer allocation allow for 1k alignment */
+	uint8_t commandbuffer[MAX_BUFFER_LENGTH + IO_BUFFER_ALIGNMENT]; /**< buffer allocation allow for 1k alignment */
 	uint8_t responsebuffer[PROP_BUFFER_LENGTH + IO_BUFFER_ALIGNMENT]; /**< buffer allocation allow for 1k alignment */
 	uint8_t *cmdbuf;  /**< Pointer to the command buffer */
     uint8_t *respbuf;  /**< pointer to the response buffer */
