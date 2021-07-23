@@ -340,8 +340,7 @@ protected:
 						rowMap_t& rowMap, const uint8_t level);
 	uint8_t getACLCmd(const std::vector<uint8_t>& object,
 		              const std::vector<uint8_t>& method);
-	uint8_t getACL(const OPAL_UID sp, const OPAL_UID auth, const std::string& password,
-				   const std::vector<uint8_t>& object,
+	uint8_t getACL(const std::vector<uint8_t>& object,
 				   const std::vector<uint8_t>& method,
 				   std::string& str, const uint8_t level);
     uint8_t getACLRow(const std::vector<uint8_t>& object,
@@ -354,4 +353,5 @@ protected:
 	void printBytes(const uint8_t* uid, const int length, char* str);
 	uint8_t printTablesForSP(const char* spStr, const OPAL_UID sp, const OPAL_UID auth,
 							 const std::string& pw, const uint8_t level);
+	void deleteSession();
 };

@@ -2943,7 +2943,7 @@ uint8_t DtaDevOpal::verifyPassword(const OPAL_UID sp, const OPAL_UID authority, 
         }
 	}
 
-    delete session;
+    deleteSession();
 	LOG(D1) << "Exiting verifyPassword()";
 	return lastRC;
 }
@@ -2991,15 +2991,15 @@ uint8_t DtaDevOpal::nextTableRow(const OPAL_UID sp, const OPAL_UID auth, const s
 	else if ((lastRC = session->start(sp, NULL,
 									  OPAL_UID::OPAL_ANYBODY_UID)) != 0) {
 		LOG(E) << "Unable to start Anybody session " << dev;
-		delete session;
+		deleteSession();
 		return lastRC;
 	}
 
 	if ((lastRC = nextTable(tableUID)) != 0) {
-		delete session;
+		deleteSession();
 		return lastRC;
 	}
-	delete session;
+	deleteSession();
 	LOG(D1) << "Exiting nextTableRow()";
 	return 0;
 }
@@ -3053,46 +3053,55 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 	std::vector<uint8_t> uidtok(uid);
 	uidtok.insert(uidtok.begin(), OPAL_SHORT_ATOM::BYTESTRING8);
 
-	if (password.length() != 0)
-	{
-		if (level > 2) cout << "Attempting password authentication.\n";
-		session = new DtaSession(this);
-		if (NULL == session) {
-			LOG(E) << "Unable to create session object ";
-			return DTAERROR_OBJECT_CREATE_FAILED;
-		}
-		if ((lastRC = session->start(sp, (char*)password.c_str(), auth)) != 0) {
-			if (level > 2) cout << "Unable to start authenticated session.\n";
-			delete session;
-		} else {
-			if (level > 2) cout << "Session opened with password authentication.\n";
-			if ((lastRC = getTable(uidtok)) != 0) {
-				delete session;
-			}
-			authenticated++;
-		}
-	}
+    if (session == NULL)
+    {
+        if (password.length() != 0)
+        {
+            if (level > 2) cout << "Attempting password authentication.\n";
+            session = new DtaSession(this);
+            if (NULL == session) {
+                LOG(E) << "Unable to create session object ";
+                return DTAERROR_OBJECT_CREATE_FAILED;
+            }
+            if ((lastRC = session->start(sp, (char*)password.c_str(), auth)) != 0) {
+                if (level > 2) cout << "Unable to start authenticated session.\n";
+                deleteSession();
+            } else {
+                if (level > 2) cout << "Session opened with password authentication.\n";
+                if ((lastRC = getTable(uidtok)) != 0) {
+                    deleteSession();
+                }
+                authenticated++;
+            }
+        }
+
+        if (lastRC != 0) {
+            // Try as anybody
+            if (level > 2) cout << "Attempting anybody authorization.\n";
+            session = new DtaSession(this);
+            if (NULL == session) {
+                LOG(E) << "Unable to create session object ";
+                return DTAERROR_OBJECT_CREATE_FAILED;
+            }
+            if ((lastRC = session->start(sp, NULL, OPAL_UID::OPAL_ANYBODY_UID)) != 0) {
+                if (level > 2) cout << "Unable to start anybody session.\n";
+            } else {
+                if (level > 2) cout << "Session opened with Anybody authorization.\n";
+                lastRC = getTable(uidtok);
+                if (lastRC == 0) {
+                    anybody++;
+                }
+            }
+        }
+    }
+    else
+    {
+        if (level > 2) cout << "Session already open.\n";
+        lastRC = getTable(uidtok);
+    }
 
 	if (lastRC != 0) {
-		// Try as anybody
-		if (level > 2) cout << "Attempting anybody authorization.\n";
-		session = new DtaSession(this);
-		if (NULL == session) {
-			LOG(E) << "Unable to create session object ";
-			return DTAERROR_OBJECT_CREATE_FAILED;
-		}
-		if ((lastRC = session->start(sp, NULL, OPAL_UID::OPAL_ANYBODY_UID)) != 0) {
-			if (level > 2) cout << "Unable to start anybody session.\n";
-		} else {
-			if (level > 2) cout << "Session opened with Anybody authorization.\n";
-			lastRC = getTable(uidtok);
-			if (lastRC == 0) {
-				anybody++;
-			}
-		}
-	}
-	if (lastRC != 0) {
-		delete session;
+		deleteSession();
 		failed++;
 		return lastRC;
 	}
@@ -3183,7 +3192,6 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
         rowMap[0].push_back('H');
     }
 
-	delete session;
 	LOG(D1) << "Exiting getTableRow()";
 	return 0;
 }
@@ -3219,62 +3227,15 @@ uint8_t DtaDevOpal::getACLCmd(const std::vector<uint8_t>& object,
 	return 0;
 }
 
-uint8_t DtaDevOpal::getACL(const OPAL_UID sp, const OPAL_UID auth,
-						   const std::string& password,
-						   const std::vector<uint8_t>& object,
+uint8_t DtaDevOpal::getACL(const std::vector<uint8_t>& object,
 						   const std::vector<uint8_t>& method,
 						   std::string& str,
 						   const uint8_t level)
 {
-	uint8_t lastRC;
-
-	// first try as anybody
-	if (level > 2) cout << "Attempting anybody authorization.\n";
-	session = new DtaSession(this);
-	if (NULL == session) {
-		LOG(E) << "Unable to create session object ";
-		return DTAERROR_OBJECT_CREATE_FAILED;
-	}
-    if ((lastRC = session->start(sp, NULL, OPAL_UID::OPAL_ANYBODY_UID)) != 0) {
-		if (level > 2) cout << "Unable to start anybody session.\n";
-	} else {
-		if (level > 2) cout << "Session opened with Anybody authorization.\n";
-		lastRC = getACLCmd(object, method);
-		if (lastRC == 0) anybody++;
-	}
-#if 0
-	if (lastRC != 0)
-	{
-		// Anybody failed, try with the suppied password.
-//		cout << "Attempting password authentication.\n";
-		delete session;
-		session = new DtaSession(this);
-		if (NULL == session) {
-			LOG(E) << "Unable to create session object ";
-			return DTAERROR_OBJECT_CREATE_FAILED;
-		}
-		if ((lastRC = session->start(sp, (char*)password.c_str(), auth)) != 0) {
-			if (level > 2) cout << "Unable to start authenticated session.\n";
-			delete session;
-			return lastRC;
-		} else {
-			if (level > 1) cout << "Session opened with password authentication.\n";
-			if ((lastRC = getACLCmd(object, method)) != 0) {
-				delete session;
-				failed++;
-				return lastRC;
-			}
-			authenticated++;
-		}
-	}
-#else
+	uint8_t lastRC = getACLCmd(object, method);
 	if (lastRC != 0) {
-		delete session;
-		failed++;
-		LOG(D1) << "Exiting getACL()";
 		return lastRC;
 	}
-#endif
 
 	char valueStr[100] = "<empty list>";
 	char* valuePtr = valueStr;
@@ -3308,9 +3269,6 @@ uint8_t DtaDevOpal::getACL(const OPAL_UID sp, const OPAL_UID auth,
 	}
 
 	str = valueStr;
-
-	delete session;
-	LOG(D1) << "Exiting getACL()";
 	return 0;
 }
 
@@ -3332,10 +3290,26 @@ uint8_t DtaDevOpal::getACLRow(const std::vector<uint8_t>& object,
 		printf("\nGet ACL for object %s\n", objectStr.c_str());
 	}
 
+	if (level > 2) cout << "Attempting anybody authorization.\n";
+	session = new DtaSession(this);
+	if (NULL == session) {
+		LOG(E) << "Unable to create session object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
+	uint8_t lastRC;
+    if ((lastRC = session->start(sp, NULL, OPAL_UID::OPAL_ANYBODY_UID)) != 0) {
+		if (level > 2) cout << "Unable to start anybody session.\n";
+        failed++;
+        return lastRC;
+	} else {
+		if (level > 2) cout << "Session opened with Anybody authorization.\n";
+		anybody++;
+	}
+
 	for (auto it = methods.begin(); it != methods.end(); ++it) {
 		std::string aclStr;
-		getACL(sp, auth, password, object, *it, aclStr, level);
-		if (aclStr.length() != 0) {
+		lastRC = getACL(object, *it, aclStr, level);
+		if ((lastRC == 0 ) && (aclStr.length() != 0)) {
 			std::string methodStr;
 			printUID(*it, methodStr);
 			methodStr.push_back('h');
@@ -3354,6 +3328,7 @@ uint8_t DtaDevOpal::getACLRow(const std::vector<uint8_t>& object,
 		}
 	}
 
+    deleteSession();
 	LOG(D1) << "Exiting DtaDevOpal::getACLRow()";
 
 	return 0;
@@ -3510,7 +3485,7 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, const OPAL_UID sp,
 		printf("Unable to read MethodID table rows.\n");
 	} else {
 		tokenCount = response.getTokenCount();
-		uint8_t  uid[8];
+		uint8_t uid[8];
 		for (uint32_t i = 0; i < tokenCount; i++) {
 			if (response.tokenIs(i) == DTA_TOKENID_BYTESTRING) {
 				response.getBytes(i, uid);
@@ -3603,6 +3578,7 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, const OPAL_UID sp,
     		}
 
     		tableRows_t tableRows;
+            session = NULL;
 
     		// retrieve each row and save the values returned.
     		for (auto itUID = rowUIDs.cbegin(); itUID != rowUIDs.cend(); itUID++) {
@@ -3613,6 +3589,7 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, const OPAL_UID sp,
     			getTableRow(*itUID, tableDescPtr, sp, auth, pw, rowMap, level);
     			tableRows.push_back(rowMap);
     		}
+            deleteSession();
 
     		// Print the table contents as reported.
     		printf("\nTable %s::%s:\n", spStr, tableDescPtr->name);
@@ -3724,3 +3701,10 @@ uint8_t DtaDevOpal::printTablesForSP(const char* spStr, const OPAL_UID sp,
 
 	return 0;
 }
+
+void DtaDevOpal::deleteSession()
+{
+	delete session;
+	session = NULL;
+}
+
