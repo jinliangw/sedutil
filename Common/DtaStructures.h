@@ -313,14 +313,15 @@ typedef struct _Discovery0CNL {
     uint8_t reserved_v : 4;
     uint8_t version : 4;
     uint8_t length;
+
     /* big endian
-    uint8_t reserved04 : 6;
-    uint8_t range_P : 1
-    uint8_t rannge_C : 1;
-     */
     uint8_t range_C : 1;
     uint8_t range_P : 1;
     uint8_t reserved04 : 6;
+     */
+    uint8_t reserved04 : 6;
+    uint8_t range_P    : 1;
+    uint8_t range_C    : 1;
 
     uint8_t reserved05[3];
 

@@ -638,6 +638,13 @@ uint8_t DtaDevOpal::assign(const char* password, const uint32_t ns,
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal::assign()";
 
+    std::vector<uint8_t> nspace;
+    nspace.push_back(BYTESTRING4);
+    nspace.push_back((ns >> 24) & 0xff);
+    nspace.push_back((ns >> 16) & 0xff);
+    nspace.push_back((ns >> 8) & 0xff);
+    nspace.push_back((ns >> 0) & 0xff);
+
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
@@ -656,7 +663,7 @@ uint8_t DtaDevOpal::assign(const char* password, const uint32_t ns,
 	}
 	cmd->reset(OPAL_UID::OPAL_LOCKING_TABLE, OPAL_METHOD::ASSIGN);
 	cmd->addToken(OPAL_TOKEN::STARTLIST);
-		cmd->addToken(ns),							// first required argument, Namespace
+		cmd->addToken(nspace);					    // first required argument, Namespace
 		cmd->addToken(OPAL_TOKEN::STARTNAME);
 			cmd->addToken((uint64_t)0);
 			cmd->addToken(start);					// first optional argument, RangeStart
