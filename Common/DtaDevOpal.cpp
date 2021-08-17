@@ -3117,7 +3117,7 @@ uint8_t DtaDevOpal::getTableRow(const std::vector<uint8_t>& uid,
 	for (uint32_t i = 0; i < tokenCount; i++) {
 		OPAL_TOKEN tokenType = response.tokenIs(i);
 		if (tokenType == OPAL_TOKEN::STARTNAME) {
-			char valueStr[100] = "<empty list>";
+			char valueStr[140] = "<empty list>";
 			char* valuePtr = valueStr;
             const char* columnName = "Unknown";
 

@@ -109,10 +109,10 @@ void usage()
     printf("--activateLockingSP <SIDpassword> <device>\n");
     printf("                                Activate the LockingSP. Admin1 password\n");
     printf("                                in LockingSP will be set to SIDpassword.\n");
-    printf("--assign <Admin1Password> <namespace> <rangeStart> <rangeLength> <device>\n");
+    printf("--assign <namespace> <rangeStart> <rangeLength> <Admin1Password> <device>\n");
     printf("                                Assign a locking range for a namespace\n");
-    printf("--deassign <Admin1password> <1...n> <keep> <device>\n");
-    printf("                                1...n - LRn, keep = T or F\n");
+    printf("--deassign <1...n> <keepGlobalKey> <Admin1password> <device>\n");
+    printf("                                1...n = LRn, keepGlobalKey = T or F\n");
     printf("--revertTPer <SIDpassword> <device>\n");
     printf("                                set the device back to factory defaults \n");
 	printf("                                This **ERASES ALL DATA** \n");
@@ -188,7 +188,7 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 		}
         else if (!strncmp("-a=", argv[i], 3)) {
             ++baseOptions;
-            strncpy(opts->authority, &argv[i][3], sizeof(opts->authority));
+            strncpy(opts->authority, &argv[i][3], sizeof(opts->authority) - 1);
             LOG(D) << "Default authority over-ride, using " << opts->authority;
         }
         else if (!strncmp("-ds=", argv[i], 4)) {
@@ -402,20 +402,20 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			OPTION_IS(device)
 			END_OPTION
         BEGIN_OPTION(assign, 5)
-            OPTION_IS(password)
             OPTION_IS(lockingrange)
             OPTION_IS(lrstart)
             OPTION_IS(lrlength)
+            OPTION_IS(password)
             OPTION_IS(device)
             END_OPTION
         BEGIN_OPTION(deassign, 4)
-            OPTION_IS(password)
             OPTION_IS(lockingrange)
             TESTARG(t, lockingstate, 1)
             TESTARG(T, lockingstate, 1)
             TESTARG(f, lockingstate, 0)
             TESTARG(F, lockingstate, 0)
             TESTFAIL("Invalid value for keep argument (T or F)")
+            OPTION_IS(password)
             OPTION_IS(device)
             END_OPTION
 		BEGIN_OPTION(objDump, 5) i += 4; OPTION_IS(device) END_OPTION
