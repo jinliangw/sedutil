@@ -32,6 +32,7 @@ void usage()
     printf("-v (optional)                   increase verbosity, one to four v's\n");
     printf("-n (optional)                   no password hashing. Passwords will be sent in clear text!\n");
     printf("-l (optional)                   log style output to stderr only\n");
+    printf("-x (optional)                   use a transaction\n");
     printf("-a=authortity (optional)        specify an authority instead of the default for the action\n");
     printf("                                Authorities are Admin[1..n], User[1..n]\n");
     printf("                                This option is not supported for all actions.\n");
@@ -190,6 +191,10 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
             ++baseOptions;
             strncpy(opts->authority, &argv[i][3], sizeof(opts->authority) - 1);
             LOG(D) << "Default authority over-ride, using " << opts->authority;
+        }
+        else if (!strcmp("-x", argv[i])) {
+            baseOptions += 1;
+            opts->useTransaction = true;
         }
         else if (!strncmp("-ds=", argv[i], 4)) {
             ++baseOptions;

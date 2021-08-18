@@ -111,6 +111,7 @@ int main(int argc, char * argv[])
         d->timeout = opts.timeout;
         d->testTimeout = opts.testTimeout;
         d->testOversizePacket = opts.testOversizePacket;
+        d->useTransaction = opts.useTransaction;
 	}
 
     switch (opts.action) {

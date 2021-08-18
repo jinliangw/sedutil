@@ -2116,8 +2116,7 @@ uint8_t DtaDevOpal::getTable(const std::vector<uint8_t>& table, const uint16_t s
 		LOG(E) << "Unable to create command object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	get->reset(OPAL_UID::OPAL_AUTHORITY_TABLE, OPAL_METHOD::GET);
-	get->changeInvokingUid(table);
+	get->reset(table, OPAL_METHOD::GET);
 	get->addToken(OPAL_TOKEN::STARTLIST);
 	get->addToken(OPAL_TOKEN::STARTLIST);
 	get->addToken(OPAL_TOKEN::STARTNAME);

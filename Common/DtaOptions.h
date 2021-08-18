@@ -48,6 +48,7 @@ typedef struct _DTA_OPTIONS {
     uint8_t testOversizePacket;
 
 	bool    no_hash_passwords; /** global parameter, disables hashing of passwords */
+    bool    useTransaction;
     char    authority[16];  /** authority over-ride */
     uint32_t timeout;       /** session timeout option */
     uint32_t datastoreCount;

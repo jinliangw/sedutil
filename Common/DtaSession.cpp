@@ -174,6 +174,16 @@ again:
 		return(authenticate(SignAuthority, HostChallenge));
 	}
 
+    if (d->useTransaction) {
+        DtaCommand *cmd = new DtaCommand();
+        cmd->reset();
+        cmd->addToken(OPAL_TOKEN::STARTTRANSACTON);
+        cmd->addToken((uint64_t)0);
+        cmd->complete();
+        sendCommand(cmd, response);
+        delete cmd;
+    }
+
     if (d->testTimeout) {
         // configure to test timeout.  Wait here for timeout + 2 seconds.
         int64_t waitTime = d->timeout + 2000;
@@ -264,12 +274,18 @@ DtaSession::sendCommand(DtaCommand * cmd, DtaResponse & response)
 		return DTAERROR_COMMAND_ERROR;
     }
     // if we get an endsession response return 0
-    if (OPAL_TOKEN::ENDOFSESSION == response.tokenIs(0)) {
+    OPAL_TOKEN token = response.tokenIs(0);
+    if (OPAL_TOKEN::ENDOFSESSION == token) {
         return 0;
     }
+    // if we got a Start Transaction or End Transaction, return transaction status
+    if ((OPAL_TOKEN::STARTTRANSACTON == token) ||
+        (OPAL_TOKEN::ENDTRANSACTON   == token )) {
+        return response.getUint8(1);
+    }
     // IF we received a method status return it
-    if (!((OPAL_TOKEN::ENDLIST == response.tokenIs(response.getTokenCount() - 1)) &&
-        (OPAL_TOKEN::STARTLIST == response.tokenIs(response.getTokenCount() - 5)))) {
+    if (!((OPAL_TOKEN::ENDLIST   == response.tokenIs(response.getTokenCount() - 1)) &&
+          (OPAL_TOKEN::STARTLIST == response.tokenIs(response.getTokenCount() - 5)))) {
         // no method status so we hope we reported the error someplace else
         LOG(E) << "Method Status missing";
 		return DTAERROR_NO_METHOD_STATUS;
@@ -358,6 +374,15 @@ DtaSession::~DtaSession()
 			LOG(E) << "Unable to create command object ";
 		} 
 		else {
+            if (d->useTransaction) {
+                cmd->reset();
+                cmd->addToken(OPAL_TOKEN::ENDTRANSACTON);
+                cmd->addToken((uint64_t)0);
+                cmd->complete(0);
+                if (sendCommand(cmd, response)) {
+                    LOG(E) << "End Transaction Failed";
+                }
+            }
 			cmd->reset();
 			cmd->addToken(OPAL_TOKEN::ENDOFSESSION);
 			cmd->complete(0);

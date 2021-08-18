@@ -372,6 +372,7 @@ public:
     uint32_t timeout = 0;   /** Session timeout, 0 is no timeout */
     bool testTimeout = false;
     bool testOversizePacket = false;
+    bool useTransaction = false;
 
 protected:
 	const char * dev;   /**< character string representing the device in the OS lexicon */
