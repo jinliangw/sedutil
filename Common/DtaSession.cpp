@@ -179,7 +179,7 @@ again:
         cmd->reset();
         cmd->addToken(OPAL_TOKEN::STARTTRANSACTON);
         cmd->addToken((uint64_t)0);
-        cmd->complete();
+        cmd->complete(0);
         sendCommand(cmd, response);
         delete cmd;
     }
