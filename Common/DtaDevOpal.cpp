@@ -752,7 +752,7 @@ uint8_t DtaDevOpal::deassign(const char* password, const uint8_t lockingrange, c
 	uid.erase(uid.begin());
 	printUID(uid, uidStr);
 
-	LOG(I) << "Locking Range UID: " << uidStr << " (LR" << lockingrange << ") deassigned";
+	LOG(I) << "Locking Range UID: " << uidStr << " (LR" << (int)lockingrange << ") deassigned";
 
 	delete cmd;
 	delete session;
@@ -1349,6 +1349,22 @@ uint8_t DtaDevOpal::revertTPer(const char* password, const uint8_t PSID, const u
 	return 0;
 }
 
+uint8_t DtaDevOpal::getTableWriteGranularity(std::vector<uint8_t>& tableRowUID, uint32_t* gran)
+{
+    LOG(D1) << "Entering DtaDevOpal::getTableWriteGranularity";
+
+    // Session to the LockingSP should already be open
+    uint8_t lastRC = getTable(tableRowUID, 0x0d, 0x0e);
+    if (lastRC == 0) {
+        if ((response.getTokenCount() > 6) && (response.getUint32(3) == 0x0D)) {
+            *gran = response.getUint32(4);
+        } else {
+            *gran = 0;
+        }
+    }
+    return lastRC;
+}
+
 uint8_t DtaDevOpal::loadPBA(const char* password, const char* filename) {
 	LOG(D1) << "Entering DtaDevOpal::loadPBAimage()" << filename << " " << dev;
 	uint8_t lastRC;
@@ -1379,24 +1395,33 @@ uint8_t DtaDevOpal::loadPBA(const char* password, const char* filename) {
 	eofpos = (uint32_t) pbafile.tellg();
 	pbafile.seekg(0, pbafile.beg);
 
-	DtaCommand *cmd = new DtaCommand();
-	if (NULL == cmd) {
-		LOG(E) << "Unable to create command object ";
-		return DTAERROR_OBJECT_CREATE_FAILED;
-	}
-
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
 	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
-		delete cmd;
 		delete session;
 		pbafile.close();
 		return lastRC;
 	}
-	LOG(I) << "Writing PBA to " << dev << " using token size of " << blockSize;
+
+    uint32_t gran = 0;
+    std::vector<uint8_t> tableTableUID = { 0x0A8, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x08, 0x04 };
+    getTableWriteGranularity(tableTableUID, &gran);
+    if (gran > 1) {
+        LOG(I) << "MandatoryWriteGranularity reported as " << gran << ", adjusting token size";
+        blockSize -= blockSize % gran;
+        buffer.resize(blockSize);
+    }
+
+    LOG(I) << "Writing PBA to " << dev << " using token size of " << blockSize;
+
+	DtaCommand *cmd = new DtaCommand();
+	if (NULL == cmd) {
+		LOG(E) << "Unable to create command object ";
+		return DTAERROR_OBJECT_CREATE_FAILED;
+	}
 
 	while (!pbafile.eof()) {
 		if (eofpos == filepos) break;
@@ -1541,25 +1566,34 @@ uint8_t DtaDevOpal::loadDataStore(const char* password, const uint8_t table, con
         byteCount = eofpos;
     }
 
+    session = new DtaSession(this);
+    if (NULL == session) {
+        LOG(E) << "Unable to create session object ";
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+    if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+        delete session;
+        fileStream.close();
+        return lastRC;
+    }
+
+    uint32_t gran = 0;
+    std::vector<uint8_t> tableTableUID = { 0x0A8, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x10 };
+    tableTableUID.push_back(table);
+    getTableWriteGranularity(tableTableUID, &gran);
+    if (gran > 1) {
+        LOG(I) << "MandatoryWriteGranularity reported as " << gran << ", adjusting token size";
+        blockSize -= blockSize % gran;
+        buffer.resize(blockSize);
+    }
+
+    LOG(I) << "Writing DataStore to " << dev << " using token size of " << blockSize;
+
     DtaCommand *cmd = new DtaCommand();
     if (NULL == cmd) {
         LOG(E) << "Unable to create command object ";
         return DTAERROR_OBJECT_CREATE_FAILED;
     }
-
-    session = new DtaSession(this);
-    if (NULL == session) {
-        LOG(E) << "Unable to create session object ";
-        delete cmd;
-        return DTAERROR_OBJECT_CREATE_FAILED;
-    }
-    if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
-        delete cmd;
-        delete session;
-        fileStream.close();
-        return lastRC;
-    }
-    LOG(I) << "Writing DataStore to " << dev << " using token size of " << blockSize;
 
     uint32_t bytesWritten = 0;
     while (bytesWritten < byteCount) {

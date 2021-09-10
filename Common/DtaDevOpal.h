@@ -354,4 +354,7 @@ protected:
 	uint8_t printTablesForSP(const char* spStr, const OPAL_UID sp, const OPAL_UID auth,
 							 const std::string& pw, const uint8_t level);
 	void deleteSession();
+
+private:
+	uint8_t getTableWriteGranularity(std::vector<uint8_t>& tableRowUID, uint32_t* gran);
 };
