@@ -636,7 +636,8 @@ uint8_t DtaDevOpal::assign(const char* password, const uint32_t ns,
                            const uint64_t start, const uint64_t length)
 {
 	uint8_t lastRC;
-	LOG(D1) << "Entering DtaDevOpal::assign()";
+	LOG(D1) << "Entering DtaDevOpal::assign(), nsid: " << ns << ", start: " << start <<
+               ", length: " << length;
 
     std::vector<uint8_t> nspace;
     nspace.push_back(BYTESTRING4);

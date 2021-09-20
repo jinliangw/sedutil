@@ -114,6 +114,8 @@ int main(int argc, char * argv[])
         d->useTransaction = opts.useTransaction;
 	}
 
+    char* end;
+
     switch (opts.action) {
  	case sedutiloption::initialSetup:
 		LOG(D) << "Performing initial setup to use sedutil on drive " << argv[opts.device];
@@ -176,13 +178,13 @@ int main(int argc, char * argv[])
 		break;
 	case sedutiloption::setupLockingRange:
 		LOG(D) << "Setup Locking Range " << (uint16_t)opts.lockingrange;
-		return (d->setupLockingRange(opts.lockingrange, atoll(argv[opts.lrstart]),
-			atoll(argv[opts.lrlength]), argv[opts.password]));
+		return (d->setupLockingRange(opts.lockingrange, strtoll(argv[opts.lrstart], &end, 0),
+                                     strtoll(argv[opts.lrlength], &end, 0), argv[opts.password]));
 		break;
 	case sedutiloption::setupLockingRange_SUM:
 		LOG(D) << "Setup Locking Range " << (uint16_t)opts.lockingrange << " in Single User Mode";
-		return (d->setupLockingRange_SUM(opts.lockingrange, atoll(argv[opts.lrstart]),
-			atoll(argv[opts.lrlength]), argv[opts.password]));
+		return (d->setupLockingRange_SUM(opts.lockingrange, strtoll(argv[opts.lrstart], &end, 0),
+                                         strtoll(argv[opts.lrlength], &end, 0), argv[opts.password]));
 		break;
 	case sedutiloption::listLockingRanges:
 		LOG(D) << "List Locking Ranges ";
@@ -242,7 +244,8 @@ int main(int argc, char * argv[])
 	case sedutiloption::assign:
 		LOG(D) << "Assign a LockingRange to a namespace " << argv[opts.lockingrange];
 		return (d->assign(argv[opts.password], atoi(argv[opts.lockingrange]),
-		                  atoll(argv[opts.lrstart]), atoll(argv[opts.lrlength])));
+                          strtoll(argv[opts.lrstart], &end, 0),
+                          strtoll(argv[opts.lrlength], &end, 0)));
 		break;
 	case sedutiloption::deassign:
 		LOG(D) << "Deassign a LockingRangee " << argv[opts.lockingrange];
