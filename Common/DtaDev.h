@@ -212,6 +212,13 @@ public:
 	 */
 	virtual uint8_t configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
                                           const char* password) = 0;
+	/** Change the active state of a locking range in single-user mode
+	 * @param lockingrange The number of the locking range (0 = global)
+	 * @param enabled OPAL_LOCKINGSTATE indicating the locking state to set
+	 * @param password Password of administrative authority for locking range
+	 */
+	virtual uint8_t configureLockingRange_SUM(const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
+                                              const char* password) = 0;
 	/** Setup a locking range.  Initialize a locking range, set it's start
 	 *  LBA and length, initialize it as unlocked with locking disabled.
 	 *  @paran lockingrange The Locking Range to be setup

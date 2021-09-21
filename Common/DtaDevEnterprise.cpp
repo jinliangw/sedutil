@@ -589,6 +589,16 @@ uint8_t DtaDevEnterprise::setupLockingRange_SUM(const uint8_t lockingrange, cons
 	LOG(D1) << "Exiting DtaDevEnterprise::setupLockingRange_SUM";
 	return 0;
 }
+
+uint8_t DtaDevEnterprise::configureLockingRange_SUM(const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
+                                                    const char* password)
+{
+	LOG(D1) << "Entering DtaDevEnterprise::ConfigureLockingRange_SUM";
+    LOG(E) << "Single User Mode is not supported by Enterprise protocol";
+	LOG(D1) << "Exiting DtaDevEnterprise::setupLockingRange_SUM";
+	return 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 uint8_t DtaDevEnterprise::listLockingRanges(const char* password, const int16_t rangeid)
 ////////////////////////////////////////////////////////////////////////////////

@@ -219,6 +219,13 @@ public:
          */
 	uint8_t configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
 								  const char* password);
+	/** Change the active state of a locking range in single-user mode
+	 * @param lockingrange The number of the locking range (0 = global)
+	 * @param enabled OPAL_LOCKINGSTATE indicating the locking state to set
+	 * @param password Password of administrative authority for locking range
+	 */
+	uint8_t configureLockingRange_SUM(const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
+                                      const char* password);
 	/** Generate a new encryption key for a locking range.
 	* @param lockingrange locking range number
 	* @param password password of the locking administrative authority

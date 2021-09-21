@@ -171,6 +171,10 @@ int main(int argc, char * argv[])
 		return (d->configureLockingRange(opts.lockingrange, DTA_DISABLELOCKING,
 			argv[opts.password]));
 		break;
+	case sedutiloption::enableLockingRange_SUM:
+        LOG(D) << "Enabling Locking Range SUM " << (uint16_t)opts.lockingrange;
+        return (d->configureLockingRange_SUM(opts.lockingrange, (OPAL_LOCKINGSTATE)opts.lockingstate, argv[opts.password]));
+        break;
 	case sedutiloption::readonlyLockingRange:
 		LOG(D) << "Enabling Locking Range " << (uint16_t)opts.lockingrange << " read-only";
 		return (d->configureLockingRange(opts.lockingrange,

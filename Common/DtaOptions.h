@@ -85,6 +85,7 @@ typedef enum _sedutiloption {
 	PSIDrevertAdminSP,
 	yesIreallywanttoERASEALLmydatausingthePSID,
 	enableLockingRange,
+    enableLockingRange_SUM,
 	disableLockingRange,
 	readonlyLockingRange,
 	setupLockingRange,

@@ -28,7 +28,7 @@ void usage()
     printf("to the TCG Enterprise, Opal, Opalite and Pyrite SSC specs\n");
     printf("\n");
     printf("General Usage:                  (see readme for extended commandset)\n");
-    printf("sedutil-cli [-vnl] <action> [options] <device>\n");
+    printf("sedutil-cli [-vnlx] [-a=auth] [-t=n] <action> [options] <device>\n");
     printf("-v (optional)                   increase verbosity, one to four v's\n");
     printf("-n (optional)                   no password hashing. Passwords will be sent in clear text!\n");
     printf("-l (optional)                   log style output to stderr only\n");
@@ -359,6 +359,20 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			OPTION_IS(password)
 			OPTION_IS(device)
 			END_OPTION
+        BEGIN_OPTION(enableLockingRange_SUM, 4)
+            TESTARG_RANGE(lockingrange, 0, 47, "Invalid Locking Range (0-47)")
+            TESTARG(RW, lockingstate, OPAL_LOCKINGSTATE::READWRITE)
+            TESTARG(rw, lockingstate, OPAL_LOCKINGSTATE::READWRITE)
+            TESTARG(R, lockingstate,  OPAL_LOCKINGSTATE::READONLY)
+            TESTARG(r, lockingstate,  OPAL_LOCKINGSTATE::READONLY)
+            TESTARG(W, lockingstate,  OPAL_LOCKINGSTATE::LOCKED)
+            TESTARG(w, lockingstate,  OPAL_LOCKINGSTATE::LOCKED)
+            TESTARG(D, lockingstate,  OPAL_LOCKINGSTATE::DISABLED)
+            TESTARG(d, lockingstate,  OPAL_LOCKINGSTATE::DISABLED)
+            TESTFAIL("Invalid locking state <rw|r|w|d>")
+            OPTION_IS(password)
+            OPTION_IS(device)
+            END_OPTION
 		BEGIN_OPTION(disableLockingRange, 3)
 			TESTARG_RANGE(lockingrange, 0, 47, "Invalid Locking Range (0-47)")
 			OPTION_IS(password)

@@ -65,6 +65,8 @@ void DtaDevGeneric::init(const char * devref)
 uint8NOCODE(initialSetup, const char* password)
 uint8NOCODE(configureLockingRange, const uint8_t lockingrange,
             const uint8_t enabled, const char* password)
+uint8NOCODE(configureLockingRange_SUM, const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
+            const char* password)
 uint8NOCODE(revertLockingSP, const char* password, const uint8_t keep)
 uint8NOCODE(setup_SUM, const uint8_t lockingrange, const uint64_t start, const uint64_t length,
             const char* Admin1Password, const char* password)

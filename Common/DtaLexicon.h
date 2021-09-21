@@ -251,13 +251,14 @@ typedef enum _OPAL_SHORT_ATOM {
 } OPAL_SHORT_ATOM;
 /** Locking state for a locking range */
 typedef enum _OPAL_LOCKINGSTATE {
-	READWRITE = 0x01,
-	READONLY = 0x02,
-	LOCKED = 0x03,
-	ARCHIVELOCKED = 0x04,
+    DISABLED        = 0x00,
+	READWRITE       = 0x01,
+	READONLY        = 0x02,
+	LOCKED          = 0x03,
+	ARCHIVELOCKED   = 0x04,
 	ARCHIVEUNLOCKED = 0x05,
-    ENABLERESET = 0x06,
-    DISABLERESET = 0x07,
+    ENABLERESET     = 0x06,
+    DISABLERESET    = 0x07,
 } OPAL_LOCKINGSTATE;
 
 /*

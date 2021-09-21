@@ -132,6 +132,9 @@ public:
 	*/
 	uint8_t configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
                                   const char* password);
+	/** dummy code not implemented in the enterprise SSC*/
+    uint8_t configureLockingRange_SUM(const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
+                                      const char* password);
 	/** Generate a new encryption key for a locking range.
 	* @param lockingrange locking range number
 	* @param password password of the locking administrative authority

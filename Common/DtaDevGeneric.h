@@ -114,7 +114,9 @@ public:
          * @param password password of administrative authority for locking range
          */
 	 uint8_t configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
-                                   const char* password) ;
+                                   const char* password);
+     uint8_t configureLockingRange_SUM(const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
+                                       const char* password);
 	 /** Setup a locking range.  Initialize a locking range, set it's start
 	 *  LBA and length, initialize it as unlocked with locking disabled.
 	 *  @paran lockingrange The Locking Range to be setup
