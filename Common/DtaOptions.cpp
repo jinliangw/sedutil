@@ -28,7 +28,7 @@ void usage()
     printf("to the TCG Enterprise, Opal, Opalite and Pyrite SSC specs\n");
     printf("\n");
     printf("General Usage:                  (see readme for extended commandset)\n");
-    printf("sedutil-cli [-vnlx] [-a=auth] [-t=n] <action> [options] <device>\n");
+    printf("sedutil-cli [-vnlx] [-a=auth] [-t=n] [-ds=x,y,z] <action> [options] <device>\n");
     printf("-v (optional)                   increase verbosity, one to four v's\n");
     printf("-n (optional)                   no password hashing. Passwords will be sent in clear text!\n");
     printf("-l (optional)                   log style output to stderr only\n");
@@ -37,6 +37,7 @@ void usage()
     printf("                                Authorities are Admin[1..n], User[1..n]\n");
     printf("                                This option is not supported for all actions.\n");
     printf("-t=timeout (optional)           specify a session timeout value to be sent with the Start Session\n");
+    printf("-ds=x,y,z (optional)            specify datastore sizes for activate\n");
     printf("\n");
     printf("actions:\n");
     printf("--scan\n");
@@ -117,6 +118,8 @@ void usage()
     printf("--revertTPer <SIDpassword> <device>\n");
     printf("                                set the device back to factory defaults \n");
 	printf("                                This **ERASES ALL DATA** \n");
+	printf("--revertLockingSP <Admin1password> <device>\n");
+	printf("                                deactivate the Locking SP, erase everything\n");
 	printf("--revertNoErase <Admin1password> <device>\n");
 	printf("                                deactivate the Locking SP \n");
 	printf("                                without erasing the data \n");
@@ -279,7 +282,7 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(activateLockingSP, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(activateLockingSP_SUM, 3)
-			TESTARG_RANGE(lockingrange, 0, 47, "Invalid Locking Range (0-47)")
+			TESTARG_RANGE(lockingrange, 0, 255, "Invalid Locking Range (0-47 or 255 for all)")
 			OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(eraseLockingRange_SUM, 3)
 			TESTARG_RANGE(lockingrange, 0, 47, "Invalid Locking Range (0-47)")

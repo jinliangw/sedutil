@@ -451,7 +451,7 @@ void DtaDev::puke()
 		cout << "SingleUser function (" << HEXON(4) << FC_SINGLEUSER << HEXOFF << ")" << std::endl;
 		cout << "    ALL = " << (disk_info.SingleUser_all ? "Y, " : "N, ")
 			<< "ANY = " << (disk_info.SingleUser_any ? "Y, " : "N, ")
-			<< "Policy = " << (disk_info.SingleUser_policy ? "Y, " : "N, ")
+			<< "Policy = " << (disk_info.SingleUser_policy ? "1 (Admins), " : "0 (User), ")
 			<< "Locking Objects = " << (disk_info.SingleUser_lockingObjects)
 			<< std::endl;
 	}
@@ -466,15 +466,13 @@ void DtaDev::puke()
 	if (disk_info.OPAL20) {
 		cout << "OPAL 2.0 function (" << HEXON(4) << FC_OPALV200 << ")" << HEXOFF << std::endl;
 		cout << "    Base comID = " << HEXON(4) << disk_info.OPAL20_basecomID << HEXOFF;
-		cout << ", Initial PIN = " << HEXON(2) << (uint32_t)disk_info.OPAL20_initialPIN << HEXOFF;
-		cout << ", Reverted PIN = " << HEXON(2) << (uint32_t)disk_info.OPAL20_revertedPIN << HEXOFF;
 		cout << ", Initial PIN = " << HEXON(2) << static_cast<uint32_t>(disk_info.OPAL20_initialPIN) << HEXOFF;
 		cout << ", Reverted PIN = " << HEXON(2) << static_cast<uint32_t>(disk_info.OPAL20_revertedPIN) << HEXOFF;
 		cout << ", comIDs = " << disk_info.OPAL20_numcomIDs;
 		cout << std::endl;
 		cout << "    Locking Admins = " << disk_info.OPAL20_numAdmins;
 		cout << ", Locking Users = " << disk_info.OPAL20_numUsers;
-		cout << ", Range Crossing = " << (disk_info.OPAL20_rangeCrossing ? "Y" : "N");
+		cout << ", Range Crossing = " << (disk_info.OPAL20_rangeCrossing ? "1 (not allowed)" : "0 (allowed)");
 		cout << std::endl;
 	}
     if (disk_info.BlockSID) {
@@ -493,11 +491,11 @@ void DtaDev::puke()
                      << ", Range_P = " << (disk_info.CNL_rangeP ? "Y" : "N") << std::endl;
 		cout << "    MaxKeyCount = " << disk_info.CNL_maxKeyCount
 		     << ", UnusedKeyCount = " << disk_info.CNL_unusedKeyCount;
-                if (disk_info.CNL_maxRangesPerNS == 0xFFFFFFFF) {
-                    cout << ", MaxRangesPerNamespace = No Limit" << std::endl;
-                } else {
-                    cout << ", MaxRangesPerNamespace = " << disk_info.CNL_maxRangesPerNS << std::endl;
-                }
+        if (disk_info.CNL_maxRangesPerNS == 0xFFFFFFFF) {
+            cout << ", MaxRangesPerNamespace = No Limit" << std::endl;
+        } else {
+            cout << ", MaxRangesPerNamespace = " << disk_info.CNL_maxRangesPerNS << std::endl;
+        }
 	}
 	if (disk_info.Opalite) {
 		cout << "Opalite function (" << HEXON(4) << FC_OPALITE << ")" << HEXOFF << std::endl;
@@ -533,7 +531,7 @@ void DtaDev::puke()
 		cout << std::endl;
 		cout << "    Locking Admins = " << disk_info.Ruby10_numAdmins;
 		cout << ", Locking Users = " << disk_info.Ruby10_numUsers;
-		cout << ", Range Crossing = " << (disk_info.Ruby10_rangeCrossing ? "Y" : "N");
+		cout << ", Range Crossing = " << (disk_info.OPAL20_rangeCrossing ? "1 (not allowed)" : "0 (allowed)");
 		cout << std::endl;
 	}
 	if (disk_info.DataRem) {

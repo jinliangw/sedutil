@@ -142,7 +142,7 @@ if((x+baseOptions) != argc) { \
 	LOG(E) << msg << " " << argv[i+1]; \
 	return 1;\
 	} \
-i++;
+    i++;
 
 #define TESTARG_RANGE(structfield, minValue, maxValue, errorStr) \
     opts->structfield = static_cast<uint8_t>(atoi(argv[i + 1])); \

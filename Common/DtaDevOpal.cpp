@@ -1927,13 +1927,20 @@ uint8_t DtaDevOpal::activateLockingSP_SUM(const uint8_t lockingrange, const char
 	}
 	vector<uint8_t> LR;
 	LR.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
-	for (int i = 0; i < 8; i++) {
-		LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKINGRANGE_GLOBAL][i]);
-	}
-	if (lockingrange > 0) {
-		LR[6] = 0x03;
-		LR[8] = lockingrange;
-	}
+    // if the lockingrange is -1, then use the Locking Table UID instead of a single row
+    if (lockingrange == (uint8_t)(-1)) {
+        for (int i = 0; i < 8; i++) {
+            LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKING_TABLE][i]);
+        }
+    } else {
+        for (int i = 0; i < 8; i++) {
+            LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKINGRANGE_GLOBAL][i]);
+        }
+        if (lockingrange > 0) {
+            LR[6] = 0x03;
+            LR[8] = lockingrange;
+        }
+    }
 	DtaCommand *cmd = new DtaCommand();
 	if (NULL == cmd) {
 		LOG(E) << "Unable to create command object ";

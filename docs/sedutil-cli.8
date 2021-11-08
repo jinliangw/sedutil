@@ -4,7 +4,7 @@
 sedutil-cli \- util to manage TCG Storage self encrypting drives
 
 .SH SYNOPSIS
-sedutil\-cli [\-vnlx] <\-t=n> <\-a=n> <action> <options> <device>
+sedutil\-cli [\-vnlx] [\-t=n] [\-a=n] [\-ds=x,y,z] <action> <options> <device>
 
 .SH DESCRIPTION
 sedutil-cli is a utility to manage self encrypting drives that conform
@@ -29,8 +29,10 @@ log style output to stderr only
 use a transaction for the operation
 .IP "\-t=n (optional)"
 set session timeout value, n is in milliseconds
-.IP "\-a=authority (optional)
+.IP "\-a=authority (optional)"
 over-ride the default authority. authority options Admin<1..n>, User<1..n>. This option is not supported by all commands.
+.IP "\-ds=x,y,z (optional)"
+optionally used with activate commands. Set the Datastore tables sizes.  1 to n size values comma separated (no spaces).
 
 .SS Actions
 
@@ -66,6 +68,8 @@ Disable a Locking Range, 0 = GLobal 1..n = LRn
 .IP "\-\-revertTPer <SIDpassword> <device>"
 set the device back to factory defaults.
 .B This **ERASES ALL DATA**
+.IP "\-\-revertLockingSP <Admin1password> <device>"
+deactivate the Locking SP and erase all of the data.
 .IP "\-\-revertNoErase <Admin1password> <device>"
 deactivate the Locking SP without erasing the data on GLOBAL RANGE *ONLY*
 .IP "\-\-PSIDrevert <PSID> <device>"
@@ -108,12 +112,12 @@ Use Admin1 password or "" for MSID.  level 0 is tables only, 1 tables and ACL, 2
 .SS TCG Opal devices in Single User Mode only
 .IP "\-\-setup_SUM <0...n> <lrstart> <lrlength> <password> <newpassword> <device>"
 Initial setup for the device in TCG Opal Single User Mode.  Selects Global range (0) or a single range (1..n).  
-lrstart and lrlength are ignored got global range. password in the SID password, User<n> password will be set to newpassword.
+lrstart and lrlength are ignored got global range. password in the SID password, User<n+1> password will be set to newpassword.
 .IP "\-\-activateLockingSP_SUM <0...n> <SIDpassword> <device>"
-Activate the LockingSP in Single User Mode on Global range (0) or a single range (1..n).  
+Activate the LockingSP in Single User Mode on Global range (0), a single range (1..n), or all ranges (255).
 Admin1 password in LockingSP will be set to SID password.
 .IP "\-\-setPassword_SUM <password> <user> <newpassword> <device>"
-Change the password of a TCG Opal User authority. user = User0, User1, ...
+Change the password of a TCG Opal User authority. user = User1, User2, ...  Default User passwords are "".
 .IP "\-\-eraseLockingRange_SUM <0...n> <password> <device>"
 Erase a Locking Range, 0 = GLobal 1..n = LRn, password is for the User<n> that owns the Locking Range.
 .IP "\-\-setLockingRange_SUM <0...n> <RW|RO|LK> <password> <device>"
