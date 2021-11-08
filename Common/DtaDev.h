@@ -194,10 +194,11 @@ public:
 	/** Change the locking state of a locking range
 	 * @param lockingrange The number of the locking range (0 = global)
 	 * @param lockingstate  the locking state to set
-	 * @param Admin1Password password of administrative authority for locking range
+	*  @param authority authority to use for the session
+	*  @param password Password of authority
 	 */
 	virtual uint8_t setLockingRange(const uint8_t lockingrange, const uint8_t lockingstate,
-                                    const char * Admin1Password) = 0;
+                                    const char* authority, const char * Admin1Password) = 0;
 	/** Change the locking state of a locking range in Single User Mode
          * @param lockingrange The number of the locking range (0 = global)
          * @param lockingstate  the locking state to set
@@ -208,29 +209,33 @@ public:
 	/** Change the active state of a locking range
 	 * @param lockingrange The number of the locking range (0 = global)
 	 * @param enabled  enable (true) or disable (false) the lockingrange
-	 * @param password Password of administrative authority for locking range
+	 * @param authority authority to use for the session
+	 * @param password Password of authority
 	 */
 	virtual uint8_t configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
-                                          const char* password) = 0;
+                                          const char* authority, const char* password) = 0;
 	/** Change the active state of a locking range in single-user mode
 	 * @param lockingrange The number of the locking range (0 = global)
 	 * @param enabled OPAL_LOCKINGSTATE indicating the locking state to set
-	 * @param password Password of administrative authority for locking range
+	 * @param password Password of Admin1
 	 */
 	virtual uint8_t configureLockingRange_SUM(const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
                                               const char* password) = 0;
+
 	/** Setup a locking range.  Initialize a locking range, set it's start
 	 *  LBA and length, initialize it as unlocked with locking disabled.
-	 *  @paran lockingrange The Locking Range to be setup
+	 *  @param lockingrange The Locking Range to be setup
 	 *  @param start  Starting LBA
 	 *  @param length Number of blocks
-	 *  @param password Password of administrator
+	 *  @param authority authority to use for the session
+	 *  @param password Password of authority
 	 */
 	virtual uint8_t setupLockingRange(const uint8_t lockingrange, const uint64_t start,
-                                      const uint64_t length, const char* password) = 0;
+                                      const uint64_t length, const char* authority, const char* password) = 0;
+
 	/** Setup a locking range in Single User Mode.  Initialize a locking range,
 	 *  set it's start LBA and length, initialize it as unlocked with locking enabled.
-         *  @paran lockingrange The Locking Range to be setup
+         *  @param lockingrange The Locking Range to be setup
          *  @param start  Starting LBA
          *  @param length Number of blocks
          *  @param password Password of administrator
@@ -238,14 +243,20 @@ public:
 	virtual uint8_t setupLockingRange_SUM(const uint8_t lockingrange, const uint64_t start,
                                           const uint64_t length, const char* password) = 0;
 	/** List status of locking ranges.
-	*  @param password Password of administrator
+	* @param authority authority to use for the session
+    * @param password Password of the authority
+    * @param rangeid ID of the locking range row, or -1 for all
 	*/
-	virtual uint8_t listLockingRanges(const char* password, const int16_t rangeid) = 0;
+	virtual uint8_t listLockingRanges(const char* authority, const char* password, const int16_t rangeid) = 0;
+
 	/** Generate a new encryption key for a locking range.
 	* @param lockingrange locking range number
-	* @param password password of the locking administrative authority
+	* @param authority authority to use for the session
+	* @param password Password of authority
 	*/
-	virtual uint8_t rekeyLockingRange(const uint8_t lockingrange, const char* password) = 0;
+	virtual uint8_t rekeyLockingRange(const uint8_t lockingrange, const char* authority,
+                                      const char* password) = 0;
+
 	/** Enable bands using MSID.
 	* @param lockingrange locking range number
 	*/
@@ -306,21 +317,27 @@ public:
 	 * @param password Password of administrative authority for locking range
 	 */
 	virtual uint8_t eraseLockingRange(const uint8_t lockingrange, const char* password) = 0;
+
 	/** Assign a locking range to a Namespace
-	 * @param password for Admin1
+	 * @param authority authority to use for the session
+	 * @param password Password of authority
 	 * @param namespace
 	 * @param global - bool, true for a global range
 	 * @param start - N/A if global is true
 	 * @param length - N/A if global is true
 	 */
-	virtual uint8_t assign(const char* password, const uint32_t ns,
+	virtual uint8_t assign(const char* authority, const char* password, const uint32_t ns,
 	                       const uint64_t start = 0, const uint64_t length = 0) = 0;
+
 	/** Deassign a locking range
-	 * @param password for Admin1
+	 * @param authority authority to use for the session
+	 * @param password Password of authority
 	 * @param lockingrange The number of the locking range
 	 * @param keep True to keep the global range Key
 	 */
-	virtual uint8_t deassign(const char* password, const uint8_t lockingrange, const bool keep) = 0;
+	virtual uint8_t deassign(const char* authority, const char* password, const uint8_t lockingrange,
+                             const bool keep) = 0;
+
 	/** Dumps an object for diagnostic purposes
 	 * @param sp index into the OPALUID table for the SP the object is in
 	 * @param auth the authority to use for the dump

@@ -155,7 +155,8 @@ int main(int argc, char * argv[])
         break;
 	case sedutiloption::setLockingRange:
         LOG(D) << "Setting Locking Range " << (uint16_t) opts.lockingrange << " " << (uint16_t) opts.lockingstate;
-        return d->setLockingRange(opts.lockingrange, opts.lockingstate, argv[opts.password]);
+        return d->setLockingRange(opts.lockingrange, opts.lockingstate, 
+                                  opts.authority[0] ? opts.authority : "Admin1", argv[opts.password]);
 		break;
 	case sedutiloption::setLockingRange_SUM:
 		LOG(D) << "Setting Locking Range " << (uint16_t)opts.lockingrange << " " << (uint16_t)opts.lockingstate << " in Single User Mode";
@@ -164,12 +165,13 @@ int main(int argc, char * argv[])
 	case sedutiloption::enableLockingRange:
         LOG(D) << "Enabling Locking Range " << (uint16_t) opts.lockingrange;
         return (d->configureLockingRange(opts.lockingrange,
-			(DTA_READLOCKINGENABLED | DTA_WRITELOCKINGENABLED), argv[opts.password]));
+                                         (DTA_READLOCKINGENABLED | DTA_WRITELOCKINGENABLED),
+                                         opts.authority[0] ? opts.authority : "Admin1", argv[opts.password]));
         break;
 	case sedutiloption::disableLockingRange:
 		LOG(D) << "Disabling Locking Range " << (uint16_t) opts.lockingrange;
 		return (d->configureLockingRange(opts.lockingrange, DTA_DISABLELOCKING,
-			argv[opts.password]));
+                                         opts.authority[0] ? opts.authority : "Admin1", argv[opts.password]));
 		break;
 	case sedutiloption::enableLockingRange_SUM:
         LOG(D) << "Enabling Locking Range SUM " << (uint16_t)opts.lockingrange;
@@ -177,13 +179,15 @@ int main(int argc, char * argv[])
         break;
 	case sedutiloption::readonlyLockingRange:
 		LOG(D) << "Enabling Locking Range " << (uint16_t)opts.lockingrange << " read-only";
-		return (d->configureLockingRange(opts.lockingrange,
-			DTA_WRITELOCKINGENABLED, argv[opts.password]));
+		return (d->configureLockingRange(opts.lockingrange, DTA_WRITELOCKINGENABLED,
+                                         opts.authority[0] ? opts.authority : "Admin1", argv[opts.password]));
 		break;
 	case sedutiloption::setupLockingRange:
 		LOG(D) << "Setup Locking Range " << (uint16_t)opts.lockingrange;
 		return (d->setupLockingRange(opts.lockingrange, strtoll(argv[opts.lrstart], &end, 0),
-                                     strtoll(argv[opts.lrlength], &end, 0), argv[opts.password]));
+                                     strtoll(argv[opts.lrlength], &end, 0), 
+                                     opts.authority[0] ? opts.authority : "Admin1",
+                                     argv[opts.password]));
 		break;
 	case sedutiloption::setupLockingRange_SUM:
 		LOG(D) << "Setup Locking Range " << (uint16_t)opts.lockingrange << " in Single User Mode";
@@ -192,15 +196,18 @@ int main(int argc, char * argv[])
 		break;
 	case sedutiloption::listLockingRanges:
 		LOG(D) << "List Locking Ranges ";
-		return (d->listLockingRanges(argv[opts.password], -1));
+		return (d->listLockingRanges(opts.authority[0] ? opts.authority : "Admin1",
+                                     argv[opts.password], -1));
 		break;
 	case sedutiloption::listLockingRange:
 		LOG(D) << "List Locking Range[" << opts.lockingrange << "]";
-		return (d->listLockingRanges(argv[opts.password], opts.lockingrange));
+		return (d->listLockingRanges(opts.authority[0] ? opts.authority : "Admin1",
+                                     argv[opts.password], opts.lockingrange));
 		break;
     case sedutiloption::rekeyLockingRange:
 		LOG(D) << "Rekey Locking Range[" << opts.lockingrange << "]";
-		return (d->rekeyLockingRange(opts.lockingrange, argv[opts.password]));
+		return (d->rekeyLockingRange(opts.lockingrange, opts.authority[0] ? opts.authority : "Admin1",
+                                     argv[opts.password]));
         break;
     case sedutiloption::setBandsEnabled:
         LOG(D) << "Set bands Enabled";
@@ -247,13 +254,15 @@ int main(int argc, char * argv[])
 		break;
 	case sedutiloption::assign:
 		LOG(D) << "Assign a LockingRange to a namespace " << argv[opts.lockingrange];
-		return (d->assign(argv[opts.password], atoi(argv[opts.lockingrange]),
+		return (d->assign(opts.authority[0] ? opts.authority : "Admin1",
+                          argv[opts.password], atoi(argv[opts.lockingrange]),
                           strtoll(argv[opts.lrstart], &end, 0),
                           strtoll(argv[opts.lrlength], &end, 0)));
 		break;
 	case sedutiloption::deassign:
 		LOG(D) << "Deassign a LockingRangee " << argv[opts.lockingrange];
-		return (d->deassign(argv[opts.password], atoi(argv[opts.lockingrange]),
+		return (d->deassign(opts.authority[0] ? opts.authority : "Admin1",
+                            argv[opts.password], atoi(argv[opts.lockingrange]),
 		                    opts.lockingstate));
 		break;
     case sedutiloption::query:

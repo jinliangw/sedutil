@@ -63,11 +63,11 @@ uint8_t DtaDevOpal::initialSetup(const char* password)
 		LOG(E) << "Initial setup failed - unable to activate LockingSP";
 		return lastRC;
 	}
-	if ((lastRC = configureLockingRange(0, DTA_DISABLELOCKING, password)) != 0) {
+	if ((lastRC = configureLockingRange(0, DTA_DISABLELOCKING, "Admin1", password)) != 0) {
 		LOG(E) << "Initial setup failed - unable to configure global locking range";
 		return lastRC;
 	}
-	if ((lastRC = setLockingRange(0, OPAL_LOCKINGSTATE::READWRITE, password)) != 0) {
+	if ((lastRC = setLockingRange(0, OPAL_LOCKINGSTATE::READWRITE, "Admin1", password)) != 0) {
 		LOG(E) << "Initial setup failed - unable to set global locking range RW";
 		return lastRC;
 	}
@@ -209,7 +209,7 @@ DtaDevOpal::lrStatus_t DtaDevOpal::getLockingRange_status(const uint8_t lockingr
 	return lrStatus;
 }
 
-uint8_t DtaDevOpal::listLockingRanges(const char* password, const int16_t rangeid)
+uint8_t DtaDevOpal::listLockingRanges(const char* authority, const char* password, const int16_t rangeid)
 {
         int firstRange = (int)rangeid;
         int lastRange = (int)rangeid;
@@ -221,12 +221,18 @@ uint8_t DtaDevOpal::listLockingRanges(const char* password, const int16_t rangei
 		LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKINGRANGE_GLOBAL][i]);
 	}
 
+    vector<uint8_t> authorityUID;
+	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
+
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}
@@ -302,7 +308,7 @@ uint8_t DtaDevOpal::listLockingRanges(const char* password, const int16_t rangei
 }
 
 uint8_t DtaDevOpal::setupLockingRange(const uint8_t lockingrange, const uint64_t start,
-                                      const uint64_t length, const char* password)
+                                      const uint64_t length, const char* authority, const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal:setupLockingRange()";
@@ -317,12 +323,19 @@ uint8_t DtaDevOpal::setupLockingRange(const uint8_t lockingrange, const uint64_t
 	}
 	LR[6] = 0x03;
 	LR[8] = lockingrange;
+
+    vector<uint8_t> authorityUID;
+	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
+
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}
@@ -374,7 +387,7 @@ uint8_t DtaDevOpal::setupLockingRange(const uint8_t lockingrange, const uint64_t
 	}
 	delete set;
 	delete session;
-	if ((lastRC = rekeyLockingRange(lockingrange, password)) != 0) {
+	if ((lastRC = rekeyLockingRange(lockingrange, authority, password)) != 0) {
 		LOG(E) << "setupLockingRange Unable to reKey Locking range -- Possible security issue ";
 		return lastRC;
 	}
@@ -475,7 +488,7 @@ uint8_t DtaDevOpal::setupLockingRange_SUM(const uint8_t lockingrange, const uint
 }
 
 uint8_t DtaDevOpal::configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
-                                          const char* password)
+                                          const char* authority, const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal::configureLockingRange()";
@@ -488,12 +501,19 @@ uint8_t DtaDevOpal::configureLockingRange(const uint8_t lockingrange, const uint
 		LR[6] = 0x03;
 		LR[8] = lockingrange;
 	}
+
+    vector<uint8_t> authorityUID;
+	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
+
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}
@@ -629,7 +649,7 @@ uint8_t DtaDevOpal::configureLockingRange_SUM(const uint8_t lockingrange,
 	return 0;
 }
 
-uint8_t DtaDevOpal::rekeyLockingRange(const uint8_t lockingrange, const char* password)
+uint8_t DtaDevOpal::rekeyLockingRange(const uint8_t lockingrange, const char* authority, const char* password)
 {
 	LOG(D1) << "Entering DtaDevOpal::rekeyLockingRange()";
 	uint8_t lastRC;
@@ -642,12 +662,19 @@ uint8_t DtaDevOpal::rekeyLockingRange(const uint8_t lockingrange, const char* pa
 		LR[6] = 0x03;
 		LR[8] = lockingrange;
 	}
+
+    vector<uint8_t> authorityUID;
+	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
+
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}
@@ -723,7 +750,7 @@ uint8_t DtaDevOpal::rekeyLockingRange_SUM(const std::vector<uint8_t>& LR,
 	return 0;
 }
 
-uint8_t DtaDevOpal::assign(const char* password, const uint32_t ns,
+uint8_t DtaDevOpal::assign(const char* authority, const char* password, const uint32_t ns,
                            const uint64_t start, const uint64_t length)
 {
 	uint8_t lastRC;
@@ -737,13 +764,18 @@ uint8_t DtaDevOpal::assign(const char* password, const uint32_t ns,
     nspace.push_back((ns >> 8) & 0xff);
     nspace.push_back((ns >> 0) & 0xff);
 
+    vector<uint8_t> authorityUID;
+	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
+
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password,
-	                             OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}
@@ -798,7 +830,8 @@ uint8_t DtaDevOpal::assign(const char* password, const uint32_t ns,
 	return 0;
 }
 
-uint8_t DtaDevOpal::deassign(const char* password, const uint8_t lockingrange, const bool keep)
+uint8_t DtaDevOpal::deassign(const char* authority, const char* password,
+                             const uint8_t lockingrange, const bool keep)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal::deassign()";
@@ -806,13 +839,18 @@ uint8_t DtaDevOpal::deassign(const char* password, const uint8_t lockingrange, c
 	std::vector<uint8_t> uid = {OPAL_SHORT_ATOM::BYTESTRING8, 0x00, 0x00, 0x08, 0x02, 0x00, 0x03, 0x00};
 	uid.push_back(lockingrange);
 
+    vector<uint8_t> authorityUID;
+	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
+
 	session = new DtaSession(this);
 	if (NULL == session) {
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password,
-	                             OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}
@@ -1115,7 +1153,7 @@ uint8_t DtaDevOpal::setMBRDone(const uint8_t mbrstate, const char* Admin1Passwor
 }
 
 uint8_t DtaDevOpal::setLockingRange(const uint8_t lockingrange, const uint8_t lockingstate,
-                                    const char* Admin1Password)
+                                    const char* authority, const char* Admin1Password)
 {
 	uint8_t lastRC;
 	uint8_t archiveuser = 0;
@@ -1123,7 +1161,12 @@ uint8_t DtaDevOpal::setLockingRange(const uint8_t lockingrange, const uint8_t lo
     OPAL_TOKEN writelocked = OPAL_TOKEN::EMPTYATOM;
     const char *msg;
     std::vector<uint8_t> lockOnReset;
+    std::vector<uint8_t> authorityUID;
 
+	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
 
 	LOG(D1) << "Entering DtaDevOpal::setLockingRange";
 	switch (lockingstate) {
@@ -1173,7 +1216,7 @@ uint8_t DtaDevOpal::setLockingRange(const uint8_t lockingrange, const uint8_t lo
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, Admin1Password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, Admin1Password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}

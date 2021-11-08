@@ -64,7 +64,7 @@ void DtaDevGeneric::init(const char * devref)
 }
 uint8NOCODE(initialSetup, const char* password)
 uint8NOCODE(configureLockingRange, const uint8_t lockingrange,
-            const uint8_t enabled, const char* password)
+            const uint8_t enabled, const char* authority, const char* password)
 uint8NOCODE(configureLockingRange_SUM, const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
             const char* password)
 uint8NOCODE(revertLockingSP, const char* password, const uint8_t keep)
@@ -75,15 +75,15 @@ uint8NOCODE(setNewPassword_SUM, const char* password, const char* userid, const 
 uint8NOCODE(setMBREnable, const uint8_t mbrstate, const char* Admin1Password)
 uint8NOCODE(setMBRDone, const uint8_t mbrstate, const char* Admin1Password)
 uint8NOCODE(setLockingRange, const uint8_t lockingrange, const uint8_t lockingstate,
-            const char* Admin1Password)
+            const char* authority, const char* Admin1Password)
 uint8NOCODE(setLockingRange_SUM, const uint8_t lockingrange, const uint8_t lockingstate,
             const char* password)
 uint8NOCODE(setupLockingRange, const uint8_t lockingrange, const uint64_t start,
-            const uint64_t length, const char* password)
-uint8NOCODE(listLockingRanges, const char* password, const int16_t rangeid)
+            const uint64_t length, const char* authority, const char* password)
+uint8NOCODE(listLockingRanges, const char* authority, const char* password, const int16_t rangeid)
 uint8NOCODE(setupLockingRange_SUM, const uint8_t lockingrange, const uint64_t start,
             const uint64_t length, const char* password)
-uint8NOCODE(rekeyLockingRange, const uint8_t lockingrange, const char* password)
+uint8NOCODE(rekeyLockingRange, const uint8_t lockingrange, const char* authority, const char* password)
 uint8NOCODE(setBandsEnabled, const int16_t lockingrange, const char* password)
 uint8NOCODE(enableUser, const char* authority, const char* password, const char* userid, const OPAL_TOKEN status)
 uint8NOCODE(revertTPer, const char* password, const uint8_t PSID, const uint8_t AdminSP)
@@ -98,9 +98,9 @@ uint8NOCODE(takeOwnership, const char* newpassword)
 uint8NOCODE(setSIDPassword, const char* oldpassword, const char* newpassword,
             const uint8_t hasholdpwd, const uint8_t hashnewpwd)
 uint8NOCODE(printTables, const char* sp, const char* password, const uint8_t level)
-uint8NOCODE(assign, const char* password, const uint32_t ns, const uint64_t start,
+uint8NOCODE(assign, const char* authority, const char* password, const uint32_t ns, const uint64_t start,
             const uint64_t length)
-uint8NOCODE(deassign, const char* password, const uint8_t lockingrange, const bool keep)
+uint8NOCODE(deassign, const char* authority, const char* password, const uint8_t lockingrange, const bool keep)
 uint8NOCODE(readMBR, const char* password, const uint32_t offset, const uint32_t count)
 uint8NOCODE(loadDataStore, const char* password, const uint8_t table, const uint32_t offset,
             const uint32_t count, const char* filename)

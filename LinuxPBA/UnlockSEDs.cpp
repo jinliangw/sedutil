@@ -95,7 +95,7 @@ uint8_t UnlockSEDs(char * password) {
                     failed = 1;
                 }
             }
-            if (d->setLockingRange(0, OPAL_LOCKINGSTATE::READWRITE, password)) {
+            if (d->setLockingRange(0, OPAL_LOCKINGSTATE::READWRITE, "Admin1", password)) {
                 failed = 1;
             }
             failed ? printf("Drive %-10s %-40s is OPAL Failed  \n", devref, d->getModelNum()) :

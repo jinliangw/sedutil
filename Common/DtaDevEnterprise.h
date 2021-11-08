@@ -105,7 +105,7 @@ public:
 	/** dummy code not implemented in the enterprise SSC*/
 	uint8_t setNewPassword_SUM(const char* password, const char* userid, const char* newpassword);
 	uint8_t setLockingRange(const uint8_t lockingrange, const uint8_t lockingstate,
-                            const char* password);
+                            const char* authority, const char* password);
 	/** dummy code not implemented in the enterprise SSC*/
 	uint8_t setLockingRange_SUM(const uint8_t lockingrange, const uint8_t lockingstate,
                                 const char* password);
@@ -114,32 +114,37 @@ public:
 	*  @param lockingrange The Locking Range to be setup
 	*  @param start  Starting LBA
 	*  @param length Number of blocks
-	*  @param password Password of administrator
+	*  @param authority authority to use for the session
+	*  @param password Password of the authority
 	*/
 	uint8_t setupLockingRange(const uint8_t lockingrange, const uint64_t start,
-                              const uint64_t length, const char* password);
+                              const uint64_t length, const char* authority, const char* password);
 	/** dummy code not implemented in the enterprise SSC*/
 	uint8_t setupLockingRange_SUM(const uint8_t lockingrange, const uint64_t start,
                                   const uint64_t length, const char* password);
 	/** List status of locking ranges.
-	*  @param password Password of administrator
+	* @param authority authority to use for the session
+    * @param password Password of the authority 
+    * @param rangeid index to the locking range row, -1 for all
 	*/
-	uint8_t listLockingRanges(const char* password, const int16_t rangeid);
+	uint8_t listLockingRanges(const char* authority, const char* password, const int16_t rangeid);
 	/** Change the active state of a locking range
 	* @param lockingrange The number of the locking range (0 = global)
 	* @param enabled  enable (true) or disable (false) the lockingrange
-	* @param password password of administrative authority for locking range
+	* @param authority authority to use for the session
+	* @param password Password of the authority
 	*/
 	uint8_t configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
-                                  const char* password);
+                                  const char* authority, const char* password);
 	/** dummy code not implemented in the enterprise SSC*/
     uint8_t configureLockingRange_SUM(const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
                                       const char* password);
 	/** Generate a new encryption key for a locking range.
 	* @param lockingrange locking range number
-	* @param password password of the locking administrative authority
+	* @param authority authority to use for the session
+	* @param password Password of the authority
 	*/
-	uint8_t rekeyLockingRange(const uint8_t lockingrange, const char* password);
+	uint8_t rekeyLockingRange(const uint8_t lockingrange, const char* authority, const char* password);
 	uint8_t setBandsEnabled(const int16_t lockingrange, const char* password);
         /** Reset the TPER to its factory condition
          * ERASES ALL DATA!
@@ -187,9 +192,10 @@ public:
                    const char* hexinvokingUID, const char* hexmethod, const char* hexparms);
 
 	// virtual methods from DtaDev class
-	uint8_t assign(const char* password, const uint32_t ns, const uint64_t start = 0, 
-                   const uint64_t length = 0);
-	uint8_t deassign(const char* password, const uint8_t lockingrange, const bool keep);
+	uint8_t assign(const char* authority, const char* password, const uint32_t ns,
+                   const uint64_t start = 0, const uint64_t length = 0);
+	uint8_t deassign(const char* authority, const char* password, const uint8_t lockingrange,
+                     const bool keep);
     uint8_t printTables(const char* sp, const char* password, const uint8_t level);
 	uint8_t readMBR(const char* password, const uint32_t offset, const uint32_t count);
 	uint8_t loadDataStore(const char* password, const uint8_t table, const uint32_t offset,

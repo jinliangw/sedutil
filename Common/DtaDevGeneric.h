@@ -97,10 +97,11 @@ public:
          /** Change the locking state of a locking range
          * @param lockingrange The number of the locking range (0 = global)
          * @param lockingstate  the locking state to set
-         * @param Admin1Password password of administrative authority for locking range
+         * @param authority authority to use for the session
+         * @param password Password of authority
          */
 	 uint8_t setLockingRange(const uint8_t lockingrange, const uint8_t lockingstate,
-                             const char* Admin1Password) ;
+                             const char* authority, const char* Admin1Password) ;
 	 /** Change the locking state of a locking range in Single User Mode
          * @param lockingrange The number of the locking range (0 = global)
          * @param lockingstate  the locking state to set
@@ -111,27 +112,30 @@ public:
          /** Change the active state of a locking range
          * @param lockingrange The number of the locking range (0 = global)
          * @param enabled  enable (true) or disable (false) the lockingrange
+         * @param authority authority to use for the session
          * @param password password of administrative authority for locking range
          */
 	 uint8_t configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
-                                   const char* password);
+                                   const char* authority, const char* password);
      uint8_t configureLockingRange_SUM(const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
                                        const char* password);
+
 	 /** Setup a locking range.  Initialize a locking range, set it's start
 	 *  LBA and length, initialize it as unlocked with locking disabled.
-	 *  @paran lockingrange The Locking Range to be setup
+	 *  @param lockingrange The Locking Range to be setup
 	 *  @param start  Starting LBA
 	 *  @param length Number of blocks
-	 *  @paran password Password of administrator
+	 *  @param authority authority to use for the session
+	 *  @param password Password of authority
 	 */
 	 uint8_t setupLockingRange(const uint8_t lockingrange, const uint64_t start,
-                               const uint64_t length, const char* password);
+                               const uint64_t length, const char* authority, const char* password);
 	 /** Setup a locking range in Single User Mode.  Initialize a locking range,
 	 *  set it's start LBA and length, initialize it as unlocked with locking enabled.
-         *  @paran lockingrange The Locking Range to be setup
+         *  @param lockingrange The Locking Range to be setup
          *  @param start  Starting LBA
          *  @param length Number of blocks
-         *  @paran password Password of administrator
+         *  @param password Password of administrator
          */
 	 uint8_t setupLockingRange_SUM(const uint8_t lockingrange, const uint64_t start,
                                    const uint64_t length, const char* password);
@@ -140,14 +144,17 @@ public:
          * @param Admin1Password Locking SP authority with access to flag
          */
 	 /** List status of locking ranges.
-	 *  @param password Password of administrator
+	 * @param authority authority to use for the session
+     * @param password Password of authority 
+     * @param locking range row index, -1 for all 
 	 */
-	 uint8_t listLockingRanges(const char* password, const int16_t rangeid);
+	 uint8_t listLockingRanges(const char* authority, const char* password, const int16_t rangeid);
 	 /** Generate a new encryption key for a locking range.
 	 * @param lockingrange locking range number
+	 * @param authority authority to use for the session
 	 * @param password password of the locking administrative authority
 	 */
-	 uint8_t rekeyLockingRange(const uint8_t lockingrange, const char* password);
+	 uint8_t rekeyLockingRange(const uint8_t lockingrange, const char* authority, const char* password);
 	 /** Enable bands using MSID.
 	 * @param lockingrange locking range number
 	 */
@@ -238,9 +245,10 @@ public:
 	 uint16_t comID() ;
 
      // virtual methods from DtaDev class
-     uint8_t assign(const char* password, const uint32_t ns, const uint64_t start = 0,
-                    const uint64_t length = 0);
-     uint8_t deassign(const char* password, const uint8_t lockingrange, const bool keep);
+     uint8_t assign(const char* authority, const char* password, const uint32_t ns,
+                    const uint64_t start = 0, const uint64_t length = 0);
+     uint8_t deassign(const char* authority, const char* password, const uint8_t lockingrange,
+                      const bool keep);
      uint8_t readMBR(const char* password, const uint32_t offset, const uint32_t count);
      uint8_t loadDataStore(const char* password, const uint8_t table, const uint32_t offset,
                            const uint32_t count, const char* filename);

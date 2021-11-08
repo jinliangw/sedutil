@@ -181,13 +181,13 @@ uint8_t DtaDevEnterprise::initialSetup(const char* password)
 		return lastRC;
 	}
 	if ((lastRC = setLockingRange(0,
-        OPAL_LOCKINGSTATE::READWRITE, password)) != 0) {
+        OPAL_LOCKINGSTATE::READWRITE, "BandMaster0", password)) != 0) {
 		LOG(E) << "Initial setup failed - unable to unlock for read/write";
 		return lastRC;
 	}
 
 	if ((lastRC = configureLockingRange(0,
-		(DTA_READLOCKINGENABLED | DTA_WRITELOCKINGENABLED), password)) != 0) {
+		(DTA_READLOCKINGENABLED | DTA_WRITELOCKINGENABLED), "BandMaster0", password)) != 0) {
 		LOG(E) << "Initial setup failed - unable to enable read/write locking";
 		return lastRC;
 	}
@@ -205,7 +205,7 @@ uint8_t DtaDevEnterprise::setup_SUM(const uint8_t lockingrange, const uint64_t s
 	return 1;
 }
 uint8_t DtaDevEnterprise::configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
-                                                const char* password)
+                                                const char* authority, const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevEnterprise::configureLockingRange()";
@@ -280,7 +280,7 @@ uint8_t DtaDevEnterprise::configureLockingRange(const uint8_t lockingrange, cons
 	LOG(D1) << "Exiting DtaDevEnterprise::configureLockingRange()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::rekeyLockingRange(const uint8_t lockingrange, const char* password)
+uint8_t DtaDevEnterprise::rekeyLockingRange(const uint8_t lockingrange, const char* authority, const char* password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::rekeyLockingRange()";
 	uint8_t lastRC;
@@ -485,7 +485,7 @@ uint8_t DtaDevEnterprise::setMBRDone(const uint8_t mbrstate, const char* Admin1P
 }
 
 uint8_t DtaDevEnterprise::setupLockingRange(const uint8_t lockingrange, const uint64_t start,
-                                            const uint64_t length, const char* password)
+                                            const uint64_t length, const char* authority, const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevEnterprise::setupLockingRange";
@@ -600,7 +600,7 @@ uint8_t DtaDevEnterprise::configureLockingRange_SUM(const uint8_t lockingrange, 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-uint8_t DtaDevEnterprise::listLockingRanges(const char* password, const int16_t rangeid)
+uint8_t DtaDevEnterprise::listLockingRanges(const char* authority, const char* password, const int16_t rangeid)
 ////////////////////////////////////////////////////////////////////////////////
 {
 	LOG(D1) << "Entering DtaDevEnterprise::listLockingRanges";
@@ -766,7 +766,7 @@ uint8_t DtaDevEnterprise::listLockingRanges(const char* password, const int16_t 
 }
 
 uint8_t DtaDevEnterprise::setLockingRange(const uint8_t lockingrange, const uint8_t lockingstate,
-                                          const char* password)
+                                          const char* authority, const char* password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::setLockingRange";
 	uint8_t lastRC;
@@ -1519,13 +1519,14 @@ uint8_t DtaDevEnterprise::properties()
 	return 0;
 }
 
-uint8_t DtaDevEnterprise::assign(const char* password, const uint32_t ns,
+uint8_t DtaDevEnterprise::assign(const char* authority, const char* password, const uint32_t ns,
                                  const uint64_t start, const uint64_t length)
 {
     cout << "TCG Enterprise SSC does not include the assign method.\n";
     return 0xff;
 }
-uint8_t DtaDevEnterprise::deassign(const char* password, const uint8_t lockingrange, const bool keep)
+uint8_t DtaDevEnterprise::deassign(const char* authority, const char* password, const uint8_t lockingrange,
+                                   const bool keep)
 {
     cout << "TCG Enterprise SSC does not include the deassign method.\n";
     return 0xff;

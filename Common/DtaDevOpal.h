@@ -162,6 +162,7 @@ public:
          */
 	uint8_t setMBREnable(const uint8_t state, const char* Admin1Password);
         /** Set the password of a locking SP user.
+         * @param authority authority to use for the session
          * @param password  current password
          * @param userid the userid whose password is to be changed
          * @param newpassword  value password is to be changed to
@@ -178,10 +179,12 @@ public:
          * RW|RO|LK are the supported states @see OPAL_LOCKINGSTATE
          * @param lockingrange locking range number
          * @param lockingstate desired locking state (see above)
-         * @param Admin1Password password of the locking administrative authority
+         * @param authority authority to use for the session
+         * @param password password of the locking administrative authority
          */
 	uint8_t setLockingRange(const uint8_t lockingrange, const uint8_t lockingstate,
-							const char* Admin1Password);
+							const char* authority, const char* password);
+
 	/** Change the locking state of a locking range in Single User Mode
          * @param lockingrange The number of the locking range (0 = global)
          * @param lockingstate  the locking state to set
@@ -189,36 +192,44 @@ public:
          */
 	uint8_t setLockingRange_SUM(const uint8_t lockingrange, const uint8_t lockingstate,
 								const char* password);
+
 	/** Setup a locking range.  Initialize a locking range, set it's start
 	*  LBA and length, initialize it as unlocked with locking disabled.
-	*  @paran lockingrange The Locking Range to be setup
+	*  @param lockingrange The Locking Range to be setup
 	*  @param start  Starting LBA
 	*  @param length Number of blocks
-	*  @param password Password of administrator
+	*  @param authority authority to use for the session
+	*  @param password Password of authority
 	*/
 	uint8_t setupLockingRange(const uint8_t lockingrange, const uint64_t start,
-							  const uint64_t length, const char* password);
+							  const uint64_t length, const char* authority, const char* password);
+
 	/** Setup a locking range in Single User Mode.  Initialize a locking range,
 	*  set it's start LBA and length, initialize it as unlocked with locking enabled.
-        *  @paran lockingrange The Locking Range to be setup
+        *  @param lockingrange The Locking Range to be setup
         *  @param start  Starting LBA
         *  @param length Number of blocks
-        *  @paran password Password of administrator
+        *  @param password Password of administrator
         */
 	uint8_t setupLockingRange_SUM(const uint8_t lockingrange, const uint64_t start,
 								  const uint64_t length, const char* password);
 	/** List status of locking ranges.
-	*  @param password Password of administrator
+	*  @param authority authority to use for the session
+	*  @param password Password of the authority
+	*  @param rangeid range IS to list, or -1 for all 
 	*/
-	uint8_t listLockingRanges(const char* password, const int16_t rangeid);
+	uint8_t listLockingRanges(const char* authority, const char* password, const int16_t rangeid);
+
         /** User command to enable/disable a locking range.
          * RW|RO|LK are the supported states @see OPAL_LOCKINGSTATE
          * @param lockingrange locking range number
          * @param enabled boolean true = enabled, false = disabled
+         * @param authority authority to use for the session
          * @param password password of the locking administrative authority
          */
 	uint8_t configureLockingRange(const uint8_t lockingrange, const uint8_t enabled,
-								  const char* password);
+								  const char* authority, const char* password);
+
 	/** Change the active state of a locking range in single-user mode
 	 * @param lockingrange The number of the locking range (0 = global)
 	 * @param enabled OPAL_LOCKINGSTATE indicating the locking state to set
@@ -228,9 +239,10 @@ public:
                                       const char* password);
 	/** Generate a new encryption key for a locking range.
 	* @param lockingrange locking range number
+	* @param authority authority to use for the session
 	* @param password password of the locking administrative authority
 	*/
-	uint8_t rekeyLockingRange(const uint8_t lockingrange, const char* password);
+	uint8_t rekeyLockingRange(const uint8_t lockingrange, const char* authority, const char* password);
 	/** Generate a new encryption key for a Single User Mode locking range.
         * @param LR locking range UID in vector format
 	* @param UID user UID in vector format
@@ -295,9 +307,10 @@ public:
 				   const char* invoker, const char* method, const char* plist);
 
 	// virtual methods from DtaDev class
-	uint8_t assign(const char* password, const uint32_t ns, const uint64_t start = 0,
-				   const uint64_t length = 0);
-	uint8_t deassign(const char* password, const uint8_t lockingrange, const bool keep);
+	uint8_t assign(const char* authority, const char* password, const uint32_t ns,
+				   const uint64_t start = 0, const uint64_t length = 0);
+	uint8_t deassign(const char* authority, const char* password, const uint8_t lockingrange,
+					 const bool keep);
 	uint8_t readMBR(const char* password, const uint32_t offset, const uint32_t count);
 	uint8_t loadDataStore(const char* password, const uint8_t table, const uint32_t offset,
 						  const uint32_t count, const char* filename);
