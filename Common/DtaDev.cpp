@@ -35,7 +35,8 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-static uint8_t buffer[512 + IO_BUFFER_ALIGNMENT];
+#define DTA_DEV_BUFFER_SIZE 4096
+static uint8_t buffer[DTA_DEV_BUFFER_SIZE + IO_BUFFER_ALIGNMENT];
 
 /** Device Class (Base) represents a single disk device.
  *  This is the functionality that is common to all OS's and SSC's
@@ -547,7 +548,7 @@ void DtaDev::puke()
 		cout << std::endl;
 	}
 	if (disk_info.NSGeometry) {
-		cout << "Namesapce Geometry Reporting function (" << HEXON(4) << FC_NSGEOMETRY << HEXOFF << ")" << std::endl;
+		cout << "Namespace Geometry Reporting function (" << HEXON(4) << FC_NSGEOMETRY << HEXOFF << ")" << std::endl;
 		cout << "    Align = " << (disk_info.NSGeometry_align ? "Y, " : "N, ")
 			<< "Alignment Granularity = " << disk_info.NSGeometry_alignmentGranularity
 			<< " (" << // display bytes
@@ -559,4 +560,52 @@ void DtaDev::puke()
 	}
 	if (disk_info.Unknown)
 		cout << "**** " << (uint16_t)disk_info.Unknown << " **** Unknown function codes IGNORED " << std::endl;
+}
+
+void DtaDev::printSecurityCompliance()
+{
+    void* bufferPtr = buffer + IO_BUFFER_ALIGNMENT;
+    bufferPtr = (void *)((uintptr_t)bufferPtr & (uintptr_t)~(IO_BUFFER_ALIGNMENT - 1));
+    memset(bufferPtr, 0, sizeof(StackResetRequest_t));
+
+    cout << std::endl;
+
+    uint8_t lastRC;
+    if ((lastRC = sendCmd(IF_RECV, 0x00, SFSC_SECURITY_COMPLIANCE_INFO, bufferPtr, DTA_DEV_BUFFER_SIZE)) != 0) {
+        LOG(D2) << "Send security compliance request to device failed " << (uint16_t)lastRC;
+        cout << "Failed to retrieve FIPS-140 compliance page from the device" << std::endl;
+        return;
+    }
+
+    SFSC_SECURITY_COMPLIANCE_PAGE* pagePtr = (SFSC_SECURITY_COMPLIANCE_PAGE*)bufferPtr;
+    uint32_t pageLength = SWAP32(pagePtr->securityComplianceLength) + sizeof(pagePtr->securityComplianceLength);
+
+    IFLOG(D3) DtaHexDump(bufferPtr, MIN(DTA_DEV_BUFFER_SIZE, pageLength));
+
+    for (uint32_t pageBytesUsed = sizeof(pagePtr->securityComplianceLength); pageBytesUsed < pageLength; ) {
+        FIPS_140_COMPLIANCE_DESCRIPTOR *descPtr = (FIPS_140_COMPLIANCE_DESCRIPTOR *)&(pagePtr->descriptor);
+        uint32_t descLength = SWAP32(descPtr->FIPS140_Header.complianceDescriptorLength);
+
+        if (SWAP16(descPtr->FIPS140_Header.complianceDescriptorType) != FIPS_140_DESCRIPTOR_TYPE) {
+            pageBytesUsed += sizeof(SFSC_COMPLIANCE_DESCRIPTOR) + descLength;
+            continue;
+        }
+
+        if (descLength < (sizeof(FIPS_140_COMPLIANCE_DESCRIPTOR) - sizeof(SFSC_COMPLIANCE_DESCRIPTOR))) {
+            LOG(I) << "Send security compliance request returned wrong size FIPS descriptor";
+            return;
+        }
+
+        cout << "SFSC FIP-140 Compliance Descriptor:" << std::endl;
+        cout << "Related Standard: " << HEXON(2) << (int)(descPtr->FIPS140_ReleastedStandard) << HEXOFF <<
+            (descPtr->FIPS140_ReleastedStandard == FIPS_140_2 ? " (FIPS 140-2)" :
+                descPtr->FIPS140_ReleastedStandard == FIPS_140_3 ? " (FIPS 140-3)" : " (Unknown)")
+             << std::endl;
+        cout << "Overall Security Level: " << descPtr->FIPS140_OverallSecurityLevel << std::endl;
+        cout << "Hardware Version: " << descPtr->FIPS140_HardwareVersion << std::endl;
+        cout << "Version: " << descPtr->FIPS140_Version << std::endl;
+        cout << "Module Name: " << descPtr->FIPS140_ModuleName << std::endl;
+        return;
+    }
+    cout << "FIPS descriptor not found" << std::endl;
 }

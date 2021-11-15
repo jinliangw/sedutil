@@ -92,6 +92,8 @@ public:
 	 */
 	void discovery0();
 
+    void printSecurityCompliance();
+
 	/*
 	 * virtual methods required in the OS specific
 	 * device class

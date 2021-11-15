@@ -2442,6 +2442,7 @@ void DtaDevOpal::puke()
 			if (!(i % 6)) cout << std::endl;
 		}
 	}
+    printSecurityCompliance();
 }
 
 uint8_t DtaDevOpal::objDump(const char* sp, const char* auth, const char* pass,

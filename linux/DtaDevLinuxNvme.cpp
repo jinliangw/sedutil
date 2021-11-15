@@ -97,7 +97,7 @@ uint8_t DtaDevLinuxNvme::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16_t comI
 	if (err < 0)
 		return errno;
 	else if (err != 0) {
-		fprintf(stderr, "NVME Security Command Error:%d\n", err);
+		fprintf(stderr, "NVME Security Command Error: 0x%x\n", err);
 		IFLOG(D4) DtaHexDump(&nvme_cmd, sizeof(nvme_cmd));
 	}
 	else

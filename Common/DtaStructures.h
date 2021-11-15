@@ -609,7 +609,38 @@ typedef struct _IDENTIFY_RESPONSE {
     uint8_t modelNum[40];
 } IDENTIFY_RESPONSE;
 
+// structures from T10 SFSC Standard
+#define SFSC_SUPPORTED_PROTOCOL_LIST    0x0000
+#define SFSC_CERTIFICATE_DATA           0x0001
+#define SFSC_SECURITY_COMPLIANCE_INFO   0x0002
 
+#define FIPS_140_DESCRIPTOR_TYPE        0x0001
+#define FIPS_140_2                      0x0032
+#define FIPS_140_3                      0x0033
+
+typedef struct _SFSC_COMPLIANCE_DESCRIPTOR
+{
+    uint16_t    complianceDescriptorType;
+    uint16_t    reserved_2;
+    uint32_t    complianceDescriptorLength;
+} SFSC_COMPLIANCE_DESCRIPTOR;
+
+typedef struct _FIPS_140_COMPLIANCE_DESCRIPTOR
+{
+    SFSC_COMPLIANCE_DESCRIPTOR  FIPS140_Header;
+    uint8_t                     FIPS140_ReleastedStandard;
+    uint8_t                     FIPS140_OverallSecurityLevel;
+    uint8_t                     FIPS140_Reserve10[6];
+    uint8_t                     FIPS140_HardwareVersion[128];
+    uint8_t                     FIPS140_Version[128];
+    uint8_t                     FIPS140_ModuleName[256];
+} FIPS_140_COMPLIANCE_DESCRIPTOR;
+
+typedef struct _SFSC_SECURITY_COMPLIANCE_PAGE
+{
+    uint32_t                    securityComplianceLength;
+    SFSC_COMPLIANCE_DESCRIPTOR  descriptor;
+} SFSC_SECURITY_COMPLIANCE_PAGE;
 
 ////////////////////////////////////////////////////////////////////////////////
 class CScsiCmdInquiry
