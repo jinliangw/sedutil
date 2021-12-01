@@ -139,6 +139,23 @@ DTA_DEVICE_TYPE DtaDev::getDevType() const
     return disk_info.devType;
 }
 
+uint16_t DtaDev::GetComID()
+{
+    uint16_t ComID = comID();
+
+    switch (ComIdOption) {
+    case ComID_Base:
+    default:
+        break;
+    case ComID_Select:
+        ComID = ComIDValue;
+        break;
+    case ComID_Offset:
+        ComID += ComIDValue;
+    }
+    return ComID;
+}
+
 uint8_t DtaDev::tperReset()
 {
 	void* bufferPtr = buffer + IO_BUFFER_ALIGNMENT;
@@ -160,7 +177,7 @@ uint8_t DtaDev::stackReset()
 	bufferPtr = (void *)((uintptr_t)bufferPtr & (uintptr_t)~(IO_BUFFER_ALIGNMENT - 1));
 	memset(bufferPtr, 0, sizeof(StackResetRequest_t));
 
-    uint16_t comId = comID();
+    uint16_t comId = GetComID();
     StackResetRequest_t* reqPtr = static_cast<StackResetRequest_t*>(bufferPtr);
     reqPtr->comID = SWAP16(comId);
     reqPtr->requestCode   = SWAP32(STACK_RESET_REQUEST_CODE);

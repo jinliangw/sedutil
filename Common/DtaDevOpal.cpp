@@ -2323,7 +2323,7 @@ uint8_t DtaDevOpal::exec(const DtaCommand* cmd, DtaResponse& resp, const uint8_t
     IFLOG(D) DtaAnnotatedDump(IF_SEND, cmd->getCmdBuffer(), cmd->outputBufferSize());
     IFLOG(D3) DtaHexDump(cmd->getCmdBuffer(), SWAP32(hdr->cp.length) + sizeof (OPALComPacket));
 
-    if((lastRC = sendCmd(IF_SEND, protocol, comID(), cmd->getCmdBuffer(), cmd->outputBufferSize())) != 0) {
+    if((lastRC = sendCmd(IF_SEND, protocol, GetComID(), cmd->getCmdBuffer(), cmd->outputBufferSize())) != 0) {
         LOG(E) << "Command failed on send, status code = " << (uint16_t) lastRC;
         return lastRC;
     }
@@ -2333,7 +2333,7 @@ uint8_t DtaDevOpal::exec(const DtaCommand* cmd, DtaResponse& resp, const uint8_t
     do {
         osmsSleep(25);
         memset(cmd->getRespBuffer(), 0, receiveLength);
-        lastRC = sendCmd(IF_RECV, protocol, comID(), cmd->getRespBuffer(), receiveLength);
+        lastRC = sendCmd(IF_RECV, protocol, GetComID(), cmd->getRespBuffer(), receiveLength);
 
     } while ((0 != hdr->cp.outstandingData) && (0 == hdr->cp.minTransfer));
 

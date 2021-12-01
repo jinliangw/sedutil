@@ -248,7 +248,7 @@ DtaSession::sendCommand(DtaCommand * cmd, DtaResponse & response)
     LOG(D1) << "Entering DtaSession::sendCommand()";
     cmd->setHSN(HSN);
     cmd->setTSN(TSN);
-    cmd->setcomID(d->comID());
+    cmd->setcomID(d->GetComID());
 
     uint8_t exec_rc = d->exec(cmd, response, SecurityProtocol);
     if (0 != exec_rc)

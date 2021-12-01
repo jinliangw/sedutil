@@ -33,6 +33,8 @@ void usage()
     printf("-n (optional)                   no password hashing. Passwords will be sent in clear text!\n");
     printf("-l (optional)                   log style output to stderr only\n");
     printf("-x (optional)                   use a transaction\n");
+    printf("-c=comID (optional)             select a comID value, offset from base or absolute\n");
+    printf("                                example: -c=+1 or -c=0x1000\n");
     printf("-a=authortity (optional)        specify an authority instead of the default for the action\n");
     printf("                                Authorities are Admin[1..n], User[1..n]\n");
     printf("                                This option is not supported for all actions.\n");
@@ -240,6 +242,19 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
             ++baseOptions;
             opts->timeout = atoi(&argv[i][3]);
             LOG(D) << "session timeout set to " << opts->timeout;
+        }
+        else if (!strncmp("-c=", argv[i], 3)) {
+            ++baseOptions;
+            if (argv[i][3] == '+') {
+                opts->comID_Option = ComID_Offset;
+            }
+            else {
+                opts->comID_Option = ComID_Select;
+            }
+            if (sscanf(&argv[i][3], "%i", &(opts->comID_Value)) != 1) {
+                LOG(E) << "Invalid ComID option value";
+                return DTAERROR_INVALID_COMMAND;
+            }
         }
         else if (!(('-' == argv[i][0]) && ('-' == argv[i][1])) && (0 == opts->action)) {
 			LOG(E) << "Argument " << (uint16_t) i << " (" << argv[i] << ") should be a command";

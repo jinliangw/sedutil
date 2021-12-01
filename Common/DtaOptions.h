@@ -28,6 +28,12 @@ typedef enum _sedutiloutput {
 	sedutilJSON
 } sedutiloutput;
 
+typedef enum _ComIDOtions {
+    ComID_Base      = 0,
+    ComID_Select    = 1,
+    ComID_Offset    = 2
+} ComIDOption_t;
+
 /** Structure representing the command line issued to the program */
 typedef struct _DTA_OPTIONS {
     uint8_t password;   /**< password supplied */
@@ -47,6 +53,9 @@ typedef struct _DTA_OPTIONS {
     uint8_t testTimeout;
     uint8_t testOversizePacket;
 
+    int             comID_Value;
+    ComIDOption_t   comID_Option;
+
 	bool    no_hash_passwords; /** global parameter, disables hashing of passwords */
     bool    useTransaction;
     char    authority[16];  /** authority over-ride */
@@ -55,6 +64,7 @@ typedef struct _DTA_OPTIONS {
     uint32_t datastoreSizes[16];
 	sedutiloutput output_format;
 } DTA_OPTIONS;
+
 /** Print a usage message */
 void usage();
 /** Parse the command line and return a structure that describes the action desired
@@ -63,6 +73,7 @@ void usage();
  * @param opts pointer to options structure to be filled out
  */
 uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts);
+
 /** Command line options implemented in sedutil */
 typedef enum _sedutiloption {
 	deadbeef,    // 0 should indicate no action specified
@@ -118,6 +129,7 @@ typedef enum _sedutiloption {
     stackReset
 
 } sedutiloption;
+
 /** verify the number of arguments passed */
 #define CHECKARGS(x) \
 if((x+baseOptions) != argc) { \

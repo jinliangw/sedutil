@@ -112,6 +112,8 @@ int main(int argc, char * argv[])
         d->testTimeout = opts.testTimeout;
         d->testOversizePacket = opts.testOversizePacket;
         d->useTransaction = opts.useTransaction;
+        d->ComIdOption = opts.comID_Option;
+        d->ComIDValue = opts.comID_Value;
 	}
 
     char* end;

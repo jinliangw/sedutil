@@ -393,12 +393,16 @@ public:
 	/** return the communications ID to be used for sessions to this device */
 	virtual uint16_t comID() = 0;
 
+    uint16_t GetComID();
+
 	bool no_hash_passwords; /** disables hashing of passwords */
 	sedutiloutput output_format; /** standard, readable, JSON */
     uint32_t timeout = 0;   /** Session timeout, 0 is no timeout */
     bool testTimeout = false;
     bool testOversizePacket = false;
     bool useTransaction = false;
+    uint16_t ComIDValue = 0;
+    ComIDOption_t ComIdOption = ComID_Base;
 
 protected:
 	const char * dev;   /**< character string representing the device in the OS lexicon */
