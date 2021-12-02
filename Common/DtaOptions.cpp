@@ -90,7 +90,7 @@ void usage()
     printf("--enableUser <password> <user> <device>\n");
     printf("                                enable a user, user = Admin[2...n] or User[2...n]\n");
     printf("                                default authority is Admin1, over-ride with -a option\n");
-	printf("--setLockingRange <0...n> <RW|RO|LK|+R|-R> <Admin1password> <device> \n");
+	printf("--setLockingRange <0...n> <RW|RO|WO|LK|+R|-R> <Admin1password> <device> \n");
 	printf("                                Set the status of a Locking Range\n");
 	printf("                                0 = GLobal 1..n  = LRn \n");
     printf("                                default authority is Admin1, over-ride with -a option\n");
@@ -359,6 +359,8 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			TESTARG(rw, lockingstate, OPAL_LOCKINGSTATE::READWRITE)
 			TESTARG(RO, lockingstate, OPAL_LOCKINGSTATE::READONLY)
 			TESTARG(ro, lockingstate, OPAL_LOCKINGSTATE::READONLY)
+            TESTARG(WO, lockingstate, OPAL_LOCKINGSTATE::WRITEONLY)
+            TESTARG(wo, lockingstate, OPAL_LOCKINGSTATE::WRITEONLY)
 			TESTARG(LK, lockingstate, OPAL_LOCKINGSTATE::LOCKED)
 			TESTARG(lk, lockingstate, OPAL_LOCKINGSTATE::LOCKED)
             TESTARG(+R, lockingstate, OPAL_LOCKINGSTATE::ENABLERESET)
@@ -375,6 +377,8 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			TESTARG(rw, lockingstate, OPAL_LOCKINGSTATE::READWRITE)
 			TESTARG(RO, lockingstate, OPAL_LOCKINGSTATE::READONLY)
 			TESTARG(ro, lockingstate, OPAL_LOCKINGSTATE::READONLY)
+            TESTARG(WO, lockingstate, OPAL_LOCKINGSTATE::WRITEONLY)
+            TESTARG(wo, lockingstate, OPAL_LOCKINGSTATE::WRITEONLY)
 			TESTARG(LK, lockingstate, OPAL_LOCKINGSTATE::LOCKED)
 			TESTARG(lk, lockingstate, OPAL_LOCKINGSTATE::LOCKED)
 			TESTFAIL("Invalid locking state <ro|rw|lk>")

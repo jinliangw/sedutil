@@ -1,10 +1,10 @@
 .\" Manpage for sedutil-cli.
-.TH SEDUTIL\-CLI 8 "21 Sep 2021" "1.16" "sedutil-cli man page"
+.TH SEDUTIL\-CLI 8 "2 Dec 2021" "1.16" "sedutil-cli man page"
 .SH NAME
 sedutil-cli \- util to manage TCG Storage self encrypting drives
 
 .SH SYNOPSIS
-sedutil\-cli [\-vnlx] [\-t=n] [\-a=n] [\-ds=x,y,z] <action> <options> <device>
+sedutil\-cli [\-vnlx] [\-c=x] [\-t=n] [\-a=n] [\-ds=x,y,z] <action> <options> <device>
 
 .SH DESCRIPTION
 sedutil-cli is a utility to manage self encrypting drives that conform
@@ -46,13 +46,13 @@ Display the Discovery 0 response of a device
 .IP "\-\-isValidSED <device>"
 Verify whether the given device is SED or not
 .IP "\-\-listLockingRanges <password> <device>"
-List all Locking Ranges
+List all Locking Ranges.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-listLockingRange <0...n> <password> <device>"
-List an individual Locking Range, 0 = GLobal 1..n = LRn
+List an individual Locking Range, 0 = GLobal 1..n = LRn. Default authority is Admin1, over-ride with -a option.
 .IP "\-\-rekeyLockingRange <0...n> <password> <device>"
-Rekey a Locking Ranges, 0 = GLobal 1..n = LRn
+Rekey a Locking Ranges, 0 = GLobal 1..n = LRn.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-setupLockingRange <0...n> <RangeStart> <RangeLength> <password> <device>"
-Setup a new Locking Range, 0 = GLobal 1..n = LRn
+Setup a new Locking Range, 0 = GLobal 1..n = LRn.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-initialSetup <SIDpassword> <device>"
 Setup the device for use with sedutil, <SIDpassword> is new SID and Admin1 password (Opal) or the EraseMaster and all BandMasters (Enterprise).
 .IP "\-\-setSIDPassword <SIDpassword> <newSIDpassword> <device>"
@@ -61,12 +61,12 @@ Change the SID password
 Change the SID password using the MSID password
 .IP "\-\-setPassword <oldpassword> <userid> <newpassword> <device>"
 Change the password of an authority. For Enterprise, userid = "EraseMaster" or "BandMaster<n>", 0 <= n <= 1023. For Opal, userid = Admin<n> or User<n>.  oldpassword = "" for MSID. Default authority is Admin1, over-ride with -a option.
-.IP "\-\-setLockingRange <0...n> <RW|RO|LK> <password> <device>"
-Set the status of a Locking Range, 0 = GLobal 1..n = LRn
+.IP "\-\-setLockingRange <0...n> <RW|RO|WO|LK|+R|-R> <password> <device>"
+Set the status of a Locking Range, 0 = GLobal 1..n = LRn.  Options for read/write enabled, read only, write only, locked, or add or remove Programmatic Reset effect. Default authority is Admin1, over-ride with -a option.
 .IP "\-\-enableLockingRange <0...n> <password> <device>"
-Enable a Locking Range, 0 = GLobal 1..n = LRn
+Enable a Locking Range, 0 = GLobal 1..n = LRn.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-disableLockingRange <0...n> <Admin1password> <device>"
-Disable a Locking Range, 0 = GLobal 1..n = LRn
+Disable a Locking Range, 0 = GLobal 1..n = LRn.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-revertTPer <SIDpassword> <device>"
 set the device back to factory defaults.
 .B This **ERASES ALL DATA**
@@ -104,12 +104,18 @@ table selects the DataStore table, 1 if no additional tables.
 .IP "\-\-readDataStore <Admin1password> <table> <offset> <count> <device>"
 Print DataStore data starting at offset for count bytes.  table selects the DataStore table, 1 if no additional tables.
 .IP "\-\-assign <Admin1Password> <namespace> <rangeStart> <rangeLength> <device>"
-Assign a locking range for a namespace (CNL feature).
+Assign a locking range for a namespace (CNL feature).  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-deassign <Admin1password> <1...n> <keep> <device>"
-Deassign a Locking Range (CNL feature). 1...n - LRn, keep = T or F.
+Deassign a Locking Range (CNL feature). 1...n - LRn, keep = T or F.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-printTables <SP> <password> <level> <device>"
 Get and print all of the accessible table values and ACL for a Security Protocol.  SP is Admin or Locking.  
 Use Admin1 password or "" for MSID.  level 0 is tables only, 1 tables and ACL, 2 for details, 3 for debug.
+.IP "\-\-enableTperReset <SIDpassword> <D|E> <device>"
+Enable or disable TPer Reset. D = disable, E = enable.
+.IP "\-\-tperReset <device>"
+Send a TPER_RESET request to device.
+.IP "\-\-stackReset <device>"
+Send a STACK_RESET for the base ComID.
 
 .SS TCG Opal devices in Single User Mode only
 .IP "\-\-setup_SUM <0...n> <lrstart> <lrlength> <password> <newpassword> <device>"
@@ -121,8 +127,8 @@ Admin1 password in LockingSP will be set to SID password.
 .IP "\-\-setPassword_SUM <password> <user> <newpassword> <device>"
 Change the password of a TCG Opal User authority. user = User1, User2, ...  Default User passwords are "".
 .IP "\-\-eraseLockingRange_SUM <0...n> <password> <device>"
-Erase a Locking Range, 0 = GLobal 1..n = LRn, password is for the User<n> that owns the Locking Range.
-.IP "\-\-setLockingRange_SUM <0...n> <RW|RO|LK> <password> <device>"
+Erase a Locking Range, 0 = GLobal 1..n = LRn.  password is for the User<n> that owns the Locking Range.
+.IP "\-\-setLockingRange_SUM <0...n> <RW|RO|WO|LK> <password> <device>"
 Set the locking status of a Locking Range, 0 = GLobal 1..n = LRn.  password is for the User<n> that owns the Locking Range.
 .IP "\-\-setupLockingRange_SUM <0...n> <RangeStart> <RangeLength> <password> <device>"
 Setup a new Locking Range, 0 = GLobal 1..n = LRn.  password is for the User<n> that owns the Locking Range.

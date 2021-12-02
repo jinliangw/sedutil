@@ -1181,6 +1181,11 @@ uint8_t DtaDevOpal::setLockingRange(const uint8_t lockingrange, const uint8_t lo
 		writelocked = OPAL_TOKEN::OPAL_TRUE;
 		msg = "RO";
 		break;
+	case OPAL_LOCKINGSTATE::WRITEONLY:
+		readlocked = OPAL_TOKEN::OPAL_TRUE;
+		writelocked = OPAL_TOKEN::OPAL_FALSE;
+		msg = "WO";
+		break;
 	case OPAL_LOCKINGSTATE::ARCHIVELOCKED:
 		archiveuser = 1;
 	case OPAL_LOCKINGSTATE::LOCKED:
@@ -1286,6 +1291,11 @@ uint8_t DtaDevOpal::setLockingRange_SUM(const uint8_t lockingrange, const uint8_
 		readlocked = OPAL_TOKEN::OPAL_FALSE;
 		writelocked = OPAL_TOKEN::OPAL_TRUE;
 		msg = "RO";
+		break;
+	case OPAL_LOCKINGSTATE::WRITEONLY:
+		readlocked = OPAL_TOKEN::OPAL_TRUE;
+		writelocked = OPAL_TOKEN::OPAL_FALSE;
+		msg = "WO";
 		break;
 	case OPAL_LOCKINGSTATE::LOCKED:
 		readlocked = writelocked = OPAL_TOKEN::OPAL_TRUE;

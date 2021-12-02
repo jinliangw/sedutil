@@ -254,11 +254,12 @@ typedef enum _OPAL_LOCKINGSTATE {
     DISABLED        = 0x00,
 	READWRITE       = 0x01,
 	READONLY        = 0x02,
-	LOCKED          = 0x03,
-	ARCHIVELOCKED   = 0x04,
-	ARCHIVEUNLOCKED = 0x05,
-    ENABLERESET     = 0x06,
-    DISABLERESET    = 0x07,
+    WRITEONLY       = 0x03,
+	LOCKED          = 0x04,
+	ARCHIVELOCKED   = 0x05,
+	ARCHIVEUNLOCKED = 0x06,
+    ENABLERESET     = 0x07,
+    DISABLERESET    = 0x08,
 } OPAL_LOCKINGSTATE;
 
 /*
