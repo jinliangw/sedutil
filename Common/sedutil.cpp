@@ -110,6 +110,7 @@ int main(int argc, char * argv[])
 		d->output_format = opts.output_format;
         d->timeout = opts.timeout;
         d->testTimeout = opts.testTimeout;
+        d->delay = opts.delay;
         d->testOversizePacket = opts.testOversizePacket;
         d->useTransaction = opts.useTransaction;
         d->ComIdOption = opts.comID_Option;

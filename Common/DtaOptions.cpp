@@ -228,10 +228,16 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
                     }
                 }
             }
-        } else if (!strcmp("-tt", argv[i])) {
+        } else if (!strncmp("-tt", argv[i], 3)) {
             ++baseOptions;
             opts->testTimeout = 1;
-            LOG(D) << "Configured to test timeout";
+            if (argv[i][3] == '=') {
+                opts->delay = atoi(&argv[i][4]);
+                LOG(D) << "Configured to delay after open session for "
+                       << opts->delay << " milliseconds";
+            } else {
+                LOG(D) << "Configured to test timeout";
+            }
         }
         else if (!strcmp("-top", argv[i])) {
             ++baseOptions;

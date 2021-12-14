@@ -185,8 +185,11 @@ again:
     }
 
     if (d->testTimeout) {
-        // configure to test timeout.  Wait here for timeout + 2 seconds.
-        int64_t waitTime = d->timeout + 2000;
+        int64_t waitTime = d->delay;
+        if (d->delay == 0) {
+            // configure to test timeout.  Wait here for timeout + 2 seconds.
+            waitTime = d->timeout + 2000;
+        }
         LOG(W) << "Testing timeout, waiting " << waitTime << " milliseconds after opening the session";
         std::this_thread::sleep_for(std::chrono::milliseconds(waitTime));
     }
