@@ -104,7 +104,8 @@ cd images
 cd ..
 ```
 
-The various recovery and boot images will be located in the `images` directory.
+The various recovery and boot images will be located in the `images` directory.  These were brought over from the ChubbyAnt fork and I have no idea how well they work.
+If you are not planning to create a bootable disk with an MBR boot image then you can stop after the 'make all' step.  At that point the sedutil-cli executable can be found in the sedutil directory.  You can run it from there using 'sudo ./sedutil-cli' or install it using the instructions below.
 
 ### Install the executable after building:
 ```
