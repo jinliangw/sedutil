@@ -50,7 +50,7 @@ The sedutil project provides a CLI tool (`sedutil-cli`) capable of setting up an
 
 ## Setup
 
-To configure a drive, load a compatible [RECOVERY](https://github.com/ChubbyAnt/sedutil/releases) image onto a USB drive and follow the instructions here:  
+To configure a drive, load a compatible [RECOVERY](https://github.com/paulentzel/sedutil/releases) image onto a USB drive and follow the instructions here:
 
 https://github.com/Drive-Trust-Alliance/sedutil/wiki/Encrypting-your-drive  
 
@@ -83,13 +83,13 @@ sudo apt-get install build-essential autoconf pkg-config libc6-dev make g++-mult
 ### Automatically Build Everything:  
 
 ```
-git clone https://github.com/ChubbyAnt/sedutil && cd sedutil && autoreconf --install && ./configure && make all && cd images && ./getresources && ./buildpbaroot && ./buildbios && ./buildUEFI64 && ./buildrescue Rescue32 && ./buildrescue Rescue64 && cd ..
+git clone https://github.com/paulentzel/sedutil && cd sedutil && autoreconf --install && ./configure && make all && cd images && ./getresources && ./buildpbaroot && ./buildbios && ./buildUEFI64 && ./buildrescue Rescue32 && ./buildrescue Rescue64 && cd ..
 ```
 
 ### Build Everything Manually Step by Step:  
 
 ```
-git clone https://github.com/ChubbyAnt/sedutil
+git clone https://github.com/paulentzel/sedutil
 cd sedutil
 autoreconf --install
 ./configure
@@ -106,6 +106,11 @@ cd ..
 
 The various recovery and boot images will be located in the `images` directory.
 
+### Install the executable after building:
+```
+sudo make install
+```
+This will also install the man page onto the system.
 
 ## Testing
 
