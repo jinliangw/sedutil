@@ -76,12 +76,13 @@ public:
 	 uint8_t setSIDPassword(const char* oldpassword, const char* newpassword,
                             const uint8_t hasholdpwd = 1, const uint8_t hashnewpwd = 1) ;
          /** Set the password of a locking SP user.
+         * @param sp security protocol to access
          * @param authority authority to use for the session
          * @param password  current password
          * @param userid the userid whose password is to be changed
          * @param newpassword  value password is to be changed to
          */
-	 uint8_t setPassword(const char* authority, const char* password, const char* userid,
+	 uint8_t setPassword(const char* sp, const char* authority, const char* password, const char* userid,
                          const char* newpassword);
 	 /** Set the password of a locking SP user in Single User Mode.
          * @param password  current user password
@@ -166,11 +167,13 @@ public:
          */
 	 uint8_t setMBREnable(const uint8_t state, const char* Admin1Password);
          /** enable a locking sp user.
-         * @param authority for the session
+         * @param sp security protocol to access
+         * @param authority authority to use for the session
          * @param password password of locking sp authority
          * @param userid  the user to be enabled
+         * @param status enable/disable
          */
-	 uint8_t enableUser(const char* authority, const char* password, const char* userid,
+	 uint8_t enableUser(const char* sp, const char* authority, const char* password, const char* userid,
                         const OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);
           /** Enable locking on the device
          * @param password password of the admin sp SID authority

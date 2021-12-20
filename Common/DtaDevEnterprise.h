@@ -81,7 +81,7 @@ public:
         /** dummy code not implemented in teh enterprise SSC*/
 	uint8_t revertLockingSP(const char* password, const uint8_t keep = 0);
         /** Enable a Bandmaster Not functional */
-	uint8_t enableUser(const char* authority, const char* password, const char* userid,
+	uint8_t enableUser(const char* sp, const char* authority, const char* password, const char* userid,
                        const OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);
          /** Primitive to set the MBRDone flag.
          * @param state 0 or 1
@@ -94,13 +94,14 @@ public:
          */
 	uint8_t setMBREnable(const uint8_t state, const char* Admin1Password);
 
-         /** Set the password of a locking SP user.
+        /** Set the password of a locking SP user.
+         * @param sp security protocol to access
          * @param authority ignored in Enterprise
          * @param password  current password
          * @param userid the userid whose password is to be changed
          * @param newpassword  value password is to be changed to
          */
-	uint8_t setPassword(const char* authority, const char *password, const char* userid,
+	uint8_t setPassword(const char* sp, const char* authority, const char *password, const char* userid,
                         const char *newpassword);
 	/** dummy code not implemented in the enterprise SSC*/
 	uint8_t setNewPassword_SUM(const char* password, const char* userid, const char* newpassword);

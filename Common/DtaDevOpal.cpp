@@ -222,7 +222,7 @@ uint8_t DtaDevOpal::listLockingRanges(const char* authority, const char* passwor
 	}
 
     vector<uint8_t> authorityUID;
-	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+	if ((lastRC = getAuth4User(OPAL_UID::OPAL_LOCKINGSP_UID, authority, 0, authorityUID)) != 0) {
 		LOG(E) << "Invalid Authority provided " << authority;
 		return lastRC;
 	}
@@ -325,7 +325,7 @@ uint8_t DtaDevOpal::setupLockingRange(const uint8_t lockingrange, const uint64_t
 	LR[8] = lockingrange;
 
     vector<uint8_t> authorityUID;
-	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+	if ((lastRC = getAuth4User(OPAL_UID::OPAL_LOCKINGSP_UID, authority, 0, authorityUID)) != 0) {
 		LOG(E) << "Invalid Authority provided " << authority;
 		return lastRC;
 	}
@@ -503,7 +503,7 @@ uint8_t DtaDevOpal::configureLockingRange(const uint8_t lockingrange, const uint
 	}
 
     vector<uint8_t> authorityUID;
-	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+	if ((lastRC = getAuth4User(OPAL_UID::OPAL_LOCKINGSP_UID, authority, 0, authorityUID)) != 0) {
 		LOG(E) << "Invalid Authority provided " << authority;
 		return lastRC;
 	}
@@ -664,7 +664,7 @@ uint8_t DtaDevOpal::rekeyLockingRange(const uint8_t lockingrange, const char* au
 	}
 
     vector<uint8_t> authorityUID;
-	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+	if ((lastRC = getAuth4User(OPAL_UID::OPAL_LOCKINGSP_UID, authority, 0, authorityUID)) != 0) {
 		LOG(E) << "Invalid Authority provided " << authority;
 		return lastRC;
 	}
@@ -765,7 +765,7 @@ uint8_t DtaDevOpal::assign(const char* authority, const char* password, const ui
     nspace.push_back((ns >> 0) & 0xff);
 
     vector<uint8_t> authorityUID;
-	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+	if ((lastRC = getAuth4User(OPAL_UID::OPAL_LOCKINGSP_UID, authority, 0, authorityUID)) != 0) {
 		LOG(E) << "Invalid Authority provided " << authority;
 		return lastRC;
 	}
@@ -840,7 +840,7 @@ uint8_t DtaDevOpal::deassign(const char* authority, const char* password,
 	uid.push_back(lockingrange);
 
     vector<uint8_t> authorityUID;
-	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+	if ((lastRC = getAuth4User(OPAL_UID::OPAL_LOCKINGSP_UID, authority, 0, authorityUID)) != 0) {
 		LOG(E) << "Invalid Authority provided " << authority;
 		return lastRC;
 	}
@@ -957,7 +957,7 @@ uint8_t DtaDevOpal::eraseLockingRange(const uint8_t lockingrange, const char* pa
 	return 0;
 }
 
-uint8_t DtaDevOpal::getAuth4User(const char* userid, const uint8_t uidorcpin, 
+uint8_t DtaDevOpal::getAuth4User(const OPAL_UID sp, const char* userid, const uint8_t uidorcpin,
                                  std::vector<uint8_t>& userData) const
 {
 	LOG(D1) << "Entering DtaDevOpal::getAuth4User()";
@@ -974,41 +974,63 @@ uint8_t DtaDevOpal::getAuth4User(const char* userid, const uint8_t uidorcpin,
 		userData.push_back(0x0b);
 	else
 		userData.push_back(0x09);
-	if (!memcmp("User", userid, 4)) {
-		userData.push_back(0x00);
-		userData.push_back(0x03);
-		userData.push_back(0x00);
-		userData.push_back(atoi(&userid[4]) &0xff );
-	}
-	else {
-		if (!memcmp("Admin", userid, 5)) {
-			userData.push_back(0x00);
-			userData.push_back(0x01);
-			userData.push_back(0x00);
-			userData.push_back(atoi(&userid[5]) & 0xff );
-		}
-		else {
-			LOG(E) << "Invalid Userid " << userid;
-			userData.clear();
-			return DTAERROR_INVALID_PARAMETER;
-		}
-	}
+
+    if (sp == OPAL_UID::OPAL_LOCKINGSP_UID) {
+        if (!memcmp("User", userid, 4)) {
+    		userData.push_back(0x00);
+    		userData.push_back(0x03);
+    		userData.push_back(0x00);
+    		userData.push_back(atoi(&userid[4]) &0xff );
+    	}
+    	else if (!memcmp("Admin", userid, 5)) {
+            userData.push_back(0x00);
+            userData.push_back(0x01);
+            userData.push_back(0x00);
+            userData.push_back(atoi(&userid[5]) & 0xff );
+        }
+    	else {
+            LOG(E) << "Invalid Userid " << userid;
+            userData.clear();
+            return DTAERROR_INVALID_PARAMETER;
+    	}
+    }
+    else {
+        if (!memcmp("SID", userid, 3)) {
+    		userData.push_back(0x00);
+    		userData.push_back(0x00);
+    		userData.push_back(0x00);
+    		userData.push_back(uidorcpin ? 0x01 : 0x06);
+    	}
+    	else if (!memcmp("Admin", userid, 5)) {
+            userData.push_back(0x00);
+            userData.push_back(0x00);
+            userData.push_back(0x02);
+            userData.push_back(atoi(&userid[5]) & 0xff );
+        }
+    	else {
+            LOG(E) << "Invalid Userid " << userid;
+            userData.clear();
+            return DTAERROR_INVALID_PARAMETER;
+    	}
+    }
 	LOG(D1) << "Exiting DtaDevOpal::getAuth4User()";
 	return 0;
 }
 
-uint8_t DtaDevOpal::setPassword(const char* authority, const char* password, const char* userid,
-                                const char* newpassword)
+uint8_t DtaDevOpal::setPassword(const char* sp, const char* authority, const char* password,
+                                const char* userid, const char* newpassword)
 {
 	LOG(D1) << "Entering DtaDevOpal::setPassword" ;
 	uint8_t lastRC;
 	std::vector<uint8_t> userCPIN, hash, authorityUID;
 
-	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+    OPAL_UID spuid = (sp[0] == 'A') ? OPAL_UID::OPAL_ADMINSP_UID : OPAL_UID::OPAL_LOCKINGSP_UID;
+
+	if ((lastRC = getAuth4User(spuid, authority, 0, authorityUID)) != 0) {
 		LOG(E) << "Invalid Authority provided " << authority;
 		return lastRC;
 	}
-	if ((lastRC = getAuth4User(userid, 10, userCPIN)) != 0) {
+	if ((lastRC = getAuth4User(spuid, userid, 10, userCPIN)) != 0) {
 		LOG(E) << "Unable to find user " << userid << " in Authority Table";
 		return lastRC;
 	}
@@ -1018,7 +1040,7 @@ uint8_t DtaDevOpal::setPassword(const char* authority, const char* password, con
 		LOG(E) << "Unable to create session object ";
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
+	if ((lastRC = session->start(spuid, password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}
@@ -1074,7 +1096,7 @@ uint8_t DtaDevOpal::setNewPassword_SUM(const char* password, const char* userid,
 		delete session;
 		return lastRC;
 	}
-	if ((lastRC = getAuth4User(userid, 10, userCPIN)) != 0) {
+	if ((lastRC = getAuth4User(OPAL_UID::OPAL_LOCKINGSP_UID, userid, 10, userCPIN)) != 0) {
 		LOG(E) << "Unable to find user " << userid << " in Authority Table";
 		delete session;
 		return lastRC;
@@ -1163,7 +1185,7 @@ uint8_t DtaDevOpal::setLockingRange(const uint8_t lockingrange, const uint8_t lo
     std::vector<uint8_t> lockOnReset;
     std::vector<uint8_t> authorityUID;
 
-	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+	if ((lastRC = getAuth4User(OPAL_UID::OPAL_LOCKINGSP_UID, authority, 0, authorityUID)) != 0) {
 		LOG(E) << "Invalid Authority provided " << authority;
 		return lastRC;
 	}
@@ -1413,7 +1435,7 @@ uint8_t DtaDevOpal::setLockingSPvalue(const OPAL_UID table_uid, const OPAL_TOKEN
 	return 0;
 }
 
-uint8_t DtaDevOpal::enableUser(const char* authority, const char* password, const char* userid,
+uint8_t DtaDevOpal::enableUser(const char* sp, const char* authority, const char* password, const char* userid,
                                const OPAL_TOKEN status)
 {
 	LOG(D1) << "Entering DtaDevOpal::enableUser";
@@ -1421,7 +1443,9 @@ uint8_t DtaDevOpal::enableUser(const char* authority, const char* password, cons
 	vector<uint8_t> userUID;
     vector<uint8_t> authorityUID;
 
-	if ((lastRC = getAuth4User(authority, 0, authorityUID)) != 0) {
+    OPAL_UID spuid = (sp[0] == 'A') ? OPAL_UID::OPAL_ADMINSP_UID : OPAL_UID::OPAL_LOCKINGSP_UID;
+
+	if ((lastRC = getAuth4User(spuid, authority, 0, authorityUID)) != 0) {
 		LOG(E) << "Invalid Authority provided " << authority;
 		return lastRC;
 	}
@@ -1432,11 +1456,11 @@ uint8_t DtaDevOpal::enableUser(const char* authority, const char* password, cons
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
 
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
+	if ((lastRC = session->start(spuid, password, authorityUID)) != 0) {
 		delete session;
 		return lastRC;
 	}
-	if ((lastRC = getAuth4User(userid, 0, userUID)) != 0) {
+	if ((lastRC = getAuth4User(spuid, userid, 0, userUID)) != 0) {
 		LOG(E) << "Unable to find user " << userid << " in Authority Table";
 		delete session;
 		return lastRC;

@@ -28,7 +28,7 @@ void usage()
     printf("to the TCG Enterprise, Opal, Opalite and Pyrite SSC specs\n");
     printf("\n");
     printf("General Usage:                  (see readme for extended commandset)\n");
-    printf("sedutil-cli [-vnlx] [-a=auth] [-t=n] [-ds=x,y,z] <action> [options] <device>\n");
+    printf("sedutil-cli [-vnlx] [-a=auth] [-t=n] [-ds=x,y,z] [-sp=sp] <action> [options] <device>\n");
     printf("-v (optional)                   increase verbosity, one to four v's\n");
     printf("-n (optional)                   no password hashing. Passwords will be sent in clear text!\n");
     printf("-l (optional)                   log style output to stderr only\n");
@@ -36,10 +36,11 @@ void usage()
     printf("-c=comID (optional)             select a comID value, offset from base or absolute\n");
     printf("                                example: -c=+1 or -c=0x1000\n");
     printf("-a=authortity (optional)        specify an authority instead of the default for the action\n");
-    printf("                                Authorities are Admin[1..n], User[1..n]\n");
+    printf("                                Authorities are Admin[1..n], User[1..n], SID\n");
     printf("                                This option is not supported for all actions.\n");
     printf("-t=timeout (optional)           specify a session timeout value to be sent with the Start Session\n");
     printf("-ds=x,y,z (optional)            specify datastore sizes for activate\n");
+    printf("-sp=sp (optional)               specify a security protocol to access, Admin or Locking\n");
     printf("\n");
     printf("actions:\n");
     printf("--scan\n");
@@ -82,14 +83,16 @@ void usage()
     printf("                                Change the SID password using the existing password\n");
 	printf("--setAdmin1Pwd <Admin1password> <newAdmin1password> <device> \n");
 	printf("                                Change the Admin1 password in the LockingSP\n");
-	printf("--setPassword <oldpassword, \"\" for MSID> <userid> <newpassword> <device> \n");
+	printf("--setPassword <oldpassword, \"\" for NULL> <userid> <newpassword> <device> \n");
 	printf("                                Change password for userid:\n");
 	printf("                                Enteprise: \"EraseMaster\" or \"BandMaster<n>\"\n");
 	printf("                                Opal: \"Admin<n>\" or \"User<n>\"\n");
     printf("                                default authority is Admin1, over-ride with -a option\n");
+    printf("                                default security protocol is Locking, over-ride with -sp option\n");
     printf("--enableUser <password> <user> <device>\n");
     printf("                                enable a user, user = Admin[2...n] or User[2...n]\n");
     printf("                                default authority is Admin1, over-ride with -a option\n");
+    printf("                                default security protocol is Locking, over-ride with -sp option\n");
 	printf("--setLockingRange <0...n> <RW|RO|WO|LK|+R|-R> <Admin1password> <device> \n");
 	printf("                                Set the status of a Locking Range\n");
 	printf("                                0 = GLobal 1..n  = LRn \n");
@@ -132,9 +135,8 @@ void usage()
 	printf("--revertLockingSP <Admin1password> <device>\n");
 	printf("                                deactivate the Locking SP, erase everything\n");
 	printf("--revertNoErase <Admin1password> <device>\n");
-	printf("                                deactivate the Locking SP \n");
-	printf("                                without erasing the data \n");
-	printf("                                on GLOBAL RANGE *ONLY* \n");
+	printf("                                deactivate the Locking SP without erasing the data\n");
+	printf("                                on GLOBAL RANGE *ONLY*\n");
 	printf("--PSIDrevert <PSID> <device>\n");
 	printf("--yesIreallywanttoERASEALLmydatausingthePSID <PSID> <device>\n");
 	printf("                                revert the device using the PSID *ERASING*\n");
@@ -150,8 +152,7 @@ void usage()
     printf("                                use \"\" as password for MSID.\n");
     printf("                                level 0 = tables, 1 = tables & ACL, 2 = details, 3 = debug\n");
     printf("--enableTperReset <SIDpassword> <D|E> <device>\n");
-    printf("                                Enable TPer Reset\n");
-    printf("                                D = disable, E = enable\n");
+    printf("                                Set Enable TPer Reset, D = disable, E = enable\n");
     printf("--tperReset <device>\n");
     printf("                                Send TPER_RESET to device\n");
     printf("--stackReset <device>\n");
@@ -205,6 +206,11 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
             ++baseOptions;
             strncpy(opts->authority, &argv[i][3], sizeof(opts->authority) - 1);
             LOG(D) << "Default authority over-ride, using " << opts->authority;
+        }
+        else if (!strncmp("-sp=", argv[i], 4)) {
+            ++baseOptions;
+            strncpy(opts->sp, &argv[i][4], sizeof(opts->sp) - 1);
+            LOG(D) << "Default security protcol over-ride, using " << opts->sp;
         }
         else if (!strcmp("-x", argv[i])) {
             baseOptions += 1;

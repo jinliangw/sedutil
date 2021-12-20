@@ -152,18 +152,19 @@ public:
 	virtual uint8_t setSIDPassword(const char* oldpassword, const char* newpassword,
                                    const uint8_t hasholdpwd = 1, const uint8_t hashnewpwd = 1) = 0;
     /** Set the password of a locking SP user.
+     * @param sp security protocol to access
      * @param authority authority to use for the session
 	 * @param password  current password
 	 * @param userid the userid whose password is to be changed
 	 * @param newpassword  value password is to be changed to
 	 */
-	virtual uint8_t setPassword(const char* authority, const char* password, const char* userid,
-                                const char* newpassword) = 0;
+	virtual uint8_t setPassword(const char* sp, const char* authority, const char* password,
+                                const char* userid, const char* newpassword) = 0;
 	/** Set the password of a locking SP user in Single User Mode.
-         * @param password  current user password
-         * @param userid the userid whose password is to be changed
-         * @param newpassword  value password is to be changed to
-         */
+     * @param password  current user password
+     * @param userid the userid whose password is to be changed
+     * @param newpassword  value password is to be changed to
+     */
 	virtual uint8_t setNewPassword_SUM(const char* password, const char* userid, 
                                        const char* newpassword) = 0;
 	/** Loads a disk image file to the shadow MBR table.
@@ -273,13 +274,15 @@ public:
 	 * @param Admin1Password Locking SP authority with access to flag
 	 */
 	virtual uint8_t setMBREnable(const uint8_t state, const char* Admin1Password) = 0;
-    /** enable a locking sp user.
+    /** enable a user.
+     * @param sp security protocol to access
      * @param authority authority to use for the session
 	 * @param password password of locking sp authority
-	 * @param userid  the user to be enabled
+     * @param userid  the user to be enabled
+     * @param status enable/disable
 	 */
-	virtual uint8_t enableUser(const char* authority, const char* password, const char* userid,
-                               const OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE) = 0;
+	virtual uint8_t enableUser(const char* sp, const char* authority, const char* password,
+                               const char* userid, const OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE) = 0;
 	/** Enable locking on the device
 	 * @param password password of the admin sp SID authority
 	 */

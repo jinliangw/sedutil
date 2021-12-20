@@ -138,17 +138,20 @@ public:
          */
 	uint8_t revertLockingSP(const char* password, const uint8_t keep = 0);
          /** get the UID or CPIN ID of a user from their character name
+          * @param sp UID enum of the sp
           * @param userid  Character user name
-          *  @param column UID or CPIN to be returned
-          *  @param userData The UIS or CPIN of the USER
+          * @param column UID or CPIN to be returned
+          * @param userData The UIS or CPIN of the USER
           */
-	uint8_t getAuth4User(const char* userid, const uint8_t column, std::vector<uint8_t> &userData) const;
+	uint8_t getAuth4User(const OPAL_UID sp, const char* userid, const uint8_t column, std::vector<uint8_t> &userData) const;
 		/**  Enable a user in the Locking SP
-		 * @param authority authority to use for the session
-         * @param password the password of the Locking SP authority
-         * @param userid Character name of the user to be enabled
+         * @param sp security protocol to access
+         * @param authority authority to use for the session
+         * @param password password of locking sp authority
+         * @param userid  the user to be enabled
+         * @param status enable/disable
          */
-	uint8_t enableUser(const char* authority, const char* password, const char* userid,
+	uint8_t enableUser(const char* sp, const char* authority, const char* password, const char* userid,
 					   const OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);
         /** Primitive to set the MBRDone flag.
          * @param state 0 or 1
@@ -156,19 +159,20 @@ public:
 		 * @param status true or false to enable/disable
          */
 	uint8_t setMBRDone(const uint8_t state, const char* Admin1Password);
-          /** Primitive to set the MBREnable flag.
+        /** Primitive to set the MBREnable flag.
          * @param state 0 or 1
          * @param Admin1Password Locking SP authority with access to flag
          */
 	uint8_t setMBREnable(const uint8_t state, const char* Admin1Password);
         /** Set the password of a locking SP user.
+         * @param sp security protocol to access
          * @param authority authority to use for the session
          * @param password  current password
          * @param userid the userid whose password is to be changed
          * @param newpassword  value password is to be changed to
          */
-	uint8_t setPassword(const char* authority, const char* password, const char* userid,
-						const char* newpassword);
+        uint8_t setPassword(const char* sp, const char* authority, const char* password, const char* userid,
+                            const char* newpassword);
 	/** Set the password of a locking SP user in Single User Mode.
          * @param password  current user password
          * @param userid the userid whose password is to be changed
@@ -319,7 +323,7 @@ public:
     uint8_t enableTperReset(const char* password, const uint8_t options);
 
 protected:
-        /** Primitive to handle the setting of a value in the locking sp.
+        /** Primitive to handle the setting of a value in the a table in locking sp.
          * @param table_uid UID of the table
          * @param name column to be altered
          * @param value the value to be set
