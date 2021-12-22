@@ -375,6 +375,24 @@ public:
      */
     virtual uint8_t enableTperReset(const char* password, const uint8_t options) = 0;
 
+    /** Get an ACE table entry booelan expression column value and print it
+     * @param sp - security protocol
+     * @param auth - authority to use
+     * @param password - password for that authority
+     * @param halfRow - least significant 32 bits of the ACE table row
+     */
+    virtual uint8_t getACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow) = 0;
+
+    /** Set and ACE table entry boolean expression column to a UID value (only 1)
+     * @param sp - security protocol
+     * @param auth - authority to use
+     * @param password - password for that authority
+     * @param halfRow - least significant 32 bits of the ACE table row
+     * @param expression - user to set (i.e., Admins, Anybody, SID, Admin1, User1)
+     */
+    virtual uint8_t setACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow,
+                           const char* expression) = 0;
+
     /** Issues TPER_RESET to the device as defined in TCG Opal specification
      */
     uint8_t tperReset();

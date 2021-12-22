@@ -492,6 +492,17 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
             END_OPTION
         BEGIN_OPTION(tperReset, 1) OPTION_IS(device) END_OPTION
         BEGIN_OPTION(stackReset, 1) OPTION_IS(device) END_OPTION
+        BEGIN_OPTION(getACE, 3)
+            OPTION_IS(offset)
+            OPTION_IS(password)
+            OPTION_IS(device)
+            END_OPTION
+        BEGIN_OPTION(setACE, 4)
+            OPTION_IS(offset)
+            OPTION_IS(userid)
+            OPTION_IS(password)
+            OPTION_IS(device)
+            END_OPTION
 		else {
             LOG(E) << "Invalid command line argument " << argv[i];
 			return DTAERROR_INVALID_COMMAND;

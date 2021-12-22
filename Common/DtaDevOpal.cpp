@@ -975,14 +975,27 @@ uint8_t DtaDevOpal::getAuth4User(const OPAL_UID sp, const char* userid, const ui
 	else
 		userData.push_back(0x09);
 
-    if (sp == OPAL_UID::OPAL_LOCKINGSP_UID) {
+    if (!memcmp("Anybody", userid, 7)) {
+        userData.push_back(0x00);
+        userData.push_back(0x00);
+        userData.push_back(0x00);
+        userData.push_back(0x01);
+    }
+    else if (!memcmp("Admins", userid, 6)) {
+        userData.push_back(0x00);
+        userData.push_back(0x00);
+        userData.push_back(0x00);
+        userData.push_back(0x02);
+    }
+
+    else if (sp == OPAL_UID::OPAL_LOCKINGSP_UID) {
         if (!memcmp("User", userid, 4)) {
     		userData.push_back(0x00);
     		userData.push_back(0x03);
     		userData.push_back(0x00);
     		userData.push_back(atoi(&userid[4]) &0xff );
-    	}
-    	else if (!memcmp("Admin", userid, 5)) {
+        }
+        else if (!memcmp("Admin", userid, 5)) {
             userData.push_back(0x00);
             userData.push_back(0x01);
             userData.push_back(0x00);
@@ -2264,7 +2277,7 @@ uint8_t DtaDevOpal::enableTperReset(const char* password, const uint8_t options)
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
 	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, OPAL_UID::OPAL_SID_UID)) == 0) {
-        if ((lastRC = setTable(table, OPAL_TOKEN::TPERRESETENABLE, enable)) != 0) {
+        if ((lastRC = getTable(table, OPAL_TOKEN::TPERRESETENABLE, enable)) != 0) {
             LOG(E) << "Unable to update the TperInfo table";
         }
 	}
@@ -2273,6 +2286,141 @@ uint8_t DtaDevOpal::enableTperReset(const char* password, const uint8_t options)
 	LOG(D1) << "Exiting DtaDevOpal::enableTperReset";
 	return lastRC;
 }
+
+uint8_t DtaDevOpal::getACE(const char* sp, const char* authority, const char* password, const uint32_t halfRow)
+{
+    LOG(D1) << "Entering DtaDevOpal::getACE";
+    uint8_t lastRC;
+    std::vector<uint8_t> authorityUID;
+
+    OPAL_UID spuid = (sp[0] == 'A') ? OPAL_UID::OPAL_ADMINSP_UID : OPAL_UID::OPAL_LOCKINGSP_UID;
+
+    if ((lastRC = getAuth4User(spuid, authority, 0, authorityUID)) != 0) {
+        LOG(E) << "Invalid Authority provided " << authority;
+        return lastRC;
+    }
+
+    std::vector<uint8_t> tableRow = {OPAL_SHORT_ATOM::BYTESTRING8, 0x00, 0x00, 0x00, 0x08,
+                                     (uint8_t)(halfRow >> 24),
+                                     (uint8_t)(halfRow >> 16),
+                                     (uint8_t)(halfRow >>  8),
+                                     (uint8_t)(halfRow >>  0)};
+
+    session = new DtaSession(this);
+    if (NULL == session) {
+        LOG(E) << "Unable to create session object ";
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+
+    if ((lastRC = session->start(spuid, password, authorityUID)) != 0) {
+        delete session;
+        return lastRC;
+    }
+    if ((lastRC = getTable(tableRow, (OPAL_TOKEN)0x03, (OPAL_TOKEN)0x04)) != 0) {
+        LOG(E) << "Unable to Get from table UID 0x00000008" << HEXON(8) << halfRow << HEXOFF;
+        delete session;
+        return lastRC;
+    }
+
+    uint64_t row = 0;
+    for (int i = 1; i <= 8; i++) row = (row << 8) + tableRow[i];
+    printf("Row: 0x%016lx, value:", row);
+
+    uint32_t name = 0;
+    uint64_t value = 0;
+    uint8_t bytes[16];
+    int count;
+    for (unsigned int index = 5; index < response.getTokenCount(); ) {
+        if (response.tokenIs(index) == OPAL_TOKEN::STARTNAME) {
+            count = response.getBytes(++index, bytes);
+            for (int i = 0; i < count; i++) name = (name << 8) + bytes[i];
+            if (name == 0x00000C05) {
+                count = response.getBytes(++index, bytes);
+                for (int i = 0; i < count; i++) value = (value << 8) + bytes[i];
+                printf(" UID: 0x%016lx", value);
+            }
+            else if (name == 0x0000040E) {
+                value = response.getUint64(++index);
+                printf(" LOGIC: ");
+                if (value == 0) {
+                    printf("AND");
+                } else if (value == 1) {
+                    printf("OR");
+                } else if (value == 2) {
+                    printf("NOT");
+                } else {
+                    printf("Unknown (0x%lx)", value);
+                }
+            }
+            index += 2;    // skip end name
+        }
+        else {
+            break;
+        }
+    }
+    printf("\n");
+
+    delete session;
+    LOG(D1) << "Exiting DtaDevOpal::getACE()";
+    return 0;
+}
+
+uint8_t DtaDevOpal::setACE(const char* sp, const char* authority, const char* password, const uint32_t halfRow,
+                           const char* user)
+{
+    LOG(D1) << "Entering DtaDevOpal::setACE";
+    uint8_t lastRC;
+    std::vector<uint8_t> authorityUID;
+
+    OPAL_UID spuid = (sp[0] == 'A') ? OPAL_UID::OPAL_ADMINSP_UID : OPAL_UID::OPAL_LOCKINGSP_UID;
+
+    if ((lastRC = getAuth4User(spuid, authority, 0, authorityUID)) != 0) {
+        LOG(E) << "Invalid Authority provided " << authority;
+        return lastRC;
+    }
+
+    std::vector<uint8_t> tableRow = { OPAL_SHORT_ATOM::BYTESTRING8, 0x00, 0x00, 0x00, 0x08,
+                                      (uint8_t)(halfRow >> 24),
+                                      (uint8_t)(halfRow >> 16),
+                                      (uint8_t)(halfRow >>  8),
+                                      (uint8_t)(halfRow >>  0) };
+
+    std::vector<uint8_t> userVec;
+    if ((lastRC = getAuth4User(spuid, user, 0, userVec)) != 0) {
+        LOG(E) << "Invalid user provided " << user;
+        return lastRC;
+    }
+
+    std::vector<uint8_t> expression = {OPAL_TOKEN::STARTLIST,
+                                       OPAL_TOKEN::STARTNAME,
+                                       OPAL_SHORT_ATOM::BYTESTRING4, 0x00, 0x00, 0x0C, 0x05 };
+    expression.insert(expression.end(), userVec.begin(), userVec.end());
+    expression.push_back(OPAL_TOKEN::ENDNAME);
+    expression.push_back(OPAL_TOKEN::ENDLIST);
+
+    session = new DtaSession(this);
+    if (NULL == session) {
+        LOG(E) << "Unable to create session object ";
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+
+    if ((lastRC = session->start(spuid, password, authorityUID)) != 0) {
+        delete session;
+        return lastRC;
+    }
+    if ((lastRC = setTable(tableRow, (OPAL_TOKEN)0x03, expression)) != 0) {
+        LOG(E) << "Unable to Set from table UID " << HEXON(16) << (uint64_t)halfRow + 0x800000000 << HEXOFF;
+        delete session;
+        return lastRC;
+    }
+
+    delete session;
+    LOG(D1) << "Exiting DtaDevOpal::setACE()";
+
+    getACE(sp, authority, password, halfRow);
+    return 0;
+}
+
 
 uint8_t DtaDevOpal::setTable(const std::vector<uint8_t>& table, const OPAL_TOKEN name,
                              const OPAL_TOKEN value)

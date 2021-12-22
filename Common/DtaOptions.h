@@ -128,7 +128,9 @@ typedef enum _sedutiloption {
 	printTables,
     enableTperReset,
     tperReset,
-    stackReset
+    stackReset,
+    getACE,
+    setACE
 
 } sedutiloption;
 

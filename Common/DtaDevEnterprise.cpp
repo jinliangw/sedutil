@@ -1558,6 +1558,20 @@ uint8_t DtaDevEnterprise::enableTperReset(const char* password, const uint8_t op
     return 0xff;
 }
 
+uint8_t DtaDevEnterprise::getACE(const char* sp, const char* auth, const char* password,
+                                 const uint32_t halfRow)
+{
+    cout << "TCG Enterprise SSC does not include the getACE function.\n";
+    return 0xff;
+}
+
+uint8_t DtaDevEnterprise::setACE(const char* sp, const char* auth, const char* password,
+                                 const uint32_t halfRow, const char* expression)
+{
+    cout << "TCG Enterprise SSC does not include the setACE function.\n";
+    return 0xff;
+}
+
 void DtaDevEnterprise::puke()
 {
 

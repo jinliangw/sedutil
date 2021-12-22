@@ -351,6 +351,17 @@ int main(int argc, char * argv[])
     case sedutiloption::stackReset:
         LOG(D) << "Performing STACK_RESET";
         return d->stackReset();
+    case sedutiloption::getACE:
+        LOG(D) << "Performing getACE";
+        return d->getACE(opts.sp[0] ? opts.sp : "Locking",
+                         opts.authority[0] ? opts.authority : "Admin1",
+                         argv[opts.password], strtol(argv[opts.offset], &end, 0));
+    case sedutiloption::setACE:
+        LOG(D) << "Performing setACE";
+        return d->setACE(opts.sp[0] ? opts.sp : "Locking",
+                         opts.authority[0] ? opts.authority : "Admin1",
+                         argv[opts.password], strtol(argv[opts.offset], &end, 0),
+                         argv[opts.userid]);
     default:
         LOG(E) << "Unable to determine what you want to do ";
         usage();
