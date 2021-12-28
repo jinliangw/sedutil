@@ -2277,7 +2277,7 @@ uint8_t DtaDevOpal::enableTperReset(const char* password, const uint8_t options)
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
 	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, OPAL_UID::OPAL_SID_UID)) == 0) {
-        if ((lastRC = getTable(table, OPAL_TOKEN::TPERRESETENABLE, enable)) != 0) {
+        if ((lastRC = setTable(table, OPAL_TOKEN::TPERRESETENABLE, enable)) != 0) {
             LOG(E) << "Unable to update the TperInfo table";
         }
 	}
