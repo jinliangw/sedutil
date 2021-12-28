@@ -303,7 +303,7 @@ int main(int argc, char * argv[])
 		break;
 	case sedutiloption::revertTPer:
 		LOG(D) << "Performing revertTPer on " << argv[opts.device];
-        return d->revertTPer(argv[opts.password], 0, 0);
+        return d->revertTPer(opts.authority[0] ? opts.authority : "SID", argv[opts.password], 0);
         break;
 	case sedutiloption::revertNoErase:
 		LOG(D) << "Performing revertLockingSP  keep global locking range on " << argv[opts.device];
@@ -316,11 +316,11 @@ int main(int argc, char * argv[])
 	case sedutiloption::yesIreallywanttoERASEALLmydatausingthePSID:
 	case sedutiloption::PSIDrevert:
 		LOG(D) << "Performing a PSID Revert on " << argv[opts.device] << " with password " << argv[opts.password];
-        return d->revertTPer(argv[opts.password], 1, 0);
+        return d->revertTPer("PSID", argv[opts.password], 0);
         break;
 	case sedutiloption::PSIDrevertAdminSP:
 		LOG(D) << "Performing a PSID RevertAdminSP on " << argv[opts.device] << " with password " << argv[opts.password];
-        return d->revertTPer(argv[opts.password], 1, 1);
+        return d->revertTPer("PSID", argv[opts.password], 1);
         break;
 	case sedutiloption::eraseLockingRange:
 		LOG(D) << "Erase Locking Range " << (uint16_t)opts.lockingrange;

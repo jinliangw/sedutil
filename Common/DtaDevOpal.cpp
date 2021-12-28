@@ -1018,7 +1018,13 @@ uint8_t DtaDevOpal::getAuth4User(const OPAL_UID sp, const char* userid, const ui
             userData.push_back(0x00);
             userData.push_back(0x00);
             userData.push_back(0x02);
-            userData.push_back(atoi(&userid[5]) & 0xff );
+            userData.push_back(atoi(&userid[5]) & 0xff);
+        }
+        else if (!memcmp("PSID", userid, 4)) {
+            userData.push_back(0x00);
+            userData.push_back(0x01);
+            userData.push_back(0xFF);
+            userData.push_back(0x01);
         }
     	else {
             LOG(E) << "Invalid Userid " << userid;
@@ -1489,10 +1495,18 @@ uint8_t DtaDevOpal::enableUser(const char* sp, const char* authority, const char
 	return 0;
 }
 
-uint8_t DtaDevOpal::revertTPer(const char* password, const uint8_t PSID, const uint8_t AdminSP)
+uint8_t DtaDevOpal::revertTPer(const char* authority, const char* password, const uint8_t AdminSP)
 {
 	LOG(D1) << "Entering DtaDevOpal::revertTPer() " << AdminSP;
+
 	uint8_t lastRC;
+    std::vector<uint8_t> authorityUID;
+
+    if ((lastRC = getAuth4User(OPAL_UID::OPAL_ADMINSP_UID, authority, 0, authorityUID)) != 0) {
+        LOG(E) << "Invalid Authority provided " << authority;
+        return lastRC;
+    }
+
 	DtaCommand *cmd = new DtaCommand();
 	if (NULL == cmd) {
 		LOG(E) << "Unable to create command object ";
@@ -1504,12 +1518,12 @@ uint8_t DtaDevOpal::revertTPer(const char* password, const uint8_t PSID, const u
 		delete cmd;
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	OPAL_UID uid = OPAL_UID::OPAL_SID_UID;
-	if (PSID) {
+
+	if (!strcmp(authority, "PSID")) {
 		session->dontHashPwd(); // PSID pwd should be passed as entered
-		uid = OPAL_UID::OPAL_PSID_UID;
-		}
-	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, uid)) != 0) {
+	}
+
+	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, authorityUID)) != 0) {
 		delete cmd;
 		delete session;
 		return lastRC;

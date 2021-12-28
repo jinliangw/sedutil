@@ -263,7 +263,7 @@ public:
 	* @param lockingrange locking range number
 	*/
 	uint8_t setBandsEnabled(const int16_t rangeid, const char* password);
-	uint8_t revertTPer(const char* password, const uint8_t PSID = 0, const uint8_t AdminSP = 0);
+	uint8_t revertTPer(const char* authority, const char* password, const uint8_t AdminSP = 0);
 	    /** Erase a locking range
 	    * @param lockingrange The number of the locking range (0 = global)
 	    * @param password Password of administrative authority for locking range

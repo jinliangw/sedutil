@@ -88,7 +88,7 @@ uint8NOCODE(rekeyLockingRange, const uint8_t lockingrange, const char* authority
 uint8NOCODE(setBandsEnabled, const int16_t lockingrange, const char* password)
 uint8NOCODE(enableUser, const char* sp, const char* authority, const char* password, const char* userid,
             const OPAL_TOKEN status)
-uint8NOCODE(revertTPer, const char* password, const uint8_t PSID, const uint8_t AdminSP)
+uint8NOCODE(revertTPer, const char* authority, const char* password, const uint8_t AdminSP)
 uint8NOCODE(eraseLockingRange, const uint8_t lockingrange, const char* password)
 uint8NOCODE(printDefaultPassword);
 uint8NOCODE(loadPBA, const char* password, const char* filename)

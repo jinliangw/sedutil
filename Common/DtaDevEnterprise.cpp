@@ -874,11 +874,11 @@ uint8_t DtaDevEnterprise::enableUser(const char* sp, const char* authority, cons
 	LOG(D1) << "Exiting DtaDevEnterprise::enableUser()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::revertTPer(const char* password, const uint8_t PSID,
+uint8_t DtaDevEnterprise::revertTPer(const char* authority, const char* password,
                                      const uint8_t AdminSP)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::revertTPer()";
-	if (password == NULL) { LOG(D4) << "Referencing formal parameters " << PSID; }
+	if (password == NULL) { LOG(D4) << "Referencing formal parameters " << authority; }
 	uint8_t lastRC;
 	DtaCommand *cmd = new DtaCommand();
 	if (NULL == cmd) {
@@ -892,10 +892,10 @@ uint8_t DtaDevEnterprise::revertTPer(const char* password, const uint8_t PSID,
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
 	OPAL_UID uid = OPAL_UID::OPAL_SID_UID;
-	if (PSID) {
+	if (!strcmp(authority, "PSID")) {
 		session->dontHashPwd(); // PSID pwd should be passed as entered
 		uid = OPAL_UID::OPAL_PSID_UID;
-		}
+	}
 	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, uid)) != 0) {
 		delete cmd;
 		delete session;

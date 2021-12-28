@@ -132,6 +132,7 @@ void usage()
     printf("--revertTPer <SIDpassword> <device>\n");
     printf("                                set the device back to factory defaults \n");
 	printf("                                This **ERASES ALL DATA** \n");
+    printf("                                Default authority is SID, over-ride with -a option\n");
 	printf("--revertLockingSP <Admin1password> <device>\n");
 	printf("                                deactivate the Locking SP, erase everything\n");
 	printf("--revertNoErase <Admin1password> <device>\n");

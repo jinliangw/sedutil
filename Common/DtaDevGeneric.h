@@ -203,10 +203,11 @@ public:
 	 uint8_t revertLockingSP(const char* password, const uint8_t keep ) ;
          /** Reset the TPER to its factory condition
          * ERASES ALL DATA!
+         * @param authority selects the authority to use in the session
          * @param password password of authority (SID or PSID)
-         * @param PSID true or false is the authority the PSID
-         *   */
-	 uint8_t revertTPer(const char* password, const uint8_t PSID, const uint8_t AdminSP );
+         * @param AdminSP set to 1 to use AdminSP instead of This for invokingID
+         */
+	 uint8_t revertTPer(const char* authority, const char* password, const uint8_t AdminSP);
 	    /** Erase a locking range
 	    * @param lockingrange The number of the locking range (0 = global)
 	    * @param password Password of administrative authority for locking range
