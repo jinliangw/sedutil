@@ -136,7 +136,7 @@ public:
          * @param password  current SID password
          * @param keep boolean keep the data (NOT FUNCTIONAL)
          */
-	uint8_t revertLockingSP(const char* password, const uint8_t keep = 0);
+	uint8_t revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep = 0);
          /** get the UID or CPIN ID of a user from their character name
           * @param sp UID enum of the sp
           * @param userid  Character user name

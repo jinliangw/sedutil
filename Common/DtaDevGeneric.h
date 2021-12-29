@@ -200,7 +200,7 @@ public:
          * @param password of Administrative user
          * @param keep true false for noerase function NOT WWORKING
          */
-	 uint8_t revertLockingSP(const char* password, const uint8_t keep ) ;
+	 uint8_t revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep ) ;
          /** Reset the TPER to its factory condition
          * ERASES ALL DATA!
          * @param authority selects the authority to use in the session

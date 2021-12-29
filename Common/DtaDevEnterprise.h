@@ -79,7 +79,7 @@ public:
 	/** dummy code not implemented in teh enterprise SSC*/
 	uint8_t eraseLockingRange_SUM(const uint8_t lockingrange, const char* password);
         /** dummy code not implemented in teh enterprise SSC*/
-	uint8_t revertLockingSP(const char* password, const uint8_t keep = 0);
+	uint8_t revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep = 0);
         /** Enable a Bandmaster Not functional */
 	uint8_t enableUser(const char* sp, const char* authority, const char* password, const char* userid,
                        const OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);

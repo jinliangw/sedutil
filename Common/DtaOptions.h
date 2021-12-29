@@ -50,6 +50,7 @@ typedef struct _DTA_OPTIONS {
 	uint8_t level;			/** output level, for print operations */
 	uint8_t offset;			/** offset in table */
 	uint8_t count;			/** Count of bytes in table */
+    uint8_t spindex;        /**< index to sp var */
     uint8_t testTimeout;
     uint8_t testOversizePacket;
 
@@ -91,6 +92,7 @@ typedef enum _sedutiloption {
 	readDataStore,
 	setLockingRange,
 	revertTPer,
+    revertSP,
 	revertNoErase,
 	setLockingRange_SUM,
 	revertLockingSP,

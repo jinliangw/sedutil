@@ -897,15 +897,20 @@ uint8_t DtaDevOpal::setBandsEnabled(const int16_t lockingrange, const char* pass
 	LOG(D1) << "Exiting DtaDevOpal::setBandsEnabled()";
 	return 0;
 }
-uint8_t DtaDevOpal::revertLockingSP(const char* password, const uint8_t keep)
+
+uint8_t DtaDevOpal::revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep)
 {
-	LOG(D1) << "Entering DtaDevOpal::revertLockingSP() keep = " << (uint16_t) keep;
+	LOG(D1) << "Entering DtaDevOpal::revertSP(), sp = " << sp << ", keep = " << (uint16_t) keep;
 	uint8_t lastRC;
-	vector<uint8_t> keepGlobalLocking;
-	keepGlobalLocking.push_back(0x83);
-	keepGlobalLocking.push_back(0x06);
-	keepGlobalLocking.push_back(0x00);
-	keepGlobalLocking.push_back(0x00);
+
+    OPAL_UID spUID = (sp[0] == 'A' || sp[0] == 'a') ? OPAL_UID::OPAL_ADMINSP_UID : OPAL_UID::OPAL_LOCKINGSP_UID;
+
+    vector<uint8_t> authorityUID;
+	if ((lastRC = getAuth4User(spUID, authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
+
 	DtaCommand *cmd = new DtaCommand();
 	if (NULL == cmd) {
 		LOG(E) << "Create session object failed";
@@ -917,15 +922,17 @@ uint8_t DtaDevOpal::revertLockingSP(const char* password, const uint8_t keep)
 		delete cmd;
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+	if ((lastRC = session->start(spUID, password, authorityUID)) != 0) {
 		delete cmd;
 		delete session;
-                LOG(E) << "Start session failed";
+        LOG(E) << "Start session failed";
 		return lastRC;
 	}
+
 	cmd->reset(OPAL_UID::OPAL_THISSP_UID, OPAL_METHOD::REVERTSP);
 	cmd->addToken(OPAL_TOKEN::STARTLIST);
 	if (keep) {
+        std::vector<uint8_t> keepGlobalLocking = {0x83, 0x06, 0x00, 0x00};
 		cmd->addToken(OPAL_TOKEN::STARTNAME);
 		cmd->addToken(keepGlobalLocking);
 		cmd->addToken(OPAL_TOKEN::OPAL_TRUE);
@@ -934,17 +941,18 @@ uint8_t DtaDevOpal::revertLockingSP(const char* password, const uint8_t keep)
 	cmd->addToken(OPAL_TOKEN::ENDLIST);
 	cmd->complete();
 	if ((lastRC = session->sendCommand(cmd, response)) != 0) {
-                LOG(E) << "Command failed";
+        LOG(E) << "Command failed";
 		delete cmd;
 		delete session;
 		return lastRC;
 	}
+
 	// empty list returned so rely on method status
-	LOG(I) << "Revert LockingSP complete";
+	LOG(I) << "RevertSP complete";
 	session->expectAbort();
 	delete cmd;
 	delete session;
-	LOG(D1) << "Exiting DtaDevOpal::revertLockingSP()";
+	LOG(D1) << "Exiting DtaDevOpal::revertSP()";
 	return 0;
 }
 

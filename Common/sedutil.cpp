@@ -288,7 +288,7 @@ int main(int argc, char * argv[])
         break;
  	case sedutiloption::revertLockingSP:
 		LOG(D) << "Performing revertLockingSP on " << argv[opts.device];
-        return d->revertLockingSP(argv[opts.password], 0);
+        return d->revertSP("Lockingin", "Admin1", argv[opts.password], 0);
         break;
 	case sedutiloption::setPassword:
         LOG(D) << "Performing setPassword for user " << argv[opts.userid];
@@ -305,9 +305,12 @@ int main(int argc, char * argv[])
 		LOG(D) << "Performing revertTPer on " << argv[opts.device];
         return d->revertTPer(opts.authority[0] ? opts.authority : "SID", argv[opts.password], 0);
         break;
+    case sedutiloption::revertSP:
+        LOG(D) << "Performing RevertSP on " << argv[opts.spindex] << "SP";
+        return d->revertSP(argv[opts.spindex], argv[opts.userid], argv[opts.password], opts.lockingstate);
 	case sedutiloption::revertNoErase:
 		LOG(D) << "Performing revertLockingSP  keep global locking range on " << argv[opts.device];
-		return d->revertLockingSP(argv[opts.password], 1);
+		return d->revertSP("Locking", "Admin1", argv[opts.password], 1);
 		break;
 	case sedutiloption::validatePBKDF2:
         LOG(D) << "Performing PBKDF2 validation ";
