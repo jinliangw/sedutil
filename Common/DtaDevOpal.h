@@ -324,6 +324,7 @@ public:
     uint8_t getACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow);
     uint8_t setACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow,
                    const char* expression);
+    uint8_t getRandom(const char* sp, const char* authority, const char* password, const uint32_t size);
 
 protected:
         /** Primitive to handle the setting of a value in the a table in locking sp.

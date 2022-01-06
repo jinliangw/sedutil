@@ -212,7 +212,7 @@ public:
 	    * @param lockingrange The number of the locking range (0 = global)
 	    * @param password Password of administrative authority for locking range
 	    */
-	virtual uint8_t eraseLockingRange(const uint8_t lockingrange, const char* password);
+	 uint8_t eraseLockingRange(const uint8_t lockingrange, const char* password);
          /** Dumps an object for diagnostic purposes
          * @param sp index into the OPALUID table for the SP the object is in
          * @param auth the authority to use for the dump
@@ -262,5 +262,5 @@ public:
      uint8_t getACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow);
      uint8_t setACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow,
                     const char* expression);
-
+     uint8_t getRandom(const char* sp, const char* authority, const char* password, const uint32_t size);
 };

@@ -1572,6 +1572,13 @@ uint8_t DtaDevEnterprise::setACE(const char* sp, const char* auth, const char* p
     return 0xff;
 }
 
+uint8_t DtaDevEnterprise::getRandom(const char* sp, const char* authority, const char* password,
+                                    const uint32_t size)
+{
+    cout << "TCG Enterprise SSC does not include the getRandom function.\n";
+    return 0xff;
+}
+
 void DtaDevEnterprise::puke()
 {
 

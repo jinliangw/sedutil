@@ -396,6 +396,14 @@ public:
     virtual uint8_t setACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow,
                            const char* expression) = 0;
 
+    /** Get a Random number
+     * @param sp security protocol
+     * @param authority authority to use when opening the session
+     * @param password PIN for the authority
+     * @param size number of bytes of random numner to request
+     */
+    virtual uint8_t getRandom(const char* sp, const char* authority, const char* password, const uint32_t size) = 0;
+
     /** Issues TPER_RESET to the device as defined in TCG Opal specification
      */
     uint8_t tperReset();

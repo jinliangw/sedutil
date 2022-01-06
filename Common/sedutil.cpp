@@ -365,6 +365,11 @@ int main(int argc, char * argv[])
                          opts.authority[0] ? opts.authority : "Admin1",
                          argv[opts.password], strtol(argv[opts.offset], &end, 0),
                          argv[opts.userid]);
+    case sedutiloption::getRandom:
+        LOG(D) << "Performing Random method call";
+        return d->getRandom(opts.sp[0] ? opts.sp : "Admin",
+                            opts.authority[0] ? opts.authority : "Anybody",
+                            argv[opts.password], atoi(argv[opts.offset]));
     default:
         LOG(E) << "Unable to determine what you want to do ";
         usage();

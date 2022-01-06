@@ -110,6 +110,7 @@ uint8NOCODE(readDataStore, const char* password, const uint8_t table, const uint
 uint8NOCODE(enableTperReset, const char* password, const uint8_t options)
 uint8NOCODE(getACE, const char* sp, const char* auth, const char* password, const uint32_t halfRow)
 uint8NOCODE(setACE, const char* sp, const char* auth, const char* password, const uint32_t halfRow, const char* expression)
+uint8NOCODE(getRandom, const char* sp, const char* auth, const char* password, const uint32_t size)
 
 uint16_t DtaDevGeneric::comID()
 {

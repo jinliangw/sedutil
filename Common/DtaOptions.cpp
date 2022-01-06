@@ -162,6 +162,9 @@ void usage()
     printf("                                Send TPER_RESET to device\n");
     printf("--stackReset <device>\n");
     printf("                                Send a STACK_RESET for the base ComID\n");
+    printf("--getRandom <size> <password> <device>\n");
+    printf("                                Generate a random byte sequence of <size> bytes\n");
+    printf("                                Default SP is Admin, default authority is Anybody\n");
     printf("\n");
     printf("Examples \n");
     printf("sedutil-cli --scan \n");
@@ -516,6 +519,11 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
         BEGIN_OPTION(setACE, 4)
             OPTION_IS(offset)
             OPTION_IS(userid)
+            OPTION_IS(password)
+            OPTION_IS(device)
+            END_OPTION
+        BEGIN_OPTION(getRandom, 3)
+            OPTION_IS(offset)
             OPTION_IS(password)
             OPTION_IS(device)
             END_OPTION

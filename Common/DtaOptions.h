@@ -132,7 +132,8 @@ typedef enum _sedutiloption {
     tperReset,
     stackReset,
     getACE,
-    setACE
+    setACE,
+    getRandom
 
 } sedutiloption;
 
