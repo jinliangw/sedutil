@@ -129,7 +129,7 @@ void usage()
     printf("--deassign <1...n> <keepGlobalKey> <Admin1password> <device>\n");
     printf("                                1...n = LRn, keepGlobalKey = T or F\n");
     printf("                                default authority is Admin1, over-ride with -a option\n");
-    printf("--revertTPer <SIDpassword> <device>\n");
+    printf("--revertTPer <password> <device>\n");
     printf("                                set the device back to factory defaults \n");
 	printf("                                This **ERASES ALL DATA** \n");
     printf("                                Default authority is SID, over-ride with -a option\n");

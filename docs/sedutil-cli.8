@@ -60,7 +60,7 @@ Change the SID password
 .IP "\-\-takeOwnership <newSIDpassword> <device>" 
 Change the SID password using the MSID password
 .IP "\-\-setPassword <oldpassword> <userid> <newpassword> <device>"
-Change the password of an authority. For Enterprise, userid = "EraseMaster" or "BandMaster<n>", 0 <= n <= 1023. For Opal, userid = Admin<n> or User<n>.  oldpassword = "" for MSID. Default authority is Admin1, over-ride with -a option.
+Change the password of an authority. For Enterprise, userid = "EraseMaster" or "BandMaster<n>", 0 <= n <= 1023. For Opal, userid = Admin<n> or User<n>.  oldpassword = "" for MSID. Default authority is Admin1, over-ride with -a option.  Default SP is Locking, over-ride with -sp option.
 .IP "\-\-setLockingRange <0...n> <RW|RO|WO|LK|+R|-R> <password> <device>"
 Set the status of a Locking Range, 0 = GLobal 1..n = LRn.  Options for read/write enabled, read only, write only, locked, or add or remove Programmatic Reset effect. Default authority is Admin1, over-ride with -a option.
 .IP "\-\-enableLockingRange <0...n> <password> <device>"
@@ -68,18 +68,18 @@ Enable a Locking Range, 0 = GLobal 1..n = LRn.  Default authority is Admin1, ove
 .IP "\-\-disableLockingRange <0...n> <Admin1password> <device>"
 Disable a Locking Range, 0 = GLobal 1..n = LRn.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-revertTPer <password> <device>"
-set the device back to factory defaults.  Default authority is SID, over-ride with -a option.
+Set the device back to factory defaults.  Default authority is SID, over-ride with -a option.
 .B This **ERASES ALL DATA**
 .IP "\-\-revertSP <SP> <authority> <password> <keep> <device>"
-set a security protocol to factory defaults.  SP is Admin or Locking, authority is SID or Admin[1..n], keep = T or F (keep the global locking range key)
+Set a security protocol to factory defaults.  SP is Admin or Locking, authority is SID or Admin[1..n], keep = T or F (keep the global locking range key)
 .B This **ERASES ALL DATA** except that protoected by the Global Range key is keep is T.
 .IP "\-\-revertLockingSP <Admin1password> <device>"
-deactivate the Locking SP and erase all of the data.
+Deactivate the Locking SP and erase all of the data.
 .IP "\-\-revertNoErase <Admin1password> <device>"
-deactivate the Locking SP without erasing the data on GLOBAL RANGE *ONLY*
+Deactivate the Locking SP without erasing the data on GLOBAL RANGE *ONLY*
 .IP "\-\-PSIDrevert <PSID> <device>"
 .IP "\-\-yesIreallywanttoERASEALLmydatausingthePSID <PSID> <device>"
-revert the device using the PSID. 
+Revert the device using the PSID.
 .B *ERASING* *ALL* the data
 .IP "\-\-PSIDrevertAdminSP <PSID> <device>"
 Alike to PSIDrevert, but on Enterprise calls AdminSP->Revert instead of
@@ -93,6 +93,8 @@ print MSID
 Change the Admin1 password
 .IP "\-\-activateLockingSP <SIDpassword> <device>"
 Activate the LockingSP. Admin1 password in LockingSP will be set to SID password.
+.IP "\-\-enableUser <password> <user> <device>"
+Enable a user is Admin[1..n] or User[1..n].  Default SP is Locking, over-ride with -sp option.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-setMBREnable <on|off> <Admin1password> <device>"
 Enable|Disable MBR shadowing
 .IP "\-\-setMBRDone <on|off> <Admin1password> <device>"
@@ -123,6 +125,8 @@ Send a STACK_RESET for the base ComID.
 Print the ACE table boolean expression for the row specified by the halfUID value (lower half of row UID). Default SP is Locking, over-ride with -sp option.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-setACE <halfUID> <expression> <password> <device>"
 Set the ACE table boolean expression (UID) for the row specified by the halfUID value (lower half of row UID). Expression is Anybody, SID, PSID, Admins, Admin[1..n], User[1..n]. Default SP is Locking, over-ride with -sp option.  Default authority is Admin1, over-ride with -a option.
+.IP "\-\-getRandom <size> <password> <device>"
+Get a random number of <size> bytes.  Default SP is Admin, over-ride with -sp option.  Default authority is Anybody (password is ignored), over-ride with -a option.
 
 .SS TCG Opal devices in Single User Mode only
 .IP "\-\-setup_SUM <0...n> <lrstart> <lrlength> <password> <newpassword> <device>"
