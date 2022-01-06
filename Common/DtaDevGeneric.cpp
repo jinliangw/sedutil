@@ -67,7 +67,7 @@ uint8NOCODE(configureLockingRange, const uint8_t lockingrange,
             const uint8_t enabled, const char* authority, const char* password)
 uint8NOCODE(configureLockingRange_SUM, const uint8_t lockingrange, const OPAL_LOCKINGSTATE enabled,
             const char* password)
-uint8NOCODE(revertLockingSP, const char* password, const uint8_t keep)
+uint8NOCODE(revertSP, const char* sp, const char* authority, const char* password, const uint8_t keep)
 uint8NOCODE(setup_SUM, const uint8_t lockingrange, const uint64_t start, const uint64_t length,
             const char* Admin1Password, const char* password)
 uint8NOCODE(setPassword, const char* sp, const char* authority, const char* password, const char* userid,
@@ -88,7 +88,7 @@ uint8NOCODE(rekeyLockingRange, const uint8_t lockingrange, const char* authority
 uint8NOCODE(setBandsEnabled, const int16_t lockingrange, const char* password)
 uint8NOCODE(enableUser, const char* sp, const char* authority, const char* password, const char* userid,
             const OPAL_TOKEN status)
-uint8NOCODE(revertTPer, const char* password, const uint8_t PSID, const uint8_t AdminSP)
+uint8NOCODE(revertTPer, const char* authority, const char* password, const uint8_t AdminSP)
 uint8NOCODE(eraseLockingRange, const uint8_t lockingrange, const char* password)
 uint8NOCODE(printDefaultPassword);
 uint8NOCODE(loadPBA, const char* password, const char* filename)
@@ -110,6 +110,7 @@ uint8NOCODE(readDataStore, const char* password, const uint8_t table, const uint
 uint8NOCODE(enableTperReset, const char* password, const uint8_t options)
 uint8NOCODE(getACE, const char* sp, const char* auth, const char* password, const uint32_t halfRow)
 uint8NOCODE(setACE, const char* sp, const char* auth, const char* password, const uint32_t halfRow, const char* expression)
+uint8NOCODE(getRandom, const char* sp, const char* auth, const char* password, const uint32_t size)
 
 uint16_t DtaDevGeneric::comID()
 {

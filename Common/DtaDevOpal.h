@@ -136,7 +136,7 @@ public:
          * @param password  current SID password
          * @param keep boolean keep the data (NOT FUNCTIONAL)
          */
-	uint8_t revertLockingSP(const char* password, const uint8_t keep = 0);
+	uint8_t revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep = 0);
          /** get the UID or CPIN ID of a user from their character name
           * @param sp UID enum of the sp
           * @param userid  Character user name
@@ -263,7 +263,7 @@ public:
 	* @param lockingrange locking range number
 	*/
 	uint8_t setBandsEnabled(const int16_t rangeid, const char* password);
-	uint8_t revertTPer(const char* password, const uint8_t PSID = 0, const uint8_t AdminSP = 0);
+	uint8_t revertTPer(const char* authority, const char* password, const uint8_t AdminSP = 0);
 	    /** Erase a locking range
 	    * @param lockingrange The number of the locking range (0 = global)
 	    * @param password Password of administrative authority for locking range
@@ -324,6 +324,7 @@ public:
     uint8_t getACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow);
     uint8_t setACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow,
                    const char* expression);
+    uint8_t getRandom(const char* sp, const char* authority, const char* password, const uint32_t size);
 
 protected:
         /** Primitive to handle the setting of a value in the a table in locking sp.

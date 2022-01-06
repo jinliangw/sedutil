@@ -79,7 +79,7 @@ public:
 	/** dummy code not implemented in teh enterprise SSC*/
 	uint8_t eraseLockingRange_SUM(const uint8_t lockingrange, const char* password);
         /** dummy code not implemented in teh enterprise SSC*/
-	uint8_t revertLockingSP(const char* password, const uint8_t keep = 0);
+	uint8_t revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep = 0);
         /** Enable a Bandmaster Not functional */
 	uint8_t enableUser(const char* sp, const char* authority, const char* password, const char* userid,
                        const OPAL_TOKEN status = OPAL_TOKEN::OPAL_TRUE);
@@ -149,10 +149,11 @@ public:
 	uint8_t setBandsEnabled(const int16_t lockingrange, const char* password);
         /** Reset the TPER to its factory condition
          * ERASES ALL DATA!
+         * @param authority selects the authority to use in the session
          * @param password password of authority (SID or PSID)
-         * @param PSID true or false is the authority the PSID
-         *   */
-	uint8_t revertTPer(const char* password, const uint8_t PSID = 0, const uint8_t AdminSP = 0);
+         * @param AdminSP set to 1 to use AdminSP instead of This for invokingID
+         */
+	uint8_t revertTPer(const char* authority, const char* password, const uint8_t AdminSP = 0);
 	    /** Erase a locking range
 	    * @param lockingrange The number of the locking range (0 = global)
 	    * @param password Password of administrative authority for locking range
@@ -207,6 +208,7 @@ public:
     uint8_t getACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow);
     uint8_t setACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow,
                    const char* expression);
+    uint8_t getRandom(const char* sp, const char* authority, const char* password, const uint32_t size);
 
 protected:
 	uint8_t getDefaultPassword();

@@ -200,18 +200,19 @@ public:
          * @param password of Administrative user
          * @param keep true false for noerase function NOT WWORKING
          */
-	 uint8_t revertLockingSP(const char* password, const uint8_t keep ) ;
+	 uint8_t revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep ) ;
          /** Reset the TPER to its factory condition
          * ERASES ALL DATA!
+         * @param authority selects the authority to use in the session
          * @param password password of authority (SID or PSID)
-         * @param PSID true or false is the authority the PSID
-         *   */
-	 uint8_t revertTPer(const char* password, const uint8_t PSID, const uint8_t AdminSP );
+         * @param AdminSP set to 1 to use AdminSP instead of This for invokingID
+         */
+	 uint8_t revertTPer(const char* authority, const char* password, const uint8_t AdminSP);
 	    /** Erase a locking range
 	    * @param lockingrange The number of the locking range (0 = global)
 	    * @param password Password of administrative authority for locking range
 	    */
-	virtual uint8_t eraseLockingRange(const uint8_t lockingrange, const char* password);
+	 uint8_t eraseLockingRange(const uint8_t lockingrange, const char* password);
          /** Dumps an object for diagnostic purposes
          * @param sp index into the OPALUID table for the SP the object is in
          * @param auth the authority to use for the dump
@@ -261,5 +262,5 @@ public:
      uint8_t getACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow);
      uint8_t setACE(const char* sp, const char* auth, const char* password, const uint32_t halfRow,
                     const char* expression);
-
+     uint8_t getRandom(const char* sp, const char* authority, const char* password, const uint32_t size);
 };

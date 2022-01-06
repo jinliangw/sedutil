@@ -129,9 +129,14 @@ void usage()
     printf("--deassign <1...n> <keepGlobalKey> <Admin1password> <device>\n");
     printf("                                1...n = LRn, keepGlobalKey = T or F\n");
     printf("                                default authority is Admin1, over-ride with -a option\n");
-    printf("--revertTPer <SIDpassword> <device>\n");
+    printf("--revertTPer <password> <device>\n");
     printf("                                set the device back to factory defaults \n");
 	printf("                                This **ERASES ALL DATA** \n");
+    printf("                                Default authority is SID, over-ride with -a option\n");
+    printf("--revertSP <SP> <authority> <password> <keep> <device>\n");
+    printf("                                revert the selected SP to factory state\n");
+    printf("                                SP is Admin or Locking, keep is T or F\n");
+    printf("                                keep = T only preserves the Global range key\n");
 	printf("--revertLockingSP <Admin1password> <device>\n");
 	printf("                                deactivate the Locking SP, erase everything\n");
 	printf("--revertNoErase <Admin1password> <device>\n");
@@ -157,6 +162,9 @@ void usage()
     printf("                                Send TPER_RESET to device\n");
     printf("--stackReset <device>\n");
     printf("                                Send a STACK_RESET for the base ComID\n");
+    printf("--getRandom <size> <password> <device>\n");
+    printf("                                Generate a random byte sequence of <size> bytes\n");
+    printf("                                Default SP is Admin, default authority is Anybody\n");
     printf("\n");
     printf("Examples \n");
     printf("sedutil-cli --scan \n");
@@ -309,6 +317,17 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
 			OPTION_IS(device)
 			END_OPTION
 		BEGIN_OPTION(revertTPer, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
+        BEGIN_OPTION(revertSP, 5)
+            OPTION_IS(spindex)
+            OPTION_IS(userid)
+            OPTION_IS(password)
+            TESTARG(t, lockingstate, 1)
+            TESTARG(T, lockingstate, 1)
+            TESTARG(f, lockingstate, 0)
+            TESTARG(F, lockingstate, 0)
+            TESTFAIL("Invalid value for keep argument (T or F)")
+            OPTION_IS(device)
+            END_OPTION
 		BEGIN_OPTION(revertNoErase, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(PSIDrevert, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(PSIDrevertAdminSP, 2) OPTION_IS(password) OPTION_IS(device) END_OPTION
@@ -500,6 +519,11 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
         BEGIN_OPTION(setACE, 4)
             OPTION_IS(offset)
             OPTION_IS(userid)
+            OPTION_IS(password)
+            OPTION_IS(device)
+            END_OPTION
+        BEGIN_OPTION(getRandom, 3)
+            OPTION_IS(offset)
             OPTION_IS(password)
             OPTION_IS(device)
             END_OPTION

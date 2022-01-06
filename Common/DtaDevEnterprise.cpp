@@ -338,9 +338,9 @@ uint8_t DtaDevEnterprise::rekeyLockingRange(const uint8_t lockingrange, const ch
 	LOG(D1) << "Exiting DtaDevEnterprise::rekeyLockingRange()";
 	return 0;
 }
-uint8_t DtaDevEnterprise::revertLockingSP(const char* password, const uint8_t keep)
+uint8_t DtaDevEnterprise::revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep)
 {
-	LOG(D1) << "Entering DtaDevEnterprise::revertLockingSP()";
+	LOG(D1) << "Entering DtaDevEnterprise::revertSP()";
 	if(password == NULL) { LOG(D4) << "Referencing formal parameters " << keep; }
 	uint8_t lastRC;
 	DtaCommand *cmd = new DtaCommand();
@@ -373,11 +373,11 @@ uint8_t DtaDevEnterprise::revertLockingSP(const char* password, const uint8_t ke
 		delete session;
 		return lastRC;
 	}
-	LOG(I) << "revertLockingSP completed successfully";
+	LOG(I) << "revertSP completed successfully";
 	session->expectAbort();
 	delete cmd;
 	delete session;
-	LOG(D1) << "Exiting DtaDevEnterprise::revertLockingSP()";
+	LOG(D1) << "Exiting DtaDevEnterprise::revertSP()";
 	return 0;
 }
 uint8_t DtaDevEnterprise::setPassword(const char* sp, const char* authority, const char* password,
@@ -874,11 +874,11 @@ uint8_t DtaDevEnterprise::enableUser(const char* sp, const char* authority, cons
 	LOG(D1) << "Exiting DtaDevEnterprise::enableUser()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::revertTPer(const char* password, const uint8_t PSID,
+uint8_t DtaDevEnterprise::revertTPer(const char* authority, const char* password,
                                      const uint8_t AdminSP)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::revertTPer()";
-	if (password == NULL) { LOG(D4) << "Referencing formal parameters " << PSID; }
+	if (password == NULL) { LOG(D4) << "Referencing formal parameters " << authority; }
 	uint8_t lastRC;
 	DtaCommand *cmd = new DtaCommand();
 	if (NULL == cmd) {
@@ -892,10 +892,10 @@ uint8_t DtaDevEnterprise::revertTPer(const char* password, const uint8_t PSID,
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
 	OPAL_UID uid = OPAL_UID::OPAL_SID_UID;
-	if (PSID) {
+	if (!strcmp(authority, "PSID")) {
 		session->dontHashPwd(); // PSID pwd should be passed as entered
 		uid = OPAL_UID::OPAL_PSID_UID;
-		}
+	}
 	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, uid)) != 0) {
 		delete cmd;
 		delete session;
@@ -1569,6 +1569,13 @@ uint8_t DtaDevEnterprise::setACE(const char* sp, const char* auth, const char* p
                                  const uint32_t halfRow, const char* expression)
 {
     cout << "TCG Enterprise SSC does not include the setACE function.\n";
+    return 0xff;
+}
+
+uint8_t DtaDevEnterprise::getRandom(const char* sp, const char* authority, const char* password,
+                                    const uint32_t size)
+{
+    cout << "TCG Enterprise SSC does not include the getRandom function.\n";
     return 0xff;
 }
 

@@ -288,7 +288,7 @@ int main(int argc, char * argv[])
         break;
  	case sedutiloption::revertLockingSP:
 		LOG(D) << "Performing revertLockingSP on " << argv[opts.device];
-        return d->revertLockingSP(argv[opts.password], 0);
+        return d->revertSP("Lockingin", "Admin1", argv[opts.password], 0);
         break;
 	case sedutiloption::setPassword:
         LOG(D) << "Performing setPassword for user " << argv[opts.userid];
@@ -303,11 +303,14 @@ int main(int argc, char * argv[])
 		break;
 	case sedutiloption::revertTPer:
 		LOG(D) << "Performing revertTPer on " << argv[opts.device];
-        return d->revertTPer(argv[opts.password], 0, 0);
+        return d->revertTPer(opts.authority[0] ? opts.authority : "SID", argv[opts.password], 0);
         break;
+    case sedutiloption::revertSP:
+        LOG(D) << "Performing RevertSP on " << argv[opts.spindex] << "SP";
+        return d->revertSP(argv[opts.spindex], argv[opts.userid], argv[opts.password], opts.lockingstate);
 	case sedutiloption::revertNoErase:
 		LOG(D) << "Performing revertLockingSP  keep global locking range on " << argv[opts.device];
-		return d->revertLockingSP(argv[opts.password], 1);
+		return d->revertSP("Locking", "Admin1", argv[opts.password], 1);
 		break;
 	case sedutiloption::validatePBKDF2:
         LOG(D) << "Performing PBKDF2 validation ";
@@ -316,11 +319,11 @@ int main(int argc, char * argv[])
 	case sedutiloption::yesIreallywanttoERASEALLmydatausingthePSID:
 	case sedutiloption::PSIDrevert:
 		LOG(D) << "Performing a PSID Revert on " << argv[opts.device] << " with password " << argv[opts.password];
-        return d->revertTPer(argv[opts.password], 1, 0);
+        return d->revertTPer("PSID", argv[opts.password], 0);
         break;
 	case sedutiloption::PSIDrevertAdminSP:
 		LOG(D) << "Performing a PSID RevertAdminSP on " << argv[opts.device] << " with password " << argv[opts.password];
-        return d->revertTPer(argv[opts.password], 1, 1);
+        return d->revertTPer("PSID", argv[opts.password], 1);
         break;
 	case sedutiloption::eraseLockingRange:
 		LOG(D) << "Erase Locking Range " << (uint16_t)opts.lockingrange;
@@ -362,6 +365,11 @@ int main(int argc, char * argv[])
                          opts.authority[0] ? opts.authority : "Admin1",
                          argv[opts.password], strtol(argv[opts.offset], &end, 0),
                          argv[opts.userid]);
+    case sedutiloption::getRandom:
+        LOG(D) << "Performing Random method call";
+        return d->getRandom(opts.sp[0] ? opts.sp : "Admin",
+                            opts.authority[0] ? opts.authority : "Anybody",
+                            argv[opts.password], atoi(argv[opts.offset]));
     default:
         LOG(E) << "Unable to determine what you want to do ";
         usage();

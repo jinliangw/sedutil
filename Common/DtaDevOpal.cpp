@@ -897,15 +897,20 @@ uint8_t DtaDevOpal::setBandsEnabled(const int16_t lockingrange, const char* pass
 	LOG(D1) << "Exiting DtaDevOpal::setBandsEnabled()";
 	return 0;
 }
-uint8_t DtaDevOpal::revertLockingSP(const char* password, const uint8_t keep)
+
+uint8_t DtaDevOpal::revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep)
 {
-	LOG(D1) << "Entering DtaDevOpal::revertLockingSP() keep = " << (uint16_t) keep;
+	LOG(D1) << "Entering DtaDevOpal::revertSP(), sp = " << sp << ", keep = " << (uint16_t) keep;
 	uint8_t lastRC;
-	vector<uint8_t> keepGlobalLocking;
-	keepGlobalLocking.push_back(0x83);
-	keepGlobalLocking.push_back(0x06);
-	keepGlobalLocking.push_back(0x00);
-	keepGlobalLocking.push_back(0x00);
+
+    OPAL_UID spUID = (sp[0] == 'A' || sp[0] == 'a') ? OPAL_UID::OPAL_ADMINSP_UID : OPAL_UID::OPAL_LOCKINGSP_UID;
+
+    vector<uint8_t> authorityUID;
+	if ((lastRC = getAuth4User(spUID, authority, 0, authorityUID)) != 0) {
+		LOG(E) << "Invalid Authority provided " << authority;
+		return lastRC;
+	}
+
 	DtaCommand *cmd = new DtaCommand();
 	if (NULL == cmd) {
 		LOG(E) << "Create session object failed";
@@ -917,15 +922,17 @@ uint8_t DtaDevOpal::revertLockingSP(const char* password, const uint8_t keep)
 		delete cmd;
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
+	if ((lastRC = session->start(spUID, password, authorityUID)) != 0) {
 		delete cmd;
 		delete session;
-                LOG(E) << "Start session failed";
+        LOG(E) << "Start session failed";
 		return lastRC;
 	}
+
 	cmd->reset(OPAL_UID::OPAL_THISSP_UID, OPAL_METHOD::REVERTSP);
 	cmd->addToken(OPAL_TOKEN::STARTLIST);
 	if (keep) {
+        std::vector<uint8_t> keepGlobalLocking = {0x83, 0x06, 0x00, 0x00};
 		cmd->addToken(OPAL_TOKEN::STARTNAME);
 		cmd->addToken(keepGlobalLocking);
 		cmd->addToken(OPAL_TOKEN::OPAL_TRUE);
@@ -934,17 +941,18 @@ uint8_t DtaDevOpal::revertLockingSP(const char* password, const uint8_t keep)
 	cmd->addToken(OPAL_TOKEN::ENDLIST);
 	cmd->complete();
 	if ((lastRC = session->sendCommand(cmd, response)) != 0) {
-                LOG(E) << "Command failed";
+        LOG(E) << "Command failed";
 		delete cmd;
 		delete session;
 		return lastRC;
 	}
+
 	// empty list returned so rely on method status
-	LOG(I) << "Revert LockingSP complete";
+	LOG(I) << "RevertSP complete";
 	session->expectAbort();
 	delete cmd;
 	delete session;
-	LOG(D1) << "Exiting DtaDevOpal::revertLockingSP()";
+	LOG(D1) << "Exiting DtaDevOpal::revertSP()";
 	return 0;
 }
 
@@ -1018,7 +1026,13 @@ uint8_t DtaDevOpal::getAuth4User(const OPAL_UID sp, const char* userid, const ui
             userData.push_back(0x00);
             userData.push_back(0x00);
             userData.push_back(0x02);
-            userData.push_back(atoi(&userid[5]) & 0xff );
+            userData.push_back(atoi(&userid[5]) & 0xff);
+        }
+        else if (!memcmp("PSID", userid, 4)) {
+            userData.push_back(0x00);
+            userData.push_back(0x01);
+            userData.push_back(0xFF);
+            userData.push_back(0x01);
         }
     	else {
             LOG(E) << "Invalid Userid " << userid;
@@ -1489,10 +1503,18 @@ uint8_t DtaDevOpal::enableUser(const char* sp, const char* authority, const char
 	return 0;
 }
 
-uint8_t DtaDevOpal::revertTPer(const char* password, const uint8_t PSID, const uint8_t AdminSP)
+uint8_t DtaDevOpal::revertTPer(const char* authority, const char* password, const uint8_t AdminSP)
 {
 	LOG(D1) << "Entering DtaDevOpal::revertTPer() " << AdminSP;
+
 	uint8_t lastRC;
+    std::vector<uint8_t> authorityUID;
+
+    if ((lastRC = getAuth4User(OPAL_UID::OPAL_ADMINSP_UID, authority, 0, authorityUID)) != 0) {
+        LOG(E) << "Invalid Authority provided " << authority;
+        return lastRC;
+    }
+
 	DtaCommand *cmd = new DtaCommand();
 	if (NULL == cmd) {
 		LOG(E) << "Unable to create command object ";
@@ -1504,12 +1526,12 @@ uint8_t DtaDevOpal::revertTPer(const char* password, const uint8_t PSID, const u
 		delete cmd;
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
-	OPAL_UID uid = OPAL_UID::OPAL_SID_UID;
-	if (PSID) {
+
+	if (!strcmp(authority, "PSID")) {
 		session->dontHashPwd(); // PSID pwd should be passed as entered
-		uid = OPAL_UID::OPAL_PSID_UID;
-		}
-	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, uid)) != 0) {
+	}
+
+	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, authorityUID)) != 0) {
 		delete cmd;
 		delete session;
 		return lastRC;
@@ -2421,6 +2443,76 @@ uint8_t DtaDevOpal::setACE(const char* sp, const char* authority, const char* pa
     return 0;
 }
 
+uint8_t DtaDevOpal::getRandom(const char* sp, const char* authority, const char* password,
+                              const uint32_t size)
+{
+    LOG(D1) << "Entering DtaDevOpal::getRandom";
+    uint8_t lastRC;
+    std::vector<uint8_t> authorityUID;
+
+    OPAL_UID spuid = ((sp[0] == 'A') || (sp[0] == 'a')) ? OPAL_UID::OPAL_ADMINSP_UID :
+                                                          OPAL_UID::OPAL_LOCKINGSP_UID;
+
+    if ((lastRC = getAuth4User(spuid, authority, 0, authorityUID)) != 0) {
+        LOG(E) << "Invalid Authority provided " << authority;
+        return lastRC;
+    }
+
+    session = new DtaSession(this);
+    if (NULL == session) {
+        LOG(E) << "Unable to create session object ";
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+
+    if (strncmp(authority, "Anybody", 7) == 0) {
+        if ((lastRC = session->start(spuid)) != 0) {
+            delete session;
+            return lastRC;
+        }
+    } else {
+        if ((lastRC = session->start(spuid, password, authorityUID)) != 0) {
+            delete session;
+            return lastRC;
+        }
+    }
+
+    DtaCommand *cmd = new DtaCommand();
+    if (NULL == cmd) {
+        LOG(E) << "Unable to create command object ";
+        delete session;
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+
+    cmd->reset(OPAL_UID::OPAL_THISSP_UID, OPAL_METHOD::RANDOM);
+    cmd->addToken(OPAL_TOKEN::STARTLIST);
+    cmd->addToken((uint64_t)size);
+    cmd->addToken(OPAL_TOKEN::ENDLIST);
+    cmd->complete();
+    if ((lastRC = session->sendCommand(cmd, response)) != 0) {
+        delete cmd;
+        delete session;
+        return lastRC;
+    }
+
+    if ((response.getTokenCount() > 3) && response.isByteSequence(1)) {
+        uint32_t returnBytes = response.getLength(1);
+        if (returnBytes > 512) {
+            LOG(E) << "Error decoding Random response, size = " << returnBytes;
+        } else {
+            uint8_t array[512];
+            uint32_t returnedBytes = response.getBytes(1, array);
+            for (uint32_t i = 0; i < returnedBytes; i++) {
+                printf("%02x", array[i]);
+            }
+            printf("\n");
+        }
+    }
+
+    delete cmd;
+    delete session;
+    LOG(D1) << "Exiting DtaDevOpal::getRandom()";
+    return 0;
+}
 
 uint8_t DtaDevOpal::setTable(const std::vector<uint8_t>& table, const OPAL_TOKEN name,
                              const OPAL_TOKEN value)
