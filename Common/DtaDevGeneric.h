@@ -184,7 +184,8 @@ public:
 	 * @param lockingrange locking range to activate in SUM
 	 * @param password password of the admin sp SID authority
 	 */
-	 uint8_t activateLockingSP_SUM(const uint8_t lockingrange, const char* password,
+	 uint8_t activateLockingSP_SUM(const std::vector<uint32_t>& ranges, const uint32_t policy,
+                                   const char* password,
                                    const uint32_t dsCount = 0, const uint32_t dsSizes[] = NULL);
 	/** Erase a Single User Mode locking range by calling the drive's erase method
          * @param lockingrange The Locking Range to erase
@@ -250,7 +251,7 @@ public:
 
      // virtual methods from DtaDev class
      uint8_t assign(const char* authority, const char* password, const uint32_t ns,
-                    const uint64_t start = 0, const uint64_t length = 0);
+                    const uint64_t start = 0, const uint64_t length = 0, const uint32_t sum = 0);
      uint8_t deassign(const char* authority, const char* password, const uint8_t lockingrange,
                       const bool keep);
      uint8_t readMBR(const char* password, const uint32_t offset, const uint32_t count);

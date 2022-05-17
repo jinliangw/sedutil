@@ -255,8 +255,8 @@ typedef struct _Discovery0DatastoreTable {
  */
 typedef struct _Discovery0OPALV200 {
     uint16_t featureCode; /* 0x0203 */
-    uint8_t reserved_v : 4;
-    uint8_t version : 4;
+    uint8_t minorVersion : 4;
+    uint8_t version      : 4;
     uint8_t length;
     uint16_t baseCommID;
     uint16_t numCommIDs;
@@ -310,8 +310,8 @@ typedef struct _Discovery0BlockSID {
  */
 typedef struct _Discovery0CNL {
     uint16_t featureCode; /* 0x0403 */
-    uint8_t reserved_v : 4;
-    uint8_t version : 4;
+    uint8_t minor_version : 4;
+    uint8_t version       : 4;
     uint8_t length;
 
     /* big endian
@@ -319,7 +319,8 @@ typedef struct _Discovery0CNL {
     uint8_t range_P : 1;
     uint8_t reserved04 : 6;
      */
-    uint8_t reserved04 : 6;
+    uint8_t reserved04 : 5;
+    uint8_t sum_C      : 1;
     uint8_t range_P    : 1;
     uint8_t range_C    : 1;
 
@@ -543,6 +544,8 @@ typedef struct _OPAL_DiskInfo {
 	uint16_t OPAL10_basecomID;
 	uint16_t OPAL10_numcomIDs;
     uint8_t OPAL10_rangeCrossing;
+    uint8_t OPAL20_version      : 4;
+    uint8_t OPAL20_minorVersion : 4;
     uint16_t OPAL20_basecomID;
     uint16_t OPAL20_numcomIDs;
     uint8_t OPAL20_initialPIN;
@@ -555,8 +558,11 @@ typedef struct _OPAL_DiskInfo {
     uint8_t BlockSID_lockingSPFreezeSup : 1;
     uint8_t BlockSID_lockingSPFreezeState : 1;
     uint8_t BlockSID_hardwareReset : 1;
+    uint8_t CNL_version      : 4;
+    uint8_t CNL_minorVersion : 4;
     uint8_t CNL_rangeC : 1;
     uint8_t CNL_rangeP : 1;
+    uint8_t CNL_sumC   : 1;
     uint32_t CNL_maxKeyCount;
     uint32_t CNL_unusedKeyCount;
     uint32_t CNL_maxRangesPerNS;

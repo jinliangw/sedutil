@@ -93,15 +93,15 @@ uint8NOCODE(eraseLockingRange, const uint8_t lockingrange, const char* password)
 uint8NOCODE(printDefaultPassword);
 uint8NOCODE(loadPBA, const char* password, const char* filename)
 uint8NOCODE(activateLockingSP, const char* password, const uint32_t dsCount, const uint32_t dsSizes[])
-uint8NOCODE(activateLockingSP_SUM, const uint8_t lockingrange, const char* password, const uint32_t dsCount,
-            const uint32_t dsSizes[])
+uint8NOCODE(activateLockingSP_SUM, const std::vector<uint32_t>& ranges, const uint32_t policy, const char* password,
+            const uint32_t dsCount, const uint32_t dsSizes[])
 uint8NOCODE(eraseLockingRange_SUM, const uint8_t lockingrange, const char* password)
 uint8NOCODE(takeOwnership, const char* newpassword)
 uint8NOCODE(setSIDPassword, const char* oldpassword, const char* newpassword,
             const uint8_t hasholdpwd, const uint8_t hashnewpwd)
 uint8NOCODE(printTables, const char* sp, const char* password, const uint8_t level)
 uint8NOCODE(assign, const char* authority, const char* password, const uint32_t ns, const uint64_t start,
-            const uint64_t length)
+            const uint64_t length, const uint32_t sum)
 uint8NOCODE(deassign, const char* authority, const char* password, const uint8_t lockingrange, const bool keep)
 uint8NOCODE(readMBR, const char* password, const uint32_t offset, const uint32_t count)
 uint8NOCODE(loadDataStore, const char* password, const uint8_t table, const uint32_t offset,

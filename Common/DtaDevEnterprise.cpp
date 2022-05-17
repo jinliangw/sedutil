@@ -1018,8 +1018,9 @@ uint8_t DtaDevEnterprise::activateLockingSP(const char* password, const uint32_t
 	LOG(D1) << "Exiting DtaDevEnterprise::activatLockingSP()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::activateLockingSP_SUM(const uint8_t lockingrange, const char* password,
-                                                const uint32_t dsCount, const uint32_t dsSizes[])
+uint8_t DtaDevEnterprise::activateLockingSP_SUM(const std::vector<uint32_t>& ranges, const uint32_t policy, 
+												const char* password, const uint32_t dsCount,
+												const uint32_t dsSizes[])
 {
 	LOG(D1) << "Entering DtaDevEnterprise::activateLockingSP_SUM()";
 	if (password == NULL) { LOG(D4) << "Referencing formal parameters "; }
@@ -1520,7 +1521,7 @@ uint8_t DtaDevEnterprise::properties()
 }
 
 uint8_t DtaDevEnterprise::assign(const char* authority, const char* password, const uint32_t ns,
-                                 const uint64_t start, const uint64_t length)
+                                 const uint64_t start, const uint64_t length, const uint32_t sum)
 {
     cout << "TCG Enterprise SSC does not include the assign method.\n";
     return 0xff;

@@ -109,7 +109,8 @@ uint8_t DtaDevOpal::setup_SUM(const uint8_t lockingrange, const uint64_t start, 
 			LOG(E) << "Setup_SUM failed - unable to take ownership";
 			return lastRC;
 		}
-		if ((lastRC = activateLockingSP_SUM(lockingrange, Admin1Password)) != 0) {
+		std::vector<uint32_t> ranges(lockingrange);
+		if ((lastRC = activateLockingSP_SUM(ranges, 0, Admin1Password)) != 0) {
 			LOG(E) << "Setup_SUM failed - unable to activate LockingSP in SUM";
 			return lastRC;
 		}
@@ -261,47 +262,116 @@ uint8_t DtaDevOpal::listLockingRanges(const char* authority, const char* passwor
                     LR[6] = 0x03;  // non global ranges are 00000802000300nn
                     LR[8] = i & 0xff;
                 }
-		if ((lastRC = getTable(LR, _OPAL_TOKEN::RANGESTART, _OPAL_TOKEN::ACTIVEKEY)) != 0) {
+		if ((lastRC = getTable(LR, _OPAL_TOKEN::RANGESTART, (uint32_t)-1)) != 0) {
 			delete session;
 			return lastRC;
 		}
 
-        std::string resets;
-        if ((response.getTokenCount() > 30) && (response.getUint8(27) == 9)) {
-            resets.append("LockOnReset =");
-            // the response included the reset list, parse it
-            for (uint32_t t = 29; t < response.getTokenCount(); t++) {
-                if (response.tokenIs(t) == OPAL_TOKEN::ENDLIST) {
-                    break;
-                }
-                char buf[4];
-                sprintf(buf, " %xh", response.getUint32(t));
-                resets.append(buf);
-            }
-        }
+		std::string rangeStart("N/A");
+		std::string rangeLength("N/A");
+		std::string wle("N/A");
+		std::string rle("N/A");
+		std::string wl("N/A");
+		std::string rl("N/A");
+		std::string resets;
+		std::string ns("N/A");
+		std::string global("N/A");
 
-		LOG(I) << "LR" << i << " Begin " << response.getUint64(4) <<
-			" for " << response.getUint64(8);
-		LOG(I)	<< "            RLKEna =" << (response.getUint8(12) ? " Y " : " N ") <<
-			" WLKEna =" << (response.getUint8(16) ? " Y " : " N ") <<
-			" RLocked =" << (response.getUint8(20) ? " Y " : " N ") <<
-			" WLocked =" << (response.getUint8(24) ? " Y " : " N ") << resets;
+		int tokenCount = response.getTokenCount();
 
-		if (disk_info.CNL && (i != 0)) {
-			if ((lastRC = getTable(LR, OPAL_TOKEN::NAMESPACEID, OPAL_TOKEN::NAMESPACEGLOBAL)) != 0) {
-				LOG(W) << "                Device supports CNL but a Get for the namespace fields failed " << lastRC;
-			} else {
-                if ((response.getTokenCount() > 10) &&
-                    (response.tokenIs(2) == OPAL_TOKEN::STARTNAME) &&
-                    (response.tokenIs(6) == OPAL_TOKEN::STARTNAME)) {
-                    LOG(I) << "            NamespaceID = " << response.getUint32(4) <<
-                        " Global = " << (response.getUint8(8) ? "Y" : "N");
-                } else {
-                    LOG(I) << "            Missing value for NamespaceID and/or Global column.";
-                }
+		for (int t = 2; t < tokenCount; t += 2) {
+			if (response.tokenIs(t) != OPAL_TOKEN::STARTNAME) {
+				break;
+			}
+			switch (response.getUint32(++t)) {
+			case 3:
+				rangeStart = to_string(response.getUint64(++t));
+				break;
+			case 4:
+				rangeLength = to_string(response.getUint64(++t));
+				break;
+			case 5:
+				rle = response.getUint32(++t) ? "Y" : "N";
+				break;
+			case 6:
+				wle = response.getUint32(++t) ? "Y" : "N";
+				break;
+			case 7:
+				rl = response.getUint32(++t) ? "Y" : "N";
+				break;
+			case 8:
+				wl = response.getUint32(++t) ? "Y" : "N";
+				break;
+			case 9:
+				resets.append("  LockOnReset =");
+				// the response included the reset list, parse it
+				t += 2;		// skip the SOL
+				for (; t < tokenCount; ++t) {
+					if (response.tokenIs(t) == OPAL_TOKEN::ENDLIST) {
+						break;
+					}
+					char buf[4];
+					sprintf(buf, " %xh", response.getUint32(t));
+					resets.append(buf);
+				}
+				break;
+			case 20:
+				ns = to_string(response.getUint64(++t));
+				break;
+			case 21:
+				global = response.getUint32(++t) ? "Y" : "N";
+				break;
+			default:
+				for (++t; t < tokenCount; ++t) {
+					if (response.tokenIs(t) == OPAL_TOKEN::ENDNAME) {
+						--t;
+						break;
+					}
+				}
+				break;
+			}
+		}
+
+		LOG(I) << "LR" << i << " Begin " << rangeStart << " for " << rangeLength;
+		LOG(I) << "    RLKEna = " << rle << "  WLKEna = " << wle <<
+			          "  RLocked = " << rl << "  WLocked = " << wl << resets;
+        LOG(I) << "    NamespaceID = " << ns << "  Global = " << global;
+	}
+
+#if 0
+	if (disk_info.SingleUser_any) {
+		// At least one locking range is in single-user mode.  Pull the list and show the ones that are.
+		std::vector<uint8_t> table;
+		table.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+		for (int i = 0; i < 8; i++) {
+			table.push_back(OPALUID[OPAL_UID::OPAL_LOCKING_TABLE][i]);
+		}
+		if ((lastRC = getTable(table, (uint32_t)0x60000, (uint32_t)0x60000)) == 0) {
+			if ((response.tokenIs(2) == OPAL_TOKEN::STARTNAME) &&
+			    (response.getUint32(3) == 0x60000) &&
+			    (response.tokenIs(4) == OPAL_TOKEN::STARTLIST)) {
+				int tokenCount = response.getTokenCount();
+				bool firstRange = true;
+
+				for (int t = 5; t < tokenCount; t++) {
+					uint8_t uid[8];
+					response.getBytes(t, uid);
+					uint32_t lr = (uid[6] << 8) + uid[7];
+					if ((lr == (uint32_t)rangeid) || (rangeid == (uint16_t)-1)) {
+						char uidStr[20];
+						printBytes(uid, 8, uidStr);
+						if (firstRange) {
+							LOG(I) << "The following locking ranges are listed as single-user mode:";
+							firstRange = false;
+						}
+						LOG(I) << "Locking Range UID: " << uidStr << " (LR" << lr << ")";
+					}
+				}
 			}
 		}
 	}
+#endif
+
 	delete session;
 	LOG(D1) << "Exiting DtaDevOpal:listLockingRanges()";
 	return 0;
@@ -751,11 +821,11 @@ uint8_t DtaDevOpal::rekeyLockingRange_SUM(const std::vector<uint8_t>& LR,
 }
 
 uint8_t DtaDevOpal::assign(const char* authority, const char* password, const uint32_t ns,
-                           const uint64_t start, const uint64_t length)
+                           const uint64_t start, const uint64_t length, const uint32_t sum)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal::assign(), nsid: " << ns << ", start: " << start <<
-               ", length: " << length;
+               ", length: " << length << ", sum: " << sum;
 
     std::vector<uint8_t> nspace;
     nspace.push_back(BYTESTRING4);
@@ -796,6 +866,12 @@ uint8_t DtaDevOpal::assign(const char* authority, const char* password, const ui
 			cmd->addToken((uint64_t)1);
 			cmd->addToken(length);					// second optional argument, Rangelength
 		cmd->addToken(OPAL_TOKEN::ENDNAME);
+	if (sum) {
+		cmd->addToken(OPAL_TOKEN::STARTNAME);
+			cmd->addToken((uint64_t)2);
+			cmd->addToken(OPAL_TRUE);				// third optional argument, AssignToSUMRange
+		cmd->addToken(OPAL_TOKEN::ENDNAME);
+		}
 	cmd->addToken(OPAL_TOKEN::ENDLIST);
 	cmd->complete();
 	if ((lastRC = session->sendCommand(cmd, response)) != 0) {
@@ -1689,7 +1765,7 @@ uint8_t DtaDevOpal::readMBR(const char* password, const uint32_t offset, const u
         return DTAERROR_OBJECT_CREATE_FAILED;
     }
     if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
-        LOG(E) << "session->start failed with code " << lastRC;
+        LOG(E) << "session->start failed with code " << HEXON(1) << (int)lastRC << HEXOFF;
         delete session;
         return lastRC;
     }
@@ -1888,7 +1964,7 @@ uint8_t DtaDevOpal::readDataStore(const char* password, const uint8_t table, con
         return DTAERROR_OBJECT_CREATE_FAILED;
     }
     if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, OPAL_UID::OPAL_ADMIN1_UID)) != 0) {
-        LOG(E) << "session->start failed with code " << lastRC;
+        LOG(E) << "session->start failed with code " << HEXON(1) << (int)lastRC << HEXOFF;
         delete session;
         return lastRC;
     }
@@ -2027,8 +2103,8 @@ uint8_t DtaDevOpal::activateLockingSP(const char* password, const uint32_t dsCou
 	return 0;
 }
 
-uint8_t DtaDevOpal::activateLockingSP_SUM(const uint8_t lockingrange, const char* password,
-                                          const uint32_t dsCount, const uint32_t dsSizes[])
+uint8_t DtaDevOpal::activateLockingSP_SUM(const std::vector<uint32_t>& ranges, const uint32_t policy,
+                                          const char* password, const uint32_t dsCount, const uint32_t dsSizes[])
 {
 	LOG(D1) << "Entering DtaDevOpal::activateLockingSP_SUM()";
 	uint8_t lastRC;
@@ -2037,20 +2113,13 @@ uint8_t DtaDevOpal::activateLockingSP_SUM(const uint8_t lockingrange, const char
 	for (int i = 0; i < 8; i++) {
 		table.push_back(OPALUID[OPAL_UID::OPAL_LOCKINGSP_UID][i]);
 	}
+	uint32_t lockingrange = ranges.front();
 	vector<uint8_t> LR;
-	LR.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
     // if the lockingrange is -1, then use the Locking Table UID instead of a single row
-    if (lockingrange == (uint8_t)(-1)) {
+    if (lockingrange == (uint32_t)(-1)) {
+		LR.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
         for (int i = 0; i < 8; i++) {
             LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKING_TABLE][i]);
-        }
-    } else {
-        for (int i = 0; i < 8; i++) {
-            LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKINGRANGE_GLOBAL][i]);
-        }
-        if (lockingrange > 0) {
-            LR[6] = 0x03;
-            LR[8] = lockingrange;
         }
     }
 	DtaCommand *cmd = new DtaCommand();
@@ -2064,7 +2133,7 @@ uint8_t DtaDevOpal::activateLockingSP_SUM(const uint8_t lockingrange, const char
 		return DTAERROR_OBJECT_CREATE_FAILED;
 	}
 	if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, OPAL_UID::OPAL_SID_UID)) != 0) {
-		LOG(E) << "session->start failed with code " << lastRC;
+        LOG(E) << "session->start failed with code " << HEXON(1) << (int)lastRC << HEXOFF;
 		delete cmd;
 		delete session;
 		return lastRC;
@@ -2099,8 +2168,32 @@ uint8_t DtaDevOpal::activateLockingSP_SUM(const uint8_t lockingrange, const char
 			cmd->addToken(OPAL_TINY_ATOM::UINT_00);
 			cmd->addToken(OPAL_TINY_ATOM::UINT_00);
 			cmd->addToken(OPAL_TOKEN::STARTLIST);
+			if (lockingrange == (uint32_t)-1) {
 				cmd->addToken(LR);
+			} else {
+				for (int j = 0; j < (int)ranges.size(); j++) {
+					lockingrange = ranges.at(j);
+					LR.clear();
+					LR.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+					for (int i = 0; i < 8; i++) {
+						LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKINGRANGE_GLOBAL][i]);
+					}
+					if (lockingrange > 0) {
+						LR[6] = 0x03;
+						LR[8] = lockingrange;
+					}
+					cmd->addToken(LR);
+				}
+			}
 			cmd->addToken(OPAL_TOKEN::ENDLIST);
+		cmd->addToken(OPAL_TOKEN::ENDNAME);
+		cmd->addToken(OPAL_TOKEN::STARTNAME);
+			// RangeStartRangeLength parameter
+			cmd->addToken(OPAL_SHORT_ATOM::UINT_3);
+			cmd->addToken(OPAL_TINY_ATOM::UINT_06);
+			cmd->addToken(OPAL_TINY_ATOM::UINT_00);
+			cmd->addToken(OPAL_TINY_ATOM::UINT_01);
+			cmd->addToken(policy);
 		cmd->addToken(OPAL_TOKEN::ENDNAME);
         // If the user has provided a list of DataStore table sizes. add the list as the parameter
         // 0x060003 (DataStoreTableSizes).  See TCG Opal Feature Set - Additional Data Store Tables.
@@ -2120,13 +2213,22 @@ uint8_t DtaDevOpal::activateLockingSP_SUM(const uint8_t lockingrange, const char
     cmd->addToken(OPAL_TOKEN::ENDLIST);
 	cmd->complete();
 	if ((lastRC = session->sendCommand(cmd, response)) != 0) {
-		LOG(E) << "session->sendCommand failed with code " << lastRC;
+		LOG(E) << "session->sendCommand failed with code " << HEXON(1) << (int)lastRC << HEXOFF;
 		delete cmd;
 		delete session;
 		return lastRC;
 	}
 	disk_info.Locking_lockingEnabled = 1;
-	LOG(I) << "Locking SP Activate Complete for single User" << (lockingrange+1) << " on locking range " << (int)lockingrange;
+
+	if (lockingrange == (uint32_t)(-1)) {
+		LOG(I) << "Locking SP Activate Complete in single-user mode for all locking ranges.";
+	} else {
+		LOG(I) << "Locking SP Activate Complete in single user mode for the following users/locking ranges:";
+		for (int j = 0; j < (int)ranges.size(); j++) {
+			lockingrange = ranges.at(j);
+			LOG(I) << "    User" << (int)(lockingrange + 1) << " on locking range " << (int)lockingrange;
+		}
+	}
 
 	delete cmd;
 	delete session;
@@ -2556,8 +2658,8 @@ uint8_t DtaDevOpal::setTable(const std::vector<uint8_t>& table, const OPAL_TOKEN
 	return 0;
 }
 
-uint8_t DtaDevOpal::getTable(const std::vector<uint8_t>& table, const uint16_t startcol,
-                             const uint16_t endcol)
+uint8_t DtaDevOpal::getTable(const std::vector<uint8_t>& table, const uint32_t startcol,
+                             const uint32_t endcol)
 {
 	LOG(D1) << "Entering DtaDevOpal::getTable";
 	uint8_t lastRC;
@@ -2573,10 +2675,12 @@ uint8_t DtaDevOpal::getTable(const std::vector<uint8_t>& table, const uint16_t s
 	get->addToken(OPAL_TOKEN::STARTCOLUMN);
 	get->addToken(startcol);
 	get->addToken(OPAL_TOKEN::ENDNAME);
-	get->addToken(OPAL_TOKEN::STARTNAME);
-	get->addToken(OPAL_TOKEN::ENDCOLUMN);
-	get->addToken(endcol);
-	get->addToken(OPAL_TOKEN::ENDNAME);
+	if (endcol != (uint32_t)-1) {
+		get->addToken(OPAL_TOKEN::STARTNAME);
+		get->addToken(OPAL_TOKEN::ENDCOLUMN);
+		get->addToken(endcol);
+		get->addToken(OPAL_TOKEN::ENDNAME);
+	}
 	get->addToken(OPAL_TOKEN::ENDLIST);
 	get->addToken(OPAL_TOKEN::ENDLIST);
 	get->complete();

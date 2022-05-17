@@ -243,14 +243,39 @@ int main(int argc, char * argv[])
         }
         return d->activateLockingSP(argv[opts.password]);
         break;
-	case sedutiloption::activateLockingSP_SUM:
+	case sedutiloption::activateLockingSP_SUM: {
 		LOG(D) << "Activating the LockingSP on" << argv[opts.device]
                << ", datastore tables " << opts.datastoreCount;
+
+		std::vector<uint32_t> ranges;
+		char* ptr = argv[opts.lockingrange];
+		for (int i = 0; (*ptr != 0) && (i < 16); i++) {
+			uint32_t val;
+			if (sscanf(ptr, "%i", &val) == 0) {
+				break;
+			}
+			ranges.push_back(val);
+			if ((val == (uint32_t)-1) && (i != 0)) {
+				LOG(E) << "locking ranges arguement should be -1 for all or a comma separated list of range numbers.";
+				exit(1);
+			}
+			for (int j = 0; j < 256; j++, ptr++) {
+				if (*ptr == 0) {
+					break;
+				}
+				if ((*ptr == ',')) {
+					++ptr;
+					break;
+				}
+			}
+		}
+
         if (opts.datastoreCount) {
-            return d->activateLockingSP_SUM(opts.lockingrange, argv[opts.password],
+            return d->activateLockingSP_SUM(ranges, opts.password, argv[opts.policy],
                                             opts.datastoreCount, opts.datastoreSizes);
         }
-        return d->activateLockingSP_SUM(opts.lockingrange, argv[opts.password]);
+        return d->activateLockingSP_SUM(ranges, opts.policy, argv[opts.password]);
+        }
 		break;
 	case sedutiloption::eraseLockingRange_SUM:
 		LOG(D) << "Erasing LockingRange " << opts.lockingrange << " on" << argv[opts.device];
@@ -261,13 +286,20 @@ int main(int argc, char * argv[])
 		return (d->assign(opts.authority[0] ? opts.authority : "Admin1",
                           argv[opts.password], atoi(argv[opts.lockingrange]),
                           strtoll(argv[opts.lrstart], &end, 0),
-                          strtoll(argv[opts.lrlength], &end, 0)));
+                          strtoll(argv[opts.lrlength], &end, 0), false));
 		break;
 	case sedutiloption::deassign:
 		LOG(D) << "Deassign a LockingRangee " << argv[opts.lockingrange];
 		return (d->deassign(opts.authority[0] ? opts.authority : "Admin1",
                             argv[opts.password], atoi(argv[opts.lockingrange]),
 		                    opts.lockingstate));
+		break;
+	case sedutiloption::assign_SUM:
+		LOG(D) << "Assign a LockingRange to a namespace " << argv[opts.lockingrange];
+		return (d->assign(opts.authority[0] ? opts.authority : "Admin1",
+                          argv[opts.password], atoi(argv[opts.lockingrange]),
+                          strtoll(argv[opts.lrstart], &end, 0),
+                          strtoll(argv[opts.lrlength], &end, 0), true));
 		break;
     case sedutiloption::query:
 		LOG(D) << "Performing diskquery() on " << argv[opts.device];

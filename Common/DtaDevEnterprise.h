@@ -74,8 +74,9 @@ public:
 	uint8_t activateLockingSP(const char* password, const uint32_t dsCount = 0,
                               const uint32_t dsSizes[] = NULL);
 	/** dummy code not implemented in teh enterprise SSC*/
-	uint8_t activateLockingSP_SUM(const uint8_t lockingrange, const char* password,
-                                  const uint32_t dsCount = 0, const uint32_t dsSizes[] = NULL);
+	uint8_t activateLockingSP_SUM(const std::vector<uint32_t>& ranges, const uint32_t policy,
+				      const char* password, const uint32_t dsCount = 0,
+				      const uint32_t dsSizes[] = NULL);
 	/** dummy code not implemented in teh enterprise SSC*/
 	uint8_t eraseLockingRange_SUM(const uint8_t lockingrange, const char* password);
         /** dummy code not implemented in teh enterprise SSC*/
@@ -195,7 +196,7 @@ public:
 
 	// virtual methods from DtaDev class
 	uint8_t assign(const char* authority, const char* password, const uint32_t ns,
-                   const uint64_t start = 0, const uint64_t length = 0);
+                   const uint64_t start = 0, const uint64_t length = 0, const uint32_t sum = 0);
 	uint8_t deassign(const char* authority, const char* password, const uint8_t lockingrange,
                      const bool keep);
     uint8_t printTables(const char* sp, const char* password, const uint8_t level);
