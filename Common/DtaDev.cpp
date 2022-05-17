@@ -232,9 +232,9 @@ void DtaDev::discovery0()
 
     epos = cpos = (uint8_t *) d0Response;
     hdr = (Discovery0Header *) d0Response;
-    len = SWAP32(hdr->length);
+    len = SWAP32(hdr->length) + 4;
     if (len > MIN_BUFFER_LENGTH) {
-	LOG(D) << "Too long Discovery0 response: " << SWAP32(hdr->length);
+	LOG(D) << "Too long Discovery0 response: " << len;
 	len = MIN_BUFFER_LENGTH;
     }
     LOG(D3) << "Dumping D0Response";
@@ -306,6 +306,8 @@ void DtaDev::discovery0()
         case FC_OPALV200: /* OPAL V200 */
             disk_info.OPAL20 = 1;
 			disk_info.ANY_OPAL_SSC = 1;
+            disk_info.OPAL20_version = body->opalv200.version;
+            disk_info.OPAL20_minorVersion = body->opalv200.minorVersion;
 		    disk_info.OPAL20_basecomID = SWAP16(body->opalv200.baseCommID);
             disk_info.OPAL20_initialPIN = body->opalv200.initialPIN;
             disk_info.OPAL20_revertedPIN = body->opalv200.revertedPIN;
@@ -324,9 +326,12 @@ void DtaDev::discovery0()
             break;
         case FC_CNL: /* Configurable Namespace Locking */
             disk_info.CNL = 1;
-            disk_info.CNL_rangeC = body->cnl.range_C;
-            disk_info.CNL_rangeP = body->cnl.range_P;
-            disk_info.CNL_maxKeyCount = SWAP32(body->cnl.maxKeyCount);
+            disk_info.CNL_version        = body->cnl.version;
+            disk_info.CNL_minorVersion   = body->cnl.minor_version;
+            disk_info.CNL_rangeC         = body->cnl.range_C;
+            disk_info.CNL_rangeP         = body->cnl.range_P;
+            disk_info.CNL_sumC           = body->cnl.sum_C;
+            disk_info.CNL_maxKeyCount    = SWAP32(body->cnl.maxKeyCount);
             disk_info.CNL_unusedKeyCount = SWAP32(body->cnl.unusedKeyCount);
             disk_info.CNL_maxRangesPerNS = SWAP32(body->cnl.maxRangesPerNS);
             break;
@@ -482,7 +487,8 @@ void DtaDev::puke()
 	}
 
 	if (disk_info.OPAL20) {
-		cout << "OPAL 2.0 function (" << HEXON(4) << FC_OPALV200 << ")" << HEXOFF << std::endl;
+		cout << "OPAL 2.0 function (" << HEXON(4) << FC_OPALV200  << HEXOFF << ") version = "
+             << (int)disk_info.OPAL20_version << "." << (int)disk_info.OPAL20_minorVersion << std::endl;
 		cout << "    Base comID = " << HEXON(4) << disk_info.OPAL20_basecomID << HEXOFF;
 		cout << ", Initial PIN = " << HEXON(2) << static_cast<uint32_t>(disk_info.OPAL20_initialPIN) << HEXOFF;
 		cout << ", Reverted PIN = " << HEXON(2) << static_cast<uint32_t>(disk_info.OPAL20_revertedPIN) << HEXOFF;
@@ -504,9 +510,11 @@ void DtaDev::puke()
     }
     if (disk_info.CNL) {
 		cout << "Configurable Namespace Locking feature (" << HEXON(4)
-		     << FC_CNL << ")" << HEXOFF << std::endl;
+             << FC_CNL << HEXOFF << ") version = " << (int)disk_info.CNL_version << "." << (int)disk_info.CNL_minorVersion
+             << std::endl;
 		cout << "    Range_C = " << (disk_info.CNL_rangeC ? "Y" : "N")
-                     << ", Range_P = " << (disk_info.CNL_rangeP ? "Y" : "N") << std::endl;
+             << ", Range_P = " << (disk_info.CNL_rangeP ? "Y" : "N")
+             << ", SUM_C = " << (disk_info.CNL_sumC ? "Y" : "N" ) << std::endl;
 		cout << "    MaxKeyCount = " << disk_info.CNL_maxKeyCount
 		     << ", UnusedKeyCount = " << disk_info.CNL_unusedKeyCount;
         if (disk_info.CNL_maxRangesPerNS == 0xFFFFFFFF) {

@@ -50,6 +50,7 @@ typedef struct _DTA_OPTIONS {
 	uint8_t level;			/** output level, for print operations */
 	uint8_t offset;			/** offset in table */
 	uint8_t count;			/** Count of bytes in table */
+        uint8_t policy;                 /** RangeStartLengthPolicy (activate SUM) */
     uint8_t spindex;        /**< index to sp var */
     uint8_t testTimeout;
     uint8_t testOversizePacket;
@@ -121,8 +122,9 @@ typedef enum _sedutiloption {
 	isValidSED,
     eraseLockingRange,
 	takeOwnership,
-	assign,
-	deassign,
+    assign,
+    assign_SUM,
+    deassign,
 	validatePBKDF2,
 	objDump,
     printDefaultPassword,
@@ -165,7 +167,8 @@ if((x+baseOptions) != argc) { \
 
 #define TESTARG_RANGE(structfield, minValue, maxValue, errorStr) \
     opts->structfield = static_cast<uint8_t>(atoi(argv[i + 1])); \
-    if ((opts->structfield < minValue) || (opts->structfield > maxValue)) \
+    if ((opts->structfield < minValue) || (opts->structfield > maxValue) || \
+       ((opts->structfield == 0) && (argv[i + 1][0] != '0'))) \
     TESTFAIL(errorStr)
 
 /** set the argc value for this parameter in the options structure */

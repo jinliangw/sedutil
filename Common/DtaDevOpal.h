@@ -89,7 +89,7 @@ public:
          * @param startcol the starting column of data requested
          * @param endcol the ending column of the data requested
          */
-	uint8_t getTable(const std::vector<uint8_t>& table, const uint16_t startcol, const uint16_t endcol);
+	uint8_t getTable(const std::vector<uint8_t>& table, const uint32_t startcol, const uint32_t endcol);
          /** Set the SID password.
          * Requires special handling because password is not always hashed.
          * @param oldpassword  current SID password
@@ -124,8 +124,9 @@ public:
          * @param lockingrange  the locking range number to activate in SUM
          * @param password  current SID password
          */
-	uint8_t activateLockingSP_SUM(const uint8_t lockingrange, const char* password,
-								  const uint32_t dsCount = 0, const uint32_t dsSizes[] = NULL);
+	uint8_t activateLockingSP_SUM(const std::vector<uint32_t>& ranges, const uint32_t policy,
+	                              const char* password, const uint32_t dsCount = 0,
+	                              const uint32_t dsSizes[] = NULL);
 	/** Erase a Single User Mode locking range by calling the drive's erase method
          * @param lockingrange The Locking Range to erase
          * @param password The administrator password for the drive
@@ -312,7 +313,7 @@ public:
 
 	// virtual methods from DtaDev class
 	uint8_t assign(const char* authority, const char* password, const uint32_t ns,
-				   const uint64_t start = 0, const uint64_t length = 0);
+				   const uint64_t start = 0, const uint64_t length = 0, const uint32_t sum = 0);
 	uint8_t deassign(const char* authority, const char* password, const uint8_t lockingrange,
 					 const bool keep);
 	uint8_t readMBR(const char* password, const uint32_t offset, const uint32_t count);

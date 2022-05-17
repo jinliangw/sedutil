@@ -132,8 +132,9 @@ Get a random number of <size> bytes.  Default SP is Admin, over-ride with -sp op
 .IP "\-\-setup_SUM <0...n> <lrstart> <lrlength> <password> <newpassword> <device>"
 Initial setup for the device in TCG Opal Single User Mode.  Selects Global range (0) or a single range (1..n).  
 lrstart and lrlength are ignored got global range. password in the SID password, User<n+1> password will be set to newpassword.
-.IP "\-\-activateLockingSP_SUM <0...n> <SIDpassword> <device>"
-Activate the LockingSP in Single User Mode on Global range (0), a single range (1..n), or all ranges (255).
+.IP "\-\-activateLockingSP_SUM <x,y,z> <policy> <SIDpassword> <device>"
+Activate the LockingSP in Single User Mode on all ranges (-1) or a comma separated list of ranges (0,4,8,10).
+policy is the RangeStartLengthPolicy, 0 for User, 1 for Admin.
 Admin1 password in LockingSP will be set to SID password.
 .IP "\-\-setPassword_SUM <password> <user> <newpassword> <device>"
 Change the password of a TCG Opal User authority. user = User1, User2, ...  Default User passwords are "".
@@ -145,6 +146,8 @@ Set the locking status of a Locking Range, 0 = GLobal 1..n = LRn.  password is f
 Setup a new Locking Range, 0 = GLobal 1..n = LRn.  password is for the User<n> that owns the Locking Range.
 .IP "\-\-enableLockingRange_SUM <0...n> <RW|R|W|D> <password> <device>"
 Set the ReadLockEnable and WriteLockEnable state for a LockingRange, 0 = Global, 1..n = LRn.  password is for the User<n> that owns the Locking Range
+.IP "\-\-assign_SUM <Admin1Password> <namespace> <rangeStart> <rangeLength> <device>"
+Assign a locking range for a namespace (CNL feature) using AssignToSUMRange option.  Default authority is Admin1, over-ride with -a option.
 
 .SS TCG Enterprise devices only 
 .IP "\-\-setBandsEnabled <password> <device>"

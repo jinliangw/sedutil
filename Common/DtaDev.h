@@ -292,9 +292,10 @@ public:
 	* @param lockingrange the locking range number to activate in SUM
 	* @param password password of the admin sp SID authority
 	*/
-	virtual uint8_t activateLockingSP_SUM(const uint8_t lockingrange, const char* password,
-                                          const uint32_t dsCount = 0,
-                                          const uint32_t dsSizes[] = NULL) = 0;
+	virtual uint8_t activateLockingSP_SUM(const std::vector<uint32_t>& ranges, const uint32_t policy,
+					      const char* password,
+                                              const uint32_t dsCount = 0,
+                                              const uint32_t dsSizes[] = NULL) = 0;
 	/** Erase a Single User Mode locking range by calling the drive's erase method
 	 * @param lockingrange The Locking Range to erase
 	 * @param password The administrator password for the drive
@@ -335,7 +336,7 @@ public:
 	 * @param length - N/A if global is true
 	 */
 	virtual uint8_t assign(const char* authority, const char* password, const uint32_t ns,
-	                       const uint64_t start = 0, const uint64_t length = 0) = 0;
+	                       const uint64_t start = 0, const uint64_t length = 0, const uint32_t sum = 0) = 0;
 
 	/** Deassign a locking range
 	 * @param authority authority to use for the session
