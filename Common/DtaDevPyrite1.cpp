@@ -23,8 +23,10 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 
-DtaDevPyrite1::DtaDevPyrite1 (const char * devref)
+DtaDevPyrite1::DtaDevPyrite1 (const char * devref, ComIDOption_t comIdOption, uint16_t comIdValue)
 {
+    DtaDev::ComIDOption = comIdOption;
+    DtaDev::ComIDValue  = comIdValue;
 	DtaDevOpal::init(devref);
 	assert(isPyrite1());
 }

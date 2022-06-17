@@ -73,7 +73,7 @@ public:
          * @param response the DtaResonse object containing the response
          * @param protocol The security protocol number to use for the command
          */
-	uint8_t exec(const DtaCommand* cmd, DtaResponse& resp, const uint8_t protocol = 0x01);
+	uint8_t exec(const DtaCommand* cmd, DtaResponse& resp, const uint16_t ComID, const uint8_t protocol = 0x01);
          /** return the communications ID to be used for sessions to this device */
 	virtual uint16_t comID() = 0;
         /** Change the SID password from it's MSID default

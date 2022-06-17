@@ -37,8 +37,10 @@ using namespace std;
 DtaSession::DtaSession(DtaDev * device)
 {
     LOG(D1) << "Creating DtaSsession()";
-	sessionauth = 0;
+    sessionauth = 0;
     d = device;
+
+    d->GetExtendedComID(&ComID, &ComIDExtension);
 }
 
 uint8_t
@@ -119,7 +121,7 @@ again:
     cmd->addToken(OPAL_TOKEN::STARTLIST); // [  (Open Bracket)
     cmd->addToken(105); // HostSessionID : sessionnumber
     cmd->addToken(SP); // SPID : SP
-    cmd->addToken(OPAL_TINY_ATOM::UINT_01); // write
+    cmd->addToken(d->useReadOnlySession ? OPAL_TINY_ATOM::UINT_00 : OPAL_TINY_ATOM::UINT_01); // ro/write
 	if ((NULL != HostChallenge) && (!d->isEprise())) {
 		cmd->addToken(OPAL_TOKEN::STARTNAME);
 		cmd->addToken(OPAL_TINY_ATOM::UINT_00);
@@ -251,9 +253,9 @@ DtaSession::sendCommand(DtaCommand * cmd, DtaResponse & response)
     LOG(D1) << "Entering DtaSession::sendCommand()";
     cmd->setHSN(HSN);
     cmd->setTSN(TSN);
-    cmd->setcomID(d->GetComID());
+    cmd->setcomID(ComID, ComIDExtension);
 
-    uint8_t exec_rc = d->exec(cmd, response, SecurityProtocol);
+    uint8_t exec_rc = d->exec(cmd, response, ComID, SecurityProtocol);
     if (0 != exec_rc)
     {
         LOG(E) << "Command failed on exec " << (uint16_t) exec_rc;

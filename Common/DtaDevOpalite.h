@@ -27,7 +27,7 @@ using namespace std;
 */
 class DtaDevOpalite : public DtaDevOpal {
 public:
-	DtaDevOpalite(const char * devref);
+	DtaDevOpalite(const char * devref, ComIDOption_t comIdOption = ComID_Base, uint16_t comIdValue = 0);
 	~DtaDevOpalite();
         /** return the communication ID to be used with this device */
 	uint16_t comID();

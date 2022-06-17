@@ -66,7 +66,7 @@ public:
     /** Add a Token to the bytstream of type uint64. */
     void addToken(const uint64_t number);
     /** Set the commid to be used in the command. */
-    void setcomID(const uint16_t comID) const;
+    void setcomID(const uint16_t comID, const uint16_t comIDExtension) const;
     /** set the Host session number to be used in the command. */
     void setHSN(const uint32_t HSN) const;
     /** Set the TPer session number to be used for the command. */

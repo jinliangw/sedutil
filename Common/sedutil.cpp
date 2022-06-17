@@ -79,43 +79,40 @@ int main(int argc, char * argv[])
 			return DTAERROR_COMMAND_ERROR;
 		}
 		if (tempDev->isRuby1())
-			d = new DtaDevRuby1(argv[opts.device]);
+			d = new DtaDevRuby1(argv[opts.device], opts.comID_Option, opts.comID_Value);
 		else if (tempDev->isOpal2())
-			d = new DtaDevOpal2(argv[opts.device]);
+			d = new DtaDevOpal2(argv[opts.device], opts.comID_Option, opts.comID_Value);
 		else if (tempDev->isOpalite())
-			d = new DtaDevOpalite(argv[opts.device]);
+			d = new DtaDevOpalite(argv[opts.device], opts.comID_Option, opts.comID_Value);
 		else if (tempDev->isPyrite1())
-			d = new DtaDevPyrite1(argv[opts.device]);
+			d = new DtaDevPyrite1(argv[opts.device], opts.comID_Option, opts.comID_Value);
 		else if (tempDev->isPyrite2())
-			d = new DtaDevPyrite2(argv[opts.device]);
+			d = new DtaDevPyrite2(argv[opts.device], opts.comID_Option, opts.comID_Value);
+		else if (tempDev->isOpal1())
+			d = new DtaDevOpal1(argv[opts.device], opts.comID_Option, opts.comID_Value);
+		else if (tempDev->isEprise())
+			d = new DtaDevEnterprise(argv[opts.device]);
 		else
-			if (tempDev->isOpal1())
-				d = new DtaDevOpal1(argv[opts.device]);
-			else
-				if (tempDev->isEprise())
-					d = new DtaDevEnterprise(argv[opts.device]);
-				else
-				{
-					LOG(E) << "Unknown OPAL SSC ";
-					return DTAERROR_INVALID_COMMAND;
-				}
+		{
+			LOG(E) << "Unknown OPAL SSC ";
+			return DTAERROR_INVALID_COMMAND;
+		}
 		delete tempDev;
 		if (NULL == d) {
 			LOG(E) << "Create device object failed";
 			return DTAERROR_OBJECT_CREATE_FAILED;
 		}
-		// make sure DtaDev::no_hash_passwords is initialized
-		d->no_hash_passwords = opts.no_hash_passwords;
 
-		d->output_format = opts.output_format;
-        d->timeout = opts.timeout;
-        d->testTimeout = opts.testTimeout;
-        d->delay = opts.delay;
+        // Transfer the command line options to the device
+        d->no_hash_passwords  = opts.no_hash_passwords;
+        d->output_format      = opts.output_format;
+        d->timeout            = opts.timeout;
+        d->testTimeout        = opts.testTimeout;
+        d->delay              = opts.delay;
         d->testOversizePacket = opts.testOversizePacket;
-        d->useTransaction = opts.useTransaction;
-        d->ComIdOption = opts.comID_Option;
-        d->ComIDValue = opts.comID_Value;
-	}
+        d->useTransaction     = opts.useTransaction;
+        d->useReadOnlySession = opts.useReadOnlySession;
+    }
 
     char* end;
 

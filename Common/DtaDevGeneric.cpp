@@ -118,7 +118,7 @@ uint16_t DtaDevGeneric::comID()
 		return 0xff;
 }
 
-uint8NOCODE(exec, const DtaCommand* cmd, DtaResponse& resp, const uint8_t protocol)
+uint8NOCODE(exec, const DtaCommand* cmd, DtaResponse& resp, const uint16_t ComID, const uint8_t protocol)
 uint8NOCODE(objDump, const char* sp, const char* auth, const char* pass, const char* objID)
 uint8NOCODE(rawCmd, const char* sp, const char* auth, const char* pass, const char* invoker,
             const char* method, const char* plist)

@@ -102,5 +102,7 @@ private:
     uint8_t SecurityProtocol = 0x01;  /**< The seurity protocol to be used */
 	uint8_t lastRC;  /**< last return code */
 	uint8_t sessionauth; /** authid for multistart */
+    uint16_t ComID;
+    uint16_t ComIDExtension = 0;
 };
 

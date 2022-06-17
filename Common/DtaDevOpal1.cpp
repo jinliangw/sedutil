@@ -23,8 +23,10 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 
-DtaDevOpal1::DtaDevOpal1 (const char * devref)
+DtaDevOpal1::DtaDevOpal1 (const char * devref, ComIDOption_t comIdOption, uint16_t comIdValue)
 {
+    DtaDev::ComIDOption = comIdOption;
+    DtaDev::ComIDValue  = comIdValue;
 	DtaDevOpal::init(devref);
 	assert(isOpal1());
 }

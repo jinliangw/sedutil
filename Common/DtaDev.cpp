@@ -139,21 +139,33 @@ DTA_DEVICE_TYPE DtaDev::getDevType() const
     return disk_info.devType;
 }
 
-uint16_t DtaDev::GetComID()
+void DtaDev::GetExtendedComID(uint16_t* ComID, uint16_t* ComIDExtension)
 {
-    uint16_t ComID = comID();
-
-    switch (ComIdOption) {
+    switch (ComIDOption) {
     case ComID_Base:
     default:
+        *ComID = comID();
+        *ComIDExtension = 0;
         break;
+
     case ComID_Select:
-        ComID = ComIDValue;
+        *ComID = ComIDValue;
+        *ComIDExtension = 0;
         break;
+
     case ComID_Offset:
-        ComID += ComIDValue;
+        *ComID = comID() + ComIDValue;
+        *ComIDExtension = 0;
+        break;
+
+    case ComID_Dynamic:
+        if (dynamicComID(ComID, ComIDExtension) != 0) {
+            LOG(I) << "Dynamic ComID failed, using static";
+            *ComID = comID();
+            *ComIDExtension = 0;
+        }
+        break;
     }
-    return ComID;
 }
 
 uint8_t DtaDev::tperReset()
@@ -177,9 +189,12 @@ uint8_t DtaDev::stackReset()
 	bufferPtr = (void *)((uintptr_t)bufferPtr & (uintptr_t)~(IO_BUFFER_ALIGNMENT - 1));
 	memset(bufferPtr, 0, sizeof(StackResetRequest_t));
 
-    uint16_t comId = GetComID();
+    uint16_t comId = 0;
+    uint16_t comIdExtension = 0;
+    GetExtendedComID(&comId, &comIdExtension);
     StackResetRequest_t* reqPtr = static_cast<StackResetRequest_t*>(bufferPtr);
     reqPtr->comID = SWAP16(comId);
+    reqPtr->extendedComID = SWAP16(comIdExtension);
     reqPtr->requestCode   = SWAP32(STACK_RESET_REQUEST_CODE);
 
     LOG(I) << "Sending STACK_RESET for comID " << std::hex << comId;
@@ -209,6 +224,31 @@ uint8_t DtaDev::stackReset()
         return retStatus;
     }
     LOG(I) << "STACK_RESET successful";
+    return 0;
+}
+
+uint8_t DtaDev::dynamicComID(uint16_t* ComID, uint16_t* ComIDExtension)
+{
+    void* bufferPtr = buffer + IO_BUFFER_ALIGNMENT;
+    bufferPtr = (void *)((uintptr_t)bufferPtr & (uintptr_t)~(IO_BUFFER_ALIGNMENT - 1));
+    memset(bufferPtr, 0, sizeof(uint32_t));
+
+    LOG(D) << "Sending GET_COMID";
+
+    uint8_t lastRC;
+    if ((lastRC = sendCmd(IF_RECV, 0x02, 0x00, bufferPtr, MIN_BUFFER_LENGTH)) != 0) {
+        LOG(W) << "Send GET_COMID request to device failed, using static" << (uint16_t)lastRC;
+        return lastRC;
+    }
+    IFLOG(D3) DtaHexDump(bufferPtr, 4);
+
+    uint32_t returnedComID = SWAP32(*(static_cast<uint32_t *>(bufferPtr)));
+
+    *ComID          = (returnedComID >> 16) & 0xffff;
+    *ComIDExtension = returnedComID & 0xffff;
+
+    LOG(D) << "Dynamic ComID assigned " << std::hex << returnedComID << std::dec;
+
     return 0;
 }
 
