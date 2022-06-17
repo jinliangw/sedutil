@@ -270,15 +270,15 @@ DtaCommand::outputBufferSize() const
 }
 
 void
-DtaCommand::setcomID(const uint16_t comID) const
+DtaCommand::setcomID(const uint16_t comID, const uint16_t comIDExtension) const
 {
     OPALHeader * hdr;
     hdr = (OPALHeader *) cmdbuf;
     LOG(D1) << "Entering DtaCommand::setcomID()";
     hdr->cp.extendedComID[0] = ((comID & 0xff00) >> 8);
     hdr->cp.extendedComID[1] = (comID & 0x00ff);
-    hdr->cp.extendedComID[2] = 0x00;
-    hdr->cp.extendedComID[3] = 0x00;
+    hdr->cp.extendedComID[2] = ((comIDExtension & 0xff00) >> 8);
+    hdr->cp.extendedComID[3] = (comIDExtension & 0x00ff);
 }
 
 void

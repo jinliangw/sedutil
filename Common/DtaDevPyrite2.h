@@ -27,7 +27,7 @@ using namespace std;
 */
 class DtaDevPyrite2 : public DtaDevOpal {
 public:
-	DtaDevPyrite2(const char * devref);
+	DtaDevPyrite2(const char * devref, ComIDOption_t comIdOption = ComID_Base, uint16_t comIdValue = 0);
 	~DtaDevPyrite2();
         /** return the communication ID to be used with this device */
 	uint16_t comID();

@@ -1432,14 +1432,14 @@ uint16_t DtaDevEnterprise::comID()
     LOG(D1) << "Entering DtaDevEnterprise::comID()";
     return disk_info.Enterprise_basecomID;
 }
-uint8_t DtaDevEnterprise::exec(const DtaCommand* cmd, DtaResponse& resp, const uint8_t protocol)
+uint8_t DtaDevEnterprise::exec(const DtaCommand* cmd, DtaResponse& resp, const uint16_t ComID, const uint8_t protocol)
 {
     uint8_t rc = 0;
     OPALHeader * hdr = (OPALHeader *) cmd->getCmdBuffer();
     LOG(D3) << endl << "Dumping command buffer";
     IFLOG(D) DtaAnnotatedDump(IF_SEND, cmd->getCmdBuffer(), cmd->outputBufferSize());
     IFLOG(D3) DtaHexDump(cmd->getCmdBuffer(), SWAP32(hdr->cp.length) + sizeof (OPALComPacket));
-    rc = sendCmd(IF_SEND, protocol, GetComID(), cmd->getCmdBuffer(), cmd->outputBufferSize());
+    rc = sendCmd(IF_SEND, protocol, ComID, cmd->getCmdBuffer(), cmd->outputBufferSize());
     if (0 != rc) {
         LOG(E) << "Command failed on send " << (uint16_t) rc;
         return rc;
@@ -1449,7 +1449,7 @@ uint8_t DtaDevEnterprise::exec(const DtaCommand* cmd, DtaResponse& resp, const u
         //LOG(I) << "read loop";
         osmsSleep(25);
         memset(cmd->getRespBuffer(), 0, MIN_BUFFER_LENGTH);
-        rc = sendCmd(IF_RECV, protocol, GetComID(), cmd->getRespBuffer(), MIN_BUFFER_LENGTH);
+        rc = sendCmd(IF_RECV, protocol,ComID, cmd->getRespBuffer(), MIN_BUFFER_LENGTH);
 
     }
     while ((0 != hdr->cp.outstandingData) && (0 == hdr->cp.minTransfer));

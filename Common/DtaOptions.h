@@ -31,7 +31,8 @@ typedef enum _sedutiloutput {
 typedef enum _ComIDOtions {
     ComID_Base      = 0,
     ComID_Select    = 1,
-    ComID_Offset    = 2
+    ComID_Offset    = 2,
+    ComID_Dynamic   = 3,
 } ComIDOption_t;
 
 /** Structure representing the command line issued to the program */
@@ -60,6 +61,7 @@ typedef struct _DTA_OPTIONS {
 
 	bool    no_hash_passwords; /** global parameter, disables hashing of passwords */
     bool    useTransaction;
+    bool    useReadOnlySession;
     char    authority[16];  /** authority over-ride */
     char    sp[16];         /** security protocol */
     uint32_t timeout;       /** session timeout option */

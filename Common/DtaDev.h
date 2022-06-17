@@ -94,6 +94,8 @@ public:
 
     void printSecurityCompliance();
 
+    uint8_t dynamicComID(uint16_t* ComID, uint16_t* ComIDExtension);
+
 	/*
 	 * virtual methods required in the OS specific
 	 * device class
@@ -422,11 +424,11 @@ public:
 	 * @param response the DtaResonse object containing the response
 	 * @param protocol The security protocol number to use for the command
 	 */
-	virtual uint8_t exec(const DtaCommand* cmd, DtaResponse& resp, const uint8_t protocol = 0x01) = 0;
+	virtual uint8_t exec(const DtaCommand* cmd, DtaResponse& resp, const uint16_t ComID, const uint8_t protocol = 0x01) = 0;
 	/** return the communications ID to be used for sessions to this device */
 	virtual uint16_t comID() = 0;
 
-    uint16_t GetComID();
+    void GetExtendedComID(uint16_t* ComID, uint16_t* ComIDExtension);
 
 	bool no_hash_passwords; /** disables hashing of passwords */
 	sedutiloutput output_format; /** standard, readable, JSON */
@@ -435,8 +437,9 @@ public:
     bool testTimeout = false;
     bool testOversizePacket = false;
     bool useTransaction = false;
+    bool useReadOnlySession = false;
     uint16_t ComIDValue = 0;
-    ComIDOption_t ComIdOption = ComID_Base;
+    ComIDOption_t ComIDOption = ComID_Base;
 
 protected:
 	const char * dev;   /**< character string representing the device in the OS lexicon */

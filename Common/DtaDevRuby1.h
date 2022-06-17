@@ -30,7 +30,7 @@ using namespace std;
 */
 class DtaDevRuby1 : public DtaDevOpal {
 public:
-	DtaDevRuby1(const char * devref);
+	DtaDevRuby1(const char * devref, ComIDOption_t comIdOption = ComID_Base, uint16_t comIdValue = 0);
 	~DtaDevRuby1();
         /** return the communication ID to be used with this device */
 	uint16_t comID();
