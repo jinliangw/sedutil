@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign subdir-objects
-AM_CFLAGS = -Wall -Werror -std=c11
-AM_CXXFLAGS = -Wall -Werror -std=c++11 -I./Common -I./Common/pbkdf2 -I./linux -I./LinuxPBA
+AM_CFLAGS = -Wall -Werror -std=c11 -ftabstop=4
+AM_CXXFLAGS = -Wall -Werror -std=c++11 -ftabstop=4 -I./Common -I./Common/pbkdf2 -I./linux -I./LinuxPBA
 SEDUTIL_COMMON_CODE = \
 	Common/DtaAnnotatedDump.cpp Common/DtaAnnotatedDump.h \
 	Common/DtaCommand.cpp Common/DtaCommand.h \
