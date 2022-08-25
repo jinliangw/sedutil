@@ -638,7 +638,7 @@ void DtaDev::printSecurityCompliance()
     uint8_t lastRC;
     if ((lastRC = sendCmd(IF_RECV, 0x00, SFSC_SECURITY_COMPLIANCE_INFO, bufferPtr, DTA_DEV_BUFFER_SIZE)) != 0) {
         LOG(D2) << "Send security compliance request to device failed " << (uint16_t)lastRC;
-        cout << "Failed to retrieve FIPS-140 compliance page from the device" << std::endl;
+        cout << "Failed to retrieve FIPS 140 compliance page from the device" << std::endl;
         return;
     }
 
@@ -661,7 +661,7 @@ void DtaDev::printSecurityCompliance()
             return;
         }
 
-        cout << "SFSC FIP-140 Compliance Descriptor:" << std::endl;
+        cout << "SFSC FIPS 140 Compliance Descriptor:" << std::endl;
         cout << "Related Standard: " << HEXON(2) << (int)(descPtr->FIPS140_ReleastedStandard) << HEXOFF <<
             (descPtr->FIPS140_ReleastedStandard == FIPS_140_2 ? " (FIPS 140-2)" :
                 descPtr->FIPS140_ReleastedStandard == FIPS_140_3 ? " (FIPS 140-3)" : " (Unknown)")

@@ -112,12 +112,13 @@ int main(int argc, char * argv[])
         d->testOversizePacket = opts.testOversizePacket;
         d->useTransaction     = opts.useTransaction;
         d->useReadOnlySession = opts.useReadOnlySession;
+        d->sendRetries        = opts.sendRetries;
     }
 
     char* end;
 
     switch (opts.action) {
- 	case sedutiloption::initialSetup:
+	case sedutiloption::initialSetup:
 		LOG(D) << "Performing initial setup to use sedutil on drive " << argv[opts.device];
         return (d->initialSetup(argv[opts.password]));
 	case sedutiloption::setup_SUM:
