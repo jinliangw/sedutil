@@ -66,6 +66,7 @@ typedef struct _DTA_OPTIONS {
     char    sp[16];         /** security protocol */
     uint32_t timeout;       /** session timeout option */
     uint32_t delay;         /** delay between open session and first method call */
+    uint32_t sendRetries;
     uint32_t datastoreCount;
     uint32_t datastoreSizes[16];
 	sedutiloutput output_format;

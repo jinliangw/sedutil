@@ -1803,6 +1803,10 @@ uint8_t DtaDevOpal::loadDataStore(const char* password, const uint8_t table, con
 {
     LOG(D1) << "Entering DtaDevOpal::loadDataStore()" << filename << " " << dev;
 
+    if (table == 0) {
+        LOG(W) << "loadDataStore requested table 0.  The first table is 1.  This is probably not going to work.";
+    }
+
     // Set the table UID to the DataStore table UID using the table argument.
     std::vector<uint8_t> tableUID;
     tableUID.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
@@ -1946,6 +1950,10 @@ uint8_t DtaDevOpal::readDataStore(const char* password, const uint8_t table, con
 {
     uint8_t buffer[PROP_BUFFER_LENGTH];
     uint8_t  lastRC = 0;
+
+    if (table == 0) {
+        LOG(W) << "readDataStore requested table 0.  The first table is 1.  This is probably not going to work.";
+    }
 
     // Set the table UID to the DataStore table UID
     std::vector<uint8_t> tableUID;
@@ -2701,23 +2709,39 @@ uint8_t DtaDevOpal::exec(const DtaCommand* cmd, DtaResponse& resp, const uint16_
     IFLOG(D) DtaAnnotatedDump(IF_SEND, cmd->getCmdBuffer(), cmd->outputBufferSize());
     IFLOG(D3) DtaHexDump(cmd->getCmdBuffer(), SWAP32(hdr->cp.length) + sizeof (OPALComPacket));
 
-    if((lastRC = sendCmd(IF_SEND, protocol, ComID, cmd->getCmdBuffer(), cmd->outputBufferSize())) != 0) {
-        LOG(E) << "Command failed on send, status code = " << (uint16_t) lastRC;
-        return lastRC;
-    }
+    uint32_t retryCount = 0;
+    do {
+        if ((lastRC = sendCmd(IF_SEND, protocol, ComID, cmd->getCmdBuffer(), cmd->outputBufferSize())) == 0) {
+            break;
+        }
+        LOG(E) << "Command failed on send, status code = " << (uint16_t)lastRC;
+        if (retryCount >= sendRetries) {
+            return lastRC;
+        }
+        ++retryCount;
+        osmsSleep(10);
+    } while (true);
 
     hdr = (OPALHeader *)cmd->getRespBuffer();
     uint32_t receiveLength = (PROP_BUFFER_LENGTH < tperMaxPacket) ? PROP_BUFFER_LENGTH : tperMaxPacket;
     do {
-        osmsSleep(25);
         memset(cmd->getRespBuffer(), 0, receiveLength);
         lastRC = sendCmd(IF_RECV, protocol, ComID, cmd->getRespBuffer(), receiveLength);
+        if ((hdr->cp.outstandingData == 0) || (hdr->cp.minTransfer != 0)) {
+            break;
+        }
+        osmsSleep(25);
 
-    } while ((0 != hdr->cp.outstandingData) && (0 == hdr->cp.minTransfer));
+    } while (lastRC == 0);
 
     LOG(D3) << std::endl << "Dumping reply buffer";
     IFLOG(D) DtaAnnotatedDump(IF_RECV, cmd->getRespBuffer(), SWAP32(hdr->cp.length) + sizeof (OPALComPacket));
     IFLOG(D3) DtaHexDump(cmd->getRespBuffer(), SWAP32(hdr->cp.length) + sizeof(OPALComPacket));
+
+    // multi-thread option set, delay after the send for other thread to get in.
+    if (sendRetries != 0) {
+        osmsSleep(20);
+    }
 
     if (0 != lastRC) {
         LOG(E) << "Command failed on recv, status code = " << (uint16_t)lastRC;

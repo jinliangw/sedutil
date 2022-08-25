@@ -434,6 +434,7 @@ public:
 	sedutiloutput output_format; /** standard, readable, JSON */
     uint32_t timeout = 0;   /** Session timeout, 0 is no timeout */
     uint32_t delay = 0;     /** Delay between open session and first method call */
+    uint32_t sendRetries = 0;
     bool testTimeout = false;
     bool testOversizePacket = false;
     bool useTransaction = false;

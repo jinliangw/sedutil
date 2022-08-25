@@ -284,6 +284,11 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
                 }
             }
         }
+        else if (!strncmp("-mt=", argv[i], 4)) {
+            ++baseOptions;
+            opts->sendRetries = atoi(&argv[i][4]);
+            LOG(D) << "multi-thread retry count set to " << opts->sendRetries;
+        }
         else if (!(('-' == argv[i][0]) && ('-' == argv[i][1])) && (0 == opts->action)) {
 			LOG(E) << "Argument " << (uint16_t) i << " (" << argv[i] << ") should be a command";
 			return DTAERROR_INVALID_COMMAND;
