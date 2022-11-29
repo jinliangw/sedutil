@@ -140,17 +140,22 @@ lrstart and lrlength are ignored got global range. password in the SID password,
 Activate the LockingSP in Single User Mode on all ranges (-1) or a comma separated list of ranges (0,4,8,10).
 policy is the RangeStartLengthPolicy, 0 for User, 1 for Admin.
 Admin1 password in LockingSP will be set to SID password.
+.IP "\-\-reactivateLockingSP_SUM <x,y,z> <policy> <password> <device>"
+Reactivate the LockingSP in Single User Mode on all ranges (-1), no ranges (-2), or a comma separated list of ranges (0,4,8,10).
+policy is the RangeStartLengthPolicy, 0 for User, 1 for Admin.
+Default authority is Admin1, over-ride with -a option.
 .IP "\-\-setPassword_SUM <password> <user> <newpassword> <device>"
 Change the password of a TCG Opal User authority. user = User1, User2, ...  Default User passwords are "".
 .IP "\-\-eraseLockingRange_SUM <0...n> <password> <device>"
-Erase a Locking Range, 0 = GLobal 1..n = LRn.  password is for the User<n> that owns the Locking Range.
+Erase a Locking Range, 0 = GLobal 1..n = LRn.  Default authority is the User<n> that owns the Locking Range, over-ride with the -a option.
+password is for the selected authority.
 .IP "\-\-setLockingRange_SUM <0...n> <RW|RO|WO|LK> <password> <device>"
 Set the locking status of a Locking Range, 0 = GLobal 1..n = LRn.  password is for the User<n> that owns the Locking Range.
 .IP "\-\-setupLockingRange_SUM <0...n> <RangeStart> <RangeLength> <password> <device>"
 Setup a new Locking Range, 0 = GLobal 1..n = LRn.  password is for the User<n> that owns the Locking Range.
 .IP "\-\-enableLockingRange_SUM <0...n> <RW|R|W|D> <password> <device>"
 Set the ReadLockEnable and WriteLockEnable state for a LockingRange, 0 = Global, 1..n = LRn.  password is for the User<n> that owns the Locking Range
-.IP "\-\-assign_SUM <Admin1Password> <namespace> <rangeStart> <rangeLength> <device>"
+.IP "\-\-assign_SUM <namespace> <rangeStart> <rangeLength> <password> <device>"
 Assign a locking range for a namespace (CNL feature) using AssignToSUMRange option.  Default authority is Admin1, over-ride with -a option.
 
 .SS TCG Enterprise devices only 
