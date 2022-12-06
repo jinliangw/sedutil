@@ -119,6 +119,7 @@ typedef enum _sedutiloption {
 	enableuser,
 	activateLockingSP,
 	activateLockingSP_SUM,
+    reactivateLockingSP_SUM,
 	eraseLockingRange_SUM,
 	query,
 	scan,

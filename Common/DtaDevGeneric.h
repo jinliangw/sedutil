@@ -180,18 +180,34 @@ public:
          */
 	 uint8_t activateLockingSP(const char* password, const uint32_t dsCount = 0,
                                const uint32_t dsSizes[] = NULL);
-	/** Enable locking on the device in Single User Mode
-	 * @param lockingrange locking range to activate in SUM
-	 * @param password password of the admin sp SID authority
-	 */
-	 uint8_t activateLockingSP_SUM(const std::vector<uint32_t>& ranges, const uint32_t policy,
-                                   const char* password,
-                                   const uint32_t dsCount = 0, const uint32_t dsSizes[] = NULL);
-	/** Erase a Single User Mode locking range by calling the drive's erase method
+        /** Enables locking in Single User Mode
+         * @param lockingrange  list of locking range numbers to activate in SUM (-1 = all)
+         * @param policy  the RangeStartRangeLengthPolicy (0 = user, 1 = admins)
+         * @param password  current SID password
+         * @param dsCount  Number of additional DataStore tables to create
+         * @param dsSizes  Sizes of the additional DataStore tables
+         */
+        uint8_t activateLockingSP_SUM(const std::vector<uint32_t>& ranges, const uint32_t policy, const char* password,
+                                      const uint32_t dsCount = 0, const uint32_t dsSizes[] = NULL);
+        /** Reactivate locking on the device in Single User Mode
+         * @param authority selects the authority to use in the session
+         * @param password  current SID password
+         * @param lockingrange  list of locking range numbers to activate in SUM (-1 = all, -2 = none)
+         * @param policy  the RangeStartRangeLengthPolicy (0 = user, 1 = admins)
+         * @param dsCount  Number of additional DataStore tables to create
+         * @param dsSizes  Sizes of the additional DataStore tables
+         */
+        uint8_t reactivateLockingSP_SUM(const char* authority,
+                                        const char* password,
+                                        const std::vector<uint32_t>& ranges, const uint32_t policy,
+                                        const uint32_t dsCount = 0, const uint32_t dsSizes[] = NULL);
+        /** Erase a Single User Mode locking range by calling the drive's erase method
+         * @param authority selects the authority to use in the session
          * @param lockingrange The Locking Range to erase
          * @param password The administrator password for the drive
          */
-        uint8_t eraseLockingRange_SUM(const uint8_t lockingrange, const char* password);
+        uint8_t eraseLockingRange_SUM(const char* authority, const uint8_t lockingrange,
+                                      const char* password);
         /** Change the SID password from it's MSID default
          * @param newpassword  new password for SID and locking SP admins
          */

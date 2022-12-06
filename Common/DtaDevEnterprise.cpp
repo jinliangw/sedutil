@@ -1028,7 +1028,17 @@ uint8_t DtaDevEnterprise::activateLockingSP_SUM(const std::vector<uint32_t>& ran
 	LOG(D1) << "Exiting DtaDevEnterprise::activateLockingSP_SUM()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::eraseLockingRange_SUM(const uint8_t lockingrange, const char* password)
+uint8_t DtaDevEnterprise::reactivateLockingSP_SUM(const char* authority, const char* password,
+                                                  const std::vector<uint32_t>& ranges, const uint32_t policy,
+                                                  const uint32_t dsCount, const uint32_t dsSizes[])
+{
+	LOG(D1) << "Entering DtaDevEnterprise::reactivateLockingSP_SUM()";
+	if (password == NULL) { LOG(D4) << "Referencing formal parameters "; }
+	LOG(E) << "reactivate Locking SP SUM is not a part of the Enterprise SSC ";
+	LOG(D1) << "Exiting DtaDevEnterprise::reactivateLockingSP_SUM()";
+	return DTAERROR_INVALID_PARAMETER;
+}
+uint8_t DtaDevEnterprise::eraseLockingRange_SUM(const char* authority, const uint8_t lockingrange, const char* password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::eraseLockingRange_SUM()";
 	if (password == NULL) { LOG(D4) << "Referencing formal parameters "; }

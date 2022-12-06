@@ -73,13 +73,18 @@ public:
     /** dummy code not implemented the the enterprise SSC */
 	uint8_t activateLockingSP(const char* password, const uint32_t dsCount = 0,
                               const uint32_t dsSizes[] = NULL);
-	/** dummy code not implemented in teh enterprise SSC*/
+	/** dummy code not implemented in the enterprise SSC*/
 	uint8_t activateLockingSP_SUM(const std::vector<uint32_t>& ranges, const uint32_t policy,
 				      const char* password, const uint32_t dsCount = 0,
 				      const uint32_t dsSizes[] = NULL);
-	/** dummy code not implemented in teh enterprise SSC*/
-	uint8_t eraseLockingRange_SUM(const uint8_t lockingrange, const char* password);
-        /** dummy code not implemented in teh enterprise SSC*/
+	/** dummy code not implemented in the enterprise SSC*/
+	uint8_t reactivateLockingSP_SUM(const char* authority, const char* password,
+                                        const std::vector<uint32_t>& ranges, const uint32_t policy,
+                                        const uint32_t dsCount = 0, const uint32_t dsSizes[] = NULL);
+	/** dummy code not implemented in the enterprise SSC*/
+	uint8_t eraseLockingRange_SUM(const char* authority, const uint8_t lockingrange,
+				      const char* password);
+        /** dummy code not implemented in the enterprise SSC*/
 	uint8_t revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep = 0);
         /** Enable a Bandmaster Not functional */
 	uint8_t enableUser(const char* sp, const char* authority, const char* password, const char* userid,
