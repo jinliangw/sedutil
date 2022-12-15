@@ -4,7 +4,7 @@
 sedutil-cli \- util to manage TCG Storage self encrypting drives
 
 .SH SYNOPSIS
-sedutil\-cli [\-vnlx] [\-c=x] [\-t=n] [\-a=n] [\-ds=x,y,z] <action> <options> <device>
+sedutil\-cli [options] <action> <arguments> <device>
 
 .SH DESCRIPTION
 sedutil-cli is a utility to manage self encrypting drives that conform
@@ -34,9 +34,9 @@ select a comID value, offset from base (-c=+1), absolute (-c=0x1000), or dynamic
 .IP "\-t=n (optional)"
 set session timeout value, n is in milliseconds
 .IP "\-a=authority (optional)"
-over-ride the default authority. authority options Admin<1..n>, User<1..n>. This option is not supported by all commands.
+over-ride the default authority. authority options Admin<1..n>, User<1..n>.  This option is not supported by all actions.
 .IP "\-sp=sp (optional)"
-specify a security protocol to access, Admin or Locking.
+specify a security protocol to access, Admin or Locking.  This option is not supported by all actions.
 .IP "\-ds=x,y,z (optional)"
 optionally used with activate commands. Set the Datastore tables sizes.  1 to n size values comma separated (no spaces).
 
@@ -60,10 +60,10 @@ Setup a new Locking Range, 0 = GLobal 1..n = LRn.  Default authority is Admin1, 
 .IP "\-\-initialSetup <SIDpassword> <device>"
 Setup the device for use with sedutil, <SIDpassword> is new SID and Admin1 password (Opal) or the EraseMaster and all BandMasters (Enterprise).
 .IP "\-\-setSIDPassword <SIDpassword> <newSIDpassword> <device>"
-Change the SID password
+Change the SID password.
 .IP "\-\-takeOwnership <newSIDpassword> <device>" 
-Change the SID password using the MSID password
-.IP "\-\-setPassword <oldpassword> <userid> <newpassword> <device>"
+Change the SID password using the MSID password.
+.IP "\-\-setPassword <oldpassword> <authority> <newpassword> <device>"
 Change the password of an authority. For Enterprise, userid = "EraseMaster" or "BandMaster<n>", 0 <= n <= 1023. For Opal, userid = Admin<n> or User<n>.  oldpassword = "" for MSID. Default authority is Admin1, over-ride with -a option.  Default SP is Locking, over-ride with -sp option.
 .IP "\-\-setLockingRange <0...n> <RW|RO|WO|LK|+R|-R> <password> <device>"
 Set the status of a Locking Range, 0 = GLobal 1..n = LRn.  Options for read/write enabled, read only, write only, locked, or add or remove Programmatic Reset effect. Default authority is Admin1, over-ride with -a option.
@@ -90,21 +90,21 @@ Alike to PSIDrevert, but on Enterprise calls AdminSP->Revert instead of
 ThisSP->RevertSP.  There are no PSID or Revert standards for Enterprise
 and different devices support different methods.
 .IP "\-\-printDefaultPassword <device>"
-print MSID
+Print the MSID PIN value.
 
 .SS TCG Opal devices only
 .IP "\-\-setAdmin1Pwd <Admin1password> <newAdmin1password> <device>"
-Change the Admin1 password
+Change the Admin1 password.
 .IP "\-\-activateLockingSP <SIDpassword> <device>"
 Activate the LockingSP. Admin1 password in LockingSP will be set to SID password.
 .IP "\-\-enableUser <password> <user> <device>"
 Enable a user is Admin[1..n] or User[1..n].  Default SP is Locking, over-ride with -sp option.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-setMBREnable <on|off> <Admin1password> <device>"
-Enable|Disable MBR shadowing
+Enable|Disable MBR shadowing.
 .IP "\-\-setMBRDone <on|off> <Admin1password> <device>"
-set|unset MBRDone
+set|unset MBRDone.
 .IP "\-\-loadPBAimage <Admin1password> <file> <device>"
-Write <file> to MBR Shadow area
+Write <file> to MBR Shadow area.
 .IP "\-\-readMBR <Admin1Password> <offset> <count> <device>"
 Print MBR data starting at offset for count bytes.
 .IP "\-\-loadDataStore <Admin1password> <table> <offset> <count> <file> <device>"
@@ -131,6 +131,8 @@ Print the ACE table boolean expression for the row specified by the halfUID valu
 Set the ACE table boolean expression (UID) for the row specified by the halfUID value (lower half of row UID). Expression is Anybody, SID, PSID, Admins, Admin[1..n], User[1..n]. Default SP is Locking, over-ride with -sp option.  Default authority is Admin1, over-ride with -a option.
 .IP "\-\-getRandom <size> <password> <device>"
 Get a random number of <size> bytes.  Default SP is Admin, over-ride with -sp option.  Default authority is Anybody (password is ignored), over-ride with -a option.
+.IP "\-\-featureLock <column> <value> <password> <device>"
+Set method call to the vendor specific FeatureLock table requesting the column be set to the value.  Default authority is SID, over-ride with -a option.
 
 .SS TCG Opal devices in Single User Mode only
 .IP "\-\-setup_SUM <0...n> <lrstart> <lrlength> <password> <newpassword> <device>"
@@ -157,6 +159,8 @@ Setup a new Locking Range, 0 = GLobal 1..n = LRn.  password is for the User<n> t
 Set the ReadLockEnable and WriteLockEnable state for a LockingRange, 0 = Global, 1..n = LRn.  password is for the User<n> that owns the Locking Range
 .IP "\-\-assign_SUM <namespace> <rangeStart> <rangeLength> <password> <device>"
 Assign a locking range for a namespace (CNL feature) using AssignToSUMRange option.  Default authority is Admin1, over-ride with -a option.
+.IP "\-\-lock_SUM <0..n> <password> <device>"
+Vendor Specific Lock method call to the specified locking range, 0 = Global, 1..n = LRn.  Default authority is Admin1, over-ride with -a option.
 
 .SS TCG Enterprise devices only 
 .IP "\-\-setBandsEnabled <password> <device>"

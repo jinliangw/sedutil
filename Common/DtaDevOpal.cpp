@@ -2288,7 +2288,7 @@ uint8_t DtaDevOpal::reactivateLockingSP_SUM(const char* authority, const char* p
 		return lastRC;
 	}
 	cmd->reset(OPAL_UID::OPAL_THISSP_UID, OPAL_METHOD::REACTIVATE);
-			cmd->addToken(OPAL_TOKEN::STARTLIST);
+	cmd->addToken(OPAL_TOKEN::STARTLIST);
 	if (lockingrange != (uint32_t)-2) {
 		cmd->addToken(OPAL_TOKEN::STARTNAME);
 		//SingleUserModeSelectionList parameter
@@ -2296,22 +2296,22 @@ uint8_t DtaDevOpal::reactivateLockingSP_SUM(const char* authority, const char* p
 		cmd->addToken(OPAL_TINY_ATOM::UINT_06);
 		cmd->addToken(OPAL_TINY_ATOM::UINT_00);
 		cmd->addToken(OPAL_TINY_ATOM::UINT_00);
-			if (lockingrange == (uint32_t)-1) {
-				cmd->addToken(LR);
-			} else {
+		if (lockingrange == (uint32_t)-1) {
+			cmd->addToken(LR);
+		} else {
 			cmd->addToken(OPAL_TOKEN::STARTLIST);
 			for (int j = 0; j < (int)ranges.size(); j++) {
-					lockingrange = ranges.at(j);
-					LR.clear();
-					LR.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
-					for (int i = 0; i < 8; i++) {
-						LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKINGRANGE_GLOBAL][i]);
-					}
-					if (lockingrange > 0) {
-						LR[6] = 0x03;
-						LR[8] = lockingrange;
-					}
-					cmd->addToken(LR);
+				lockingrange = ranges.at(j);
+				LR.clear();
+				LR.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+				for (int i = 0; i < 8; i++) {
+					LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKINGRANGE_GLOBAL][i]);
+				}
+				if (lockingrange > 0) {
+					LR[6] = 0x03;
+					LR[8] = lockingrange;
+				}
+				cmd->addToken(LR);
 			}
 			cmd->addToken(OPAL_TOKEN::ENDLIST);
 		}
@@ -2326,20 +2326,20 @@ uint8_t DtaDevOpal::reactivateLockingSP_SUM(const char* authority, const char* p
 		cmd->addToken(OPAL_TOKEN::ENDNAME);
 	}
     // If the user has provided a list of DataStore table sizes. add the list as the parameter
-        // 0x060003 (DataStoreTableSizes).  See TCG Opal Feature Set - Additional Data Store Tables.
-        if (dsCount != 0) {
-            cmd->addToken(OPAL_TOKEN::STARTNAME);
-                cmd->addToken(OPAL_SHORT_ATOM::UINT_3);
-                cmd->addToken(OPAL_TINY_ATOM::UINT_06);
-                cmd->addToken(OPAL_TINY_ATOM::UINT_00);
-                cmd->addToken(OPAL_TINY_ATOM::UINT_03);
-                cmd->addToken(OPAL_TOKEN::STARTLIST);
-                    for (uint32_t i = 0; i < dsCount; i++) {
-                        cmd->addToken((uint64_t)dsSizes[i]);
-                    }
-                cmd->addToken(OPAL_TOKEN::ENDLIST);
-            cmd->addToken(OPAL_TOKEN::ENDNAME);
-        }
+    // 0x060003 (DataStoreTableSizes).  See TCG Opal Feature Set - Additional Data Store Tables.
+    if (dsCount != 0) {
+        cmd->addToken(OPAL_TOKEN::STARTNAME);
+            cmd->addToken(OPAL_SHORT_ATOM::UINT_3);
+            cmd->addToken(OPAL_TINY_ATOM::UINT_06);
+            cmd->addToken(OPAL_TINY_ATOM::UINT_00);
+            cmd->addToken(OPAL_TINY_ATOM::UINT_03);
+            cmd->addToken(OPAL_TOKEN::STARTLIST);
+            for (uint32_t i = 0; i < dsCount; i++) {
+                cmd->addToken((uint64_t)dsSizes[i]);
+            }
+            cmd->addToken(OPAL_TOKEN::ENDLIST);
+        cmd->addToken(OPAL_TOKEN::ENDNAME);
+    }
     cmd->addToken(OPAL_TOKEN::ENDLIST);
 	cmd->complete();
 	if ((lastRC = session->sendCommand(cmd, response)) != 0) {
@@ -2368,7 +2368,8 @@ uint8_t DtaDevOpal::reactivateLockingSP_SUM(const char* authority, const char* p
 	return 0;
 }
 
-uint8_t DtaDevOpal::eraseLockingRange_SUM(const char* authority, const uint8_t lockingrange, const char* password)
+uint8_t DtaDevOpal::eraseLockingRange_SUM(const char* authority, const uint8_t lockingrange,
+										  const char* password)
 {
 	uint8_t lastRC;
 	LOG(D1) << "Entering DtaDevOpal::eraseLockingRange_SUM";
@@ -2420,6 +2421,97 @@ uint8_t DtaDevOpal::eraseLockingRange_SUM(const char* authority, const uint8_t l
 	LOG(I) << "LockingRange" << (uint16_t)lockingrange << " erased";
 	LOG(D1) << "Exiting DtaDevOpal::eraseLockingRange_SUM";
 	return 0;
+}
+
+uint8_t DtaDevOpal::lockLockingRange_SUM(const char* authority, const char* password,
+                                         const uint8_t lockingrange)
+{
+    LOG(D1) << "Entering DtaDevOpal::lockLockingRange_SUM";
+
+    uint8_t lastRC;
+    vector<uint8_t> authorityUID;
+
+    if ((lastRC = getAuth4User(OPAL_LOCKINGSP_UID, authority, 0, authorityUID)) != 0) {
+        LOG(E) << "Invalid Authority provided " << authority;
+        return lastRC;
+    }
+
+    vector<uint8_t> LR;
+    LR.push_back(OPAL_SHORT_ATOM::BYTESTRING8);
+    for (int i = 0; i < 8; i++) {
+        LR.push_back(OPALUID[OPAL_UID::OPAL_LOCKINGRANGE_GLOBAL][i]);
+    }
+    if (lockingrange != 0) {
+        LR[6] = 0x03;
+        LR[8] = lockingrange;
+    }
+
+    session = new DtaSession(this);
+    if (NULL == session) {
+        LOG(E) << "Unable to create session object ";
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+    if ((lastRC = session->start(OPAL_UID::OPAL_LOCKINGSP_UID, password, authorityUID)) != 0) {
+        delete session;
+        return lastRC;
+    }
+
+    DtaCommand *cmd = new DtaCommand();
+    if (NULL == cmd) {
+        LOG(E) << "Unable to create command object ";
+        delete session;
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+
+    cmd->reset(LR, OPAL_METHOD::LOCK);
+    cmd->addToken(OPAL_TOKEN::STARTLIST);
+    cmd->addToken(OPAL_TOKEN::ENDLIST);
+    cmd->complete();
+
+    if ((lastRC = session->sendCommand(cmd, response)) != 0) {
+        LOG(E) << "setLockingRange Failed ";
+    } else {
+        LOG(I) << "LockingRange" << (uint16_t)lockingrange << " locked";
+        LOG(D1) << "Exiting DtaDevOpal::lockLockingRange_SUM";
+    }
+    delete cmd;
+    delete session;
+    return lastRC;
+}
+
+uint8_t DtaDevOpal::setFeatureLocking(const char* authority, const char* password,
+                                      const uint8_t column, const uint8_t value)
+{
+    LOG(D1) << "Entering DtaDevOpal::setFeatureLocking";
+
+    uint8_t lastRC;
+    vector<uint8_t> authorityUID;
+
+    if ((lastRC = getAuth4User(OPAL_UID::OPAL_ADMINSP_UID, authority, 0, authorityUID)) != 0) {
+        LOG(E) << "Invalid Authority provided " << authority;
+        return lastRC;
+    }
+
+    session = new DtaSession(this);
+    if (NULL == session) {
+        LOG(E) << "Unable to create session object ";
+        return DTAERROR_OBJECT_CREATE_FAILED;
+    }
+
+    if ((lastRC = session->start(OPAL_UID::OPAL_ADMINSP_UID, password, authorityUID)) != 0) {
+        delete session;
+        return lastRC;
+    }
+
+    vector<uint8_t> table = {OPAL_SHORT_ATOM::BYTESTRING8, 0xFF, 0xFF, 0, 1, 0, 0, 0, 1};
+
+    if ((lastRC = setTable(table, (OPAL_TOKEN)column, (OPAL_TOKEN)value)) != 0) {
+        delete session;
+        return lastRC;
+    }
+
+    delete session;
+    return lastRC;
 }
 
 uint8_t DtaDevOpal::takeOwnership(const char* newpassword)
@@ -3605,6 +3697,23 @@ const tableDesc_t DataStoreTableDesc =
     {}
 };
 
+const tableDesc_t VUFeatureLockingTableDesc =
+{
+    "VU Feature Locking",
+    "Vendor Unique Feature Locking Table.",
+    { 0xFF, 0xFF, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 },
+    { 0xFF, 0xFF, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01 },
+    1,
+    0,                  // skip
+    4,
+    {
+        { 0, "UID" },
+        { 1, "FWDownload" },
+        { 2, "VUCommands" },
+        { 3, "MinFeatures" }
+    }
+};
+
 const tableDesc_t* tableDescriptors[] =
 {
 	// Defined in TCG Storage Architecture
@@ -3630,7 +3739,9 @@ const tableDesc_t* tableDescriptors[] =
 	&MBRTableDesc,
 	&K_AES_128TableDesc,
 	&K_AES_256TableDesc,
-	&DataStoreTableDesc
+	&DataStoreTableDesc,
+	// Vendor Unique
+	&VUFeatureLockingTableDesc
 };
 
 int anybody;

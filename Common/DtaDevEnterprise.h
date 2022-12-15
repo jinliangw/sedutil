@@ -70,7 +70,7 @@ public:
          */
 	uint8_t setSIDPassword(const char* oldpassword, const char* newpassword,
                            const uint8_t hasholdpwd = 1, const uint8_t hashnewpwd = 1);
-    /** dummy code not implemented the the enterprise SSC */
+    /** dummy code not implemented in the enterprise SSC */
 	uint8_t activateLockingSP(const char* password, const uint32_t dsCount = 0,
                               const uint32_t dsSizes[] = NULL);
 	/** dummy code not implemented in the enterprise SSC*/
@@ -84,6 +84,12 @@ public:
 	/** dummy code not implemented in the enterprise SSC*/
 	uint8_t eraseLockingRange_SUM(const char* authority, const uint8_t lockingrange,
 				      const char* password);
+	/** dummy code not implemented in the enterprise SSC */
+	uint8_t lockLockingRange_SUM(const char* authority, const char* password,
+				     const uint8_t lockingrange);
+	/** dummy code not implemented in the enterprise SSC */
+	uint8_t setFeatureLocking(const char* authority, const char* password,
+				  const uint8_t column, const uint8_t value);
         /** dummy code not implemented in the enterprise SSC*/
 	uint8_t revertSP(const char* sp, const char* authority, const char* password, const uint8_t keep = 0);
         /** Enable a Bandmaster Not functional */

@@ -1038,12 +1038,29 @@ uint8_t DtaDevEnterprise::reactivateLockingSP_SUM(const char* authority, const c
 	LOG(D1) << "Exiting DtaDevEnterprise::reactivateLockingSP_SUM()";
 	return DTAERROR_INVALID_PARAMETER;
 }
-uint8_t DtaDevEnterprise::eraseLockingRange_SUM(const char* authority, const uint8_t lockingrange, const char* password)
+uint8_t DtaDevEnterprise::eraseLockingRange_SUM(const char* authority, const uint8_t lockingrange,
+                                                const char* password)
 {
 	LOG(D1) << "Entering DtaDevEnterprise::eraseLockingRange_SUM()";
 	if (password == NULL) { LOG(D4) << "Referencing formal parameters "; }
 	LOG(E) << "Erase Locking Range SUM is not a part of the Enterprise SSC ";
 	LOG(D1) << "Exiting DtaDevEnterprise::eraseLockingRange_SUM()";
+	return DTAERROR_INVALID_PARAMETER;
+}
+uint8_t DtaDevEnterprise::lockLockingRange_SUM(const char* authority, const char* password,
+                                               const uint8_t lockingrange)
+{
+	LOG(D1) << "Entering DtaDevEnterprise::eraseLockingRange_SUM()";
+	LOG(E) << "Erase Locking Range SUM is not a part of the Enterprise SSC ";
+	LOG(D1) << "Exiting DtaDevEnterprise::eraseLockingRange_SUM()";
+	return DTAERROR_INVALID_PARAMETER;
+}
+uint8_t DtaDevEnterprise::setFeatureLocking(const char* authority, const char* password,
+                                            const uint8_t column, const uint8_t value)
+{
+	LOG(D1) << "Entering DtaDevEnterprise::setFeatureLocking()";
+	LOG(E) << "Method is not a part of the Enterprise SSC ";
+	LOG(D1) << "Exiting DtaDevEnterprise::setFeatureLocking()";
 	return DTAERROR_INVALID_PARAMETER;
 }
 uint8_t DtaDevEnterprise::takeOwnership(const char* newpassword)

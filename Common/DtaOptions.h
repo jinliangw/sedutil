@@ -139,8 +139,9 @@ typedef enum _sedutiloption {
     stackReset,
     getACE,
     setACE,
-    getRandom
-
+    getRandom,
+    lock_SUM,
+    featureLock
 } sedutiloption;
 
 /** verify the number of arguments passed */
