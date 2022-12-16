@@ -307,7 +307,8 @@ int main(int argc, char * argv[])
                                               argv[opts.password], ranges, opts.policy,
                                               opts.datastoreCount, opts.datastoreSizes);
         }
-        return d->reactivateLockingSP_SUM(opts.authority[0] ? opts.authority : "Admin1", argv[opts.password], ranges, opts.policy);
+        return d->reactivateLockingSP_SUM(opts.authority[0] ? opts.authority : "Admin1",
+                                          argv[opts.password], ranges, opts.policy);
         }
         break;
 	case sedutiloption::eraseLockingRange_SUM:
@@ -315,6 +316,16 @@ int main(int argc, char * argv[])
 		return d->eraseLockingRange_SUM(opts.authority[0] ? opts.authority : "Admin1",
 										opts.lockingrange, argv[opts.password]);
 		break;
+    case sedutiloption::lock_SUM:
+        LOG(D) << "Lock LockingRange " << opts.lockingrange << " on" << argv[opts.device];
+        return d->lockLockingRange_SUM(opts.authority[0] ? opts.authority : "Admin1",
+                                       argv[opts.password], opts.lockingrange);
+        break;
+    case sedutiloption::featureLock:
+		LOG(D) << "setFeatureLocking column " << argv[opts.lrstart] << " to " << argv[opts.lrlength]; 
+        return d->setFeatureLocking(opts.authority[0] ? opts.authority : "SID", argv[opts.password], 
+                                    atoi(argv[opts.lrstart]), atoi(argv[opts.lrlength]));
+        break;
 	case sedutiloption::assign:
 		LOG(D) << "Assign a LockingRange to a namespace " << argv[opts.lockingrange];
 		return (d->assign(opts.authority[0] ? opts.authority : "Admin1",

@@ -98,6 +98,8 @@ uint8NOCODE(activateLockingSP_SUM, const std::vector<uint32_t>& ranges, const ui
 uint8NOCODE(reactivateLockingSP_SUM, const char* authority,  const char* password,const std::vector<uint32_t>& ranges,
             const uint32_t policy, const uint32_t dsCount, const uint32_t dsSizes[])
 uint8NOCODE(eraseLockingRange_SUM, const char* authority, const uint8_t lockingrange, const char* password)
+uint8NOCODE(lockLockingRange_SUM, const char* authority, const char* password, const uint8_t lockingrange)
+uint8NOCODE(setFeatureLocking, const char* authority, const char* password, const uint8_t column, const uint8_t value)
 uint8NOCODE(takeOwnership, const char* newpassword)
 uint8NOCODE(setSIDPassword, const char* oldpassword, const char* newpassword,
             const uint8_t hasholdpwd, const uint8_t hashnewpwd)

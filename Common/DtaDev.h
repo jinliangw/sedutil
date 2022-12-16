@@ -307,9 +307,8 @@ public:
 	 * @param policy  the RangeStartRangeLengthPolicy (0 = user, 1 = admins)
 	 * @param dsCount  Number of additional DataStore tables to create
 	 * @param dsSizes  Sizes of the additional DataStore tables
-	 */
-	virtual uint8_t reactivateLockingSP_SUM(const char* authority,
-					        const char* password,
+	*/ 
+	virtual uint8_t reactivateLockingSP_SUM(const char* authority, const char* password,
                                                 const std::vector<uint32_t>& ranges, const uint32_t policy,
                                                 const uint32_t dsCount = 0,
                                                 const uint32_t dsSizes[] = NULL) = 0;
@@ -320,6 +319,25 @@ public:
 	 */
 	virtual uint8_t eraseLockingRange_SUM(const char* authority, const uint8_t lockingrange,
 					      const char* password) = 0;
+
+	/** Lock a Single User Mode locking range by calling the drive's Lock method
+	 * @param authority selects the authority to use in the session 
+	 * @param password The password for the selected authority
+	 * @param lockingrange The Locking Range to Lock 
+	 */
+	virtual uint8_t lockLockingRange_SUM(const char* authority, const char* password,
+					     const uint8_t lockingrange) = 0;
+
+	/** Set a value in the VU FeatureLocking table
+	 * @param authority selects the authority to use in the session 
+	 * @param password The password for the selected authority
+	 * @param column selects the column to update (0 will just read the table and dump)
+	 *      	 values)
+	 * @param value The value to write to the selected column
+	 */
+	virtual uint8_t setFeatureLocking(const char* authority, const char* password,
+					  const uint8_t column, const uint8_t value) = 0;
+
 	/** Change the SID password from it's MSID default
 	 * @param newpassword  new password for SID and locking SP admins
 	 */

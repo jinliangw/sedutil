@@ -354,13 +354,18 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
                         OPTION_IS(lockingrange)
                         TESTARG_RANGE(policy, 0, 1, "Invalid policy (0-1)")
 			OPTION_IS(password) OPTION_IS(device) END_OPTION
-		BEGIN_OPTION(reactivateLockingSP_SUM, 4)
+                BEGIN_OPTION(reactivateLockingSP_SUM, 4)
                         OPTION_IS(lockingrange)
                         TESTARG_RANGE(policy, 0, 1, "Invalid policy (0-1)")
                         OPTION_IS(password) OPTION_IS(device) END_OPTION
 		BEGIN_OPTION(eraseLockingRange_SUM, 3)
 			TESTARG_RANGE(lockingrange, 0, 47, "Invalid Locking Range (0-47)")
 			OPTION_IS(password) OPTION_IS(device) END_OPTION
+        BEGIN_OPTION(lock_SUM, 3)
+            TESTARG_RANGE(lockingrange, 0, 47, "Invalid Locking Range (0-47)")
+            OPTION_IS(password)
+            OPTION_IS(device)
+            END_OPTION
         BEGIN_OPTION(printTables, 4)
             OPTION_IS(userid)
             OPTION_IS(password)
@@ -520,6 +525,12 @@ uint8_t DtaOptions(int argc, char * argv[], DTA_OPTIONS * opts)
             END_OPTION
         BEGIN_OPTION(assign_SUM, 5)
             OPTION_IS(lockingrange)
+            OPTION_IS(lrstart)
+            OPTION_IS(lrlength)
+            OPTION_IS(password)
+            OPTION_IS(device)
+            END_OPTION
+        BEGIN_OPTION(featureLock, 4)
             OPTION_IS(lrstart)
             OPTION_IS(lrlength)
             OPTION_IS(password)
