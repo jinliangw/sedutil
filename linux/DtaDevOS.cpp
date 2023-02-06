@@ -37,6 +37,7 @@ along with sedutil.  If not, see <http://www.gnu.org/licenses/>.
 #include "DtaHexDump.h"
 #include "DtaDevLinuxSata.h"
 #include "DtaDevLinuxNvme.h"
+#include "DtaDevLinuxNvmeRedfish.h"
 #include "DtaDevGeneric.h"
 
 using namespace std;
@@ -64,6 +65,10 @@ void DtaDevOS::init(const char * devref)
 	{
 //		DtaDevLinuxNvme *NvmeDrive = new DtaDevLinuxNvme();
 		drive = new DtaDevLinuxNvme();
+	}
+    else if (!strncmp(devref, "NVMe_", 5))
+	{
+		drive = new DtaDevLinuxNvmeRedfish();
 	}
 	else if (!strncmp(devref, "/dev/s", 6))
 	{

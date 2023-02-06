@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign subdir-objects
 AM_CFLAGS = -Wall -Werror -std=c11 -ftabstop=4
-AM_CXXFLAGS = -Wall -Werror -std=c++11 -ftabstop=4 -I./Common -I./Common/pbkdf2 -I./linux -I./LinuxPBA
+AM_CXXFLAGS = -Wall -Werror -std=c++11 -ftabstop=4 -I./Common -I./Common/pbkdf2 -I./linux -I./LinuxPBA -I./cppcodec -I./json/include -I./cpp-httplib
 SEDUTIL_COMMON_CODE = \
 	Common/DtaAnnotatedDump.cpp Common/DtaAnnotatedDump.h \
 	Common/DtaCommand.cpp Common/DtaCommand.h \
@@ -27,6 +27,7 @@ sbin_PROGRAMS = sedutil-cli linuxpba
 sedutil_cli_SOURCES = linux/Version.h Common/sedutil.cpp Common/DtaOptions.cpp Common/DtaOptions.h \
 	\
 	linux/DtaDevLinuxNvme.cpp linux/DtaDevLinuxNvme.h \
+	linux/DtaDevLinuxNvmeRedfish.cpp linux/DtaDevLinuxNvmeRedfish.h \
 	linux/DtaDevLinuxSata.cpp linux/DtaDevLinuxSata.h \
 	linux/DtaDevOS.cpp linux/DtaDevOS.h \
 	linux/DtaDevLinuxDrive.h linux/os.h \
@@ -38,6 +39,7 @@ linuxpba_SOURCES = LinuxPBA/LinuxPBA.cpp LinuxPBA/GetPassPhrase.cpp LinuxPBA/Unl
 	 LinuxPBA/GetPassPhrase.h LinuxPBA/UnlockSEDs.h \
 	\
 	linux/DtaDevLinuxNvme.cpp linux/DtaDevLinuxNvme.h \
+	linux/DtaDevLinuxNvmeRedfish.cpp linux/DtaDevLinuxNvmeRedfish.h \
 	linux/DtaDevLinuxSata.cpp linux/DtaDevLinuxSata.h \
 	linux/DtaDevOS.cpp linux/DtaDevOS.h \
 	linux/DtaDevLinuxDrive.h linux/os.h \

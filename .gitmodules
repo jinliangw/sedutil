@@ -1,0 +1,9 @@
+[submodule "cppcodec"]
+	path = cppcodec
+	url = git@github.com:tplgy/cppcodec.git
+[submodule "cpp-httplib"]
+	path = cpp-httplib
+	url = git@github.com:yhirose/cpp-httplib.git
+[submodule "json"]
+	path = json
+	url = git@github.com:nlohmann/json.git
