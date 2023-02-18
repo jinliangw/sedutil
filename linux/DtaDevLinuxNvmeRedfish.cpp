@@ -52,7 +52,7 @@ DtaDevLinuxNvmeRedfish::DtaDevLinuxNvmeRedfish() : client(getBMCRedfishUri()) {}
 bool DtaDevLinuxNvmeRedfish::init(const char *devref)
 {
 	LOG(D1) << "Creating DtaDevLinuxNvmeRedfish::DtaDev() ";
-	idfy_path = std::string("/google/v1/NVMe/") + devref + "/controllers/0/Actions/NVMe.Identify";
+	idfy_path = std::string("/google/v1/NVMe/") + devref + "/Controllers/0/Actions/NVMe.Identify";
 	if_send_path = std::string("/redfish/v1/Systems/system/Storage/") + devref + "/Controllers/0/Actions/StorageController.SecuritySend";
 	if_recv_path = std::string("/redfish/v1/Systems/system/Storage/") + devref + "/Controllers/0/Actions/StorageController.SecurityReceive";
 	LOG(D1) << idfy_path;
@@ -129,9 +129,7 @@ void DtaDevLinuxNvmeRedfish::identify(OPAL_DiskInfo &disk_info)
 		{"CNS", 1},
 		{"NSID", 0},
 		{"CNTID", 0}};
-	auto res = client.Post("/google/v1/NVMe/NVMe_1/controllers/0/Actions/NVMe.Identify",
-							body.dump(),
-							"application/json");
+	auto res = client.Post(idfy_path, body.dump(), "application/json");
 	if (res.error() != httplib::Error::Success)
 	{
 		LOG(E) << "HTTP error: " << httplib::to_string(res.error()) ;
