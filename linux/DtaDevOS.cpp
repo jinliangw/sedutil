@@ -66,7 +66,7 @@ void DtaDevOS::init(const char * devref)
 //		DtaDevLinuxNvme *NvmeDrive = new DtaDevLinuxNvme();
 		drive = new DtaDevLinuxNvme();
 	}
-    else if (!strncmp(devref, "NVMe_", 5))
+    else if (strstr(devref, "_NVMe_") != NULL)
 	{
 		drive = new DtaDevLinuxNvmeRedfish();
 	}

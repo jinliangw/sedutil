@@ -52,7 +52,7 @@ DtaDevLinuxNvmeRedfish::DtaDevLinuxNvmeRedfish() : client(getBMCRedfishUri()) {}
 bool DtaDevLinuxNvmeRedfish::init(const char *devref)
 {
 	LOG(D1) << "Creating DtaDevLinuxNvmeRedfish::DtaDev() ";
-	idfy_path = std::string("/google/v1/NVMe/") + devref + "/Controllers/0/Actions/NVMe.Identify";
+	idfy_path = std::string("/google/v1/NVMe/") + devref + "/Controllers/0/Actions/NVMeController.Identify";
 	if_send_path = std::string("/redfish/v1/Systems/system/Storage/") + devref + "/Controllers/0/Actions/StorageController.SecuritySend";
 	if_recv_path = std::string("/redfish/v1/Systems/system/Storage/") + devref + "/Controllers/0/Actions/StorageController.SecurityReceive";
 	LOG(D1) << idfy_path;
