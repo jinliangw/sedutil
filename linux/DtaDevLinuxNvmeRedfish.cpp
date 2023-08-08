@@ -47,7 +47,11 @@ std::string getBMCRedfishUri()
 /** The Device class represents a single disk device.
  *  Linux specific implementation using the NVMe interface
  */
-DtaDevLinuxNvmeRedfish::DtaDevLinuxNvmeRedfish() : client(getBMCRedfishUri()) {}
+DtaDevLinuxNvmeRedfish::DtaDevLinuxNvmeRedfish() : client(getBMCRedfishUri()) {
+    client.set_connection_timeout(5, 0);  // 5 seconds
+    client.set_read_timeout(20, 0);       // 20 seconds
+    client.set_write_timeout(20, 0);      // 20 seconds
+}
 
 bool DtaDevLinuxNvmeRedfish::init(const char *devref)
 {
@@ -77,7 +81,7 @@ uint8_t DtaDevLinuxNvmeRedfish::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16
 		auto res = client.Post(if_send_path, body.dump(), "application/json");
 		if (res.error() != httplib::Error::Success)
 		{
-			LOG(E) << "HTTP error: " << httplib::to_string(res.error()) ;
+			LOG(E) << "IF_SEND HTTP error: " << httplib::to_string(res.error()) ;
 			return -1;
 		}
 
@@ -101,7 +105,7 @@ uint8_t DtaDevLinuxNvmeRedfish::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16
 		auto res = client.Post(if_recv_path, body.dump(), "application/json");
 		if (res.error() != httplib::Error::Success)
 		{
-			LOG(E) << "HTTP error: " << httplib::to_string(res.error()) ;
+			LOG(E) << "IF_RECV HTTP error: " << httplib::to_string(res.error()) ;
 			return -1;
 		}
 		
@@ -132,7 +136,7 @@ void DtaDevLinuxNvmeRedfish::identify(OPAL_DiskInfo &disk_info)
 	auto res = client.Post(idfy_path, body.dump(), "application/json");
 	if (res.error() != httplib::Error::Success)
 	{
-		LOG(E) << "HTTP error: " << httplib::to_string(res.error()) ;
+		LOG(E) << "identify HTTP error: " << httplib::to_string(res.error()) ;
 		return;
 	}
 
