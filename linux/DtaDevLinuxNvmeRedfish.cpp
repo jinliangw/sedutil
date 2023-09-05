@@ -84,13 +84,6 @@ uint8_t DtaDevLinuxNvmeRedfish::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16
 			LOG(E) << "IF_SEND HTTP error: " << httplib::to_string(res.error()) ;
 			return -1;
 		}
-
-		if (res->status != 200)
-		{
-			LOG(E) << res->status ;
-			LOG(E) << res->body ;
-			return -1;
-		}
 	}
 	else
 	{
@@ -109,12 +102,6 @@ uint8_t DtaDevLinuxNvmeRedfish::sendCmd(ATACOMMAND cmd, uint8_t protocol, uint16
 			return -1;
 		}
 		
-		if (res->status != 200)
-		{
-			LOG(E) << res->status ;
-			LOG(E) << res->body ;
-			return -1;
-		}
 		nlohmann::json response = nlohmann::json::parse(res->body);
 		auto data = response["Data"].get<std::string>();
 		std::vector<uint8_t> decoded = base64::decode(data);
